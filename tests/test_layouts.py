@@ -21,6 +21,10 @@ def test_numpad_key_belongs_to_its_control() -> None:
     assert load_layout("numpad").parts_by_code()[KP6] == ("6", "press")
 
 
+def test_ch57x_layout_gives_every_part_its_own_code() -> None:
+    assert len(load_layout("ch57x-9k3").parts_by_code()) == 9 + 3 * 3
+
+
 def test_unknown_layout_is_rejected() -> None:
     with pytest.raises(ValueError):
         load_layout("does-not-exist")

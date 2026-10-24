@@ -43,6 +43,14 @@ KEY_CODES: dict[str, int] = {
     "VOLUMEUP": 115,
     "F11": 87,
     "F12": 88,
+    # International1 to 6 in HID: macro pads can send them and no desktop
+    # reacts to them, which gives knob turns six more codes next to F13-F24.
+    "RO": 89,
+    "KATAKANAHIRAGANA": 93,
+    "YEN": 124,
+    "HENKAN": 92,
+    "MUHENKAN": 94,
+    "KPJPCOMMA": 95,
 }
 KEY_CODES.update({c: 16 + i for i, c in enumerate("QWERTYUIOP")})
 KEY_CODES.update({c: 30 + i for i, c in enumerate("ASDFGHJKL")})

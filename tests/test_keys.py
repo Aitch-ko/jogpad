@@ -19,6 +19,8 @@ from jogpad.keys import key_name, parse_key
         ("KEY_F24", 194),
         ("KEY_KPENTER", 96),
         ("KEY_VOLUMEUP", 115),
+        ("KEY_RO", 89),
+        ("KEY_KPJPCOMMA", 95),
         ("77", 77),
     ],
 )

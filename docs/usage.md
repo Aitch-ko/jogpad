@@ -104,6 +104,13 @@ too, so the page also tells you which code an unknown key sends.
 Pick the drawing with `layout` under `[input]`: `numpad` (default),
 `ch57x-9k3`, or `none` for the list only.
 
+The `ch57x-9k3` drawing expects the codes jogpad will program into the pad:
+F13 to F24 for the nine keys and the three knob presses, and the Japanese
+keys `KEY_RO`, `KEY_KATAKANAHIRAGANA`, `KEY_YEN`, `KEY_HENKAN`,
+`KEY_MUHENKAN` and `KEY_KPJPCOMMA` (International1 to 6 in USB terms) for
+turning the knobs left and right. Nothing on a printer host reacts to those
+keys. These codes are planned and not yet checked on a real pad.
+
 The page speaks English and German. It follows your browser's language; the
 menu at the top switches it, and your browser remembers the choice. Messages in
 the Mainsail or Fluidd console stay in the configured `language`, since
