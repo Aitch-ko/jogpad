@@ -10,8 +10,8 @@ keys select the step size, home the machine or send a stop.
 
 ## Status
 
-Early development. The configuration, command line and HTTP API exist; reading
-the pad and moving a machine are being ported from a working prototype.
+Early development. Jogging Klipper from a numeric keypad or a macro pad with
+knobs works: see [Klipper setup](usage.md). Not tested on a real printer yet.
 
 ## Planned support
 

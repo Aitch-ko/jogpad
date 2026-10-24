@@ -16,6 +16,10 @@ def test_config_endpoint_returns_active_port() -> None:
     assert client().get("/api/config").json()["server"]["port"] == 7150
 
 
+def test_state_without_service_reports_first_step() -> None:
+    assert client().get("/api/state").json()["step"] == 0.01
+
+
 def test_swagger_ui_is_served() -> None:
     assert client().get("/docs").status_code == 200
 

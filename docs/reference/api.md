@@ -8,4 +8,5 @@ A running instance serves the interactive Swagger UI at `/docs` and ReDoc at `/r
 | --- | --- | --- |
 | `GET` | `/api/config` | Active configuration |
 | `GET` | `/api/health` | Liveness check |
+| `GET` | `/api/state` | Current step size, selected axis and HOME selection |
 | `GET` | `/api/version` | Installed jogpad version |

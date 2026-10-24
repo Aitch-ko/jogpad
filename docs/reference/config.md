@@ -10,6 +10,7 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 | --- | --- | --- |
 | `backend` | `"moonraker"` | Firmware interface. Only Moonraker (Klipper) for now. |
 | `url` | `"http://127.0.0.1:7125"` | Base URL of the firmware's HTTP interface. |
+| `locks` | `[{"object": "print_stats", "field": "state", "equals": ["printing", "paused"], "reason": "job running"}]` | Conditions under which jogpad refuses to move or home. STOP always works. If the status cannot be read, jogpad refuses as well. |
 
 ## `[jog]`
 
@@ -18,6 +19,7 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 | `steps` | `[0.01, 0.1, 1.0]` | Step sizes in mm. The step key cycles through them; jogpad starts with the first. |
 | `feed_xy` | `3000.0` | Feed rate for X and Y in mm/min. |
 | `feed_z` | `600.0` | Feed rate for Z in mm/min. |
+| `feed_e` | `300.0` | Feed rate for the extruder in mm/min. |
 | `select_axes` | `["X", "Y"]` | Axes that `select_next` cycles through for a knob. |
 | `home_timeout` | `5.0` | Seconds after which an unfinished HOME selection is dropped. |
 
@@ -26,7 +28,7 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 | Key | Default | Description |
 | --- | --- | --- |
 | `devices` | `[]` | Input devices to read, e.g. `/dev/input/by-id/usb-...-event-kbd`. jogpad grabs them exclusively. |
-| `keys` | `see below` | Key names per action, as in `linux/input-event-codes.h`. Defaults to a numeric keypad. |
+| `keys` | `see below` | Key names or numbers per action, as in `linux/input-event-codes.h`. Merged over the numeric keypad defaults; `[]` switches an action off. |
 
 ## `[server]`
 

@@ -13,9 +13,9 @@ select the step size, home the machine or send a stop.
 
 ## Status
 
-Early development, nothing to install for end users yet. The configuration,
-command line and HTTP API exist; reading the pad and moving a machine are being
-ported from a working prototype.
+Early development, not released yet. Jogging Klipper from a numeric keypad or
+a macro pad with knobs works on Linux ([setup](docs/usage.md)); it has not been
+tested on a real printer yet.
 
 | | First version | Later |
 | --- | --- | --- |

@@ -3,14 +3,16 @@
 # Command line
 
 ```text
-usage: jogpad [-h] [--version] {serve,check-config} ...
+usage: jogpad [-h] [--version] {serve,check-config,devices,keys} ...
 
 Jog pendant for 3D printers and CNC machines.
 
 positional arguments:
-  {serve,check-config}
-    serve               Run the web interface and API.
+  {serve,check-config,devices,keys}
+    serve               Read the pad, jog the machine, serve the API.
     check-config        Validate a configuration file and exit.
+    devices             List input devices (Linux).
+    keys                Show pressed keys and their actions. Moves nothing.
 
 options:
   -h, --help            show this help message and exit
@@ -37,4 +39,24 @@ positional arguments:
 
 options:
   -h, --help  show this help message and exit
+```
+
+## `jogpad devices`
+
+```text
+usage: jogpad devices [-h]
+
+options:
+  -h, --help  show this help message and exit
+```
+
+## `jogpad keys`
+
+```text
+usage: jogpad keys [-h] [--config CONFIG] [--device DEVICE]
+
+options:
+  -h, --help       show this help message and exit
+  --config CONFIG  Path to jogpad.toml.
+  --device DEVICE  Device to read; overrides the config.
 ```

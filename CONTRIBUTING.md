@@ -39,8 +39,9 @@ Rules that make this possible:
 
 - Never edit files under `docs/reference/` by hand; they are generated.
 - Every configuration field has a `description`; it becomes the reference.
-- Every user-facing message goes through `t("some.key")` with a literal key, and
-  the key is added to `en.json` and `de.json` in the same pull request.
+- Every user-facing message goes through `t("some.key")` (or, in the core,
+  `self._notify("some.key")`) with a literal key, and the key is added to
+  `en.json` and `de.json` in the same pull request.
 
 ## Code
 

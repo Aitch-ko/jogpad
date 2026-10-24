@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 from jogpad import __version__
 from jogpad.config import Config
+from jogpad.core import State
 
 
 class Health(BaseModel):
@@ -17,7 +20,14 @@ class Version(BaseModel):
     version: str
 
 
-def create_app(config: Config) -> FastAPI:
+class JogState(BaseModel):
+    step: float
+    selected_axis: str
+    home_selection: list[str] | None
+    last_refusal: str | None
+
+
+def create_app(config: Config, state: Callable[[], State] | None = None) -> FastAPI:
     app = FastAPI(
         title="jogpad",
         version=__version__,
@@ -36,5 +46,15 @@ def create_app(config: Config) -> FastAPI:
     @app.get("/api/config", summary="Active configuration")
     def get_config() -> Config:
         return config
+
+    @app.get("/api/state", summary="Current step size, selected axis and HOME selection")
+    def get_state() -> JogState:
+        s = state() if state else State(config.jog.steps[0], config.jog.select_axes[0], None, None)
+        return JogState(
+            step=s.step,
+            selected_axis=s.selected_axis,
+            home_selection=s.home_selection,
+            last_refusal=s.last_refusal,
+        )
 
     return app

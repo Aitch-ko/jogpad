@@ -9,9 +9,11 @@ from __future__ import annotations
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from jogpad.keys import parse_key
 
 if sys.version_info >= (3, 11):
     import tomllib
@@ -26,6 +28,8 @@ class Action(str, Enum):
     Y_MINUS = "y_minus"
     Z_PLUS = "z_plus"
     Z_MINUS = "z_minus"
+    E_PLUS = "e_plus"
+    E_MINUS = "e_minus"
     SELECTED_PLUS = "selected_plus"
     SELECTED_MINUS = "selected_minus"
     SELECT_NEXT = "select_next"
@@ -51,12 +55,33 @@ class _Section(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+class Lock(_Section):
+    object: str = Field(description="Firmware status object, e.g. `print_stats`.")
+    field: str = Field(description="Field of that object, e.g. `state`.")
+    equals: list[str | float | bool] | None = Field(
+        None,
+        description="Lock when the field has one of these values. "
+        "Without it, lock when the field is true or non-zero.",
+    )
+    reason: str = Field(description="Shown when a key press is refused.")
+
+
+DEFAULT_LOCKS = [
+    Lock(object="print_stats", field="state", equals=["printing", "paused"], reason="job running")
+]
+
+
 class MachineConfig(_Section):
     backend: Literal["moonraker"] = Field(
         "moonraker", description="Firmware interface. Only Moonraker (Klipper) for now."
     )
     url: str = Field(
         "http://127.0.0.1:7125", description="Base URL of the firmware's HTTP interface."
+    )
+    locks: list[Lock] = Field(
+        DEFAULT_LOCKS,
+        description="Conditions under which jogpad refuses to move or home. "
+        "STOP always works. If the status cannot be read, jogpad refuses as well.",
     )
 
 
@@ -68,6 +93,7 @@ class JogConfig(_Section):
     )
     feed_xy: float = Field(3000, gt=0, description="Feed rate for X and Y in mm/min.")
     feed_z: float = Field(600, gt=0, description="Feed rate for Z in mm/min.")
+    feed_e: float = Field(300, gt=0, description="Feed rate for the extruder in mm/min.")
     select_axes: list[Literal["X", "Y", "Z"]] = Field(
         ["X", "Y"], description="Axes that `select_next` cycles through for a knob."
     )
@@ -84,9 +110,33 @@ class InputConfig(_Section):
     )
     keys: dict[Action, list[str]] = Field(
         DEFAULT_KEYS,
-        description="Key names per action, as in `linux/input-event-codes.h`. "
-        "Defaults to a numeric keypad.",
+        description="Key names or numbers per action, as in `linux/input-event-codes.h`. "
+        "Merged over the numeric keypad defaults; `[]` switches an action off.",
     )
+
+    @field_validator("keys", mode="before")
+    @classmethod
+    def _merge_defaults(cls, value: Any) -> Any:
+        if isinstance(value, dict):
+            return {**{a.value: k for a, k in DEFAULT_KEYS.items()}, **value}
+        return value
+
+    @field_validator("keys")
+    @classmethod
+    def _keys_unique(cls, value: dict[Action, list[str]]) -> dict[Action, list[str]]:
+        seen: dict[int, Action] = {}
+        for action, names in value.items():
+            for name in names:
+                code = parse_key(name)
+                if code in seen:
+                    raise ValueError(
+                        f"{name} is used for both {seen[code].value} and {action.value}"
+                    )
+                seen[code] = action
+        return value
+
+    def actions_by_code(self) -> dict[int, Action]:
+        return {parse_key(name): action for action, names in self.keys.items() for name in names}
 
 
 class ServerConfig(_Section):

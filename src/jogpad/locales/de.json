@@ -1,4 +1,15 @@
 {
   "server.starting": "jogpad {version} lauscht auf http://{host}:{port}",
-  "config.invalid": "Konfiguration {path} ist ungültig:\n{error}"
+  "config.invalid": "Konfiguration {path} ist ungültig:\n{error}",
+  "axis.selected": "Achse {axis}",
+  "step.changed": "Schritt {step} mm",
+  "home.select": "HOME: alle -- Achsen wählen oder HOME drücken",
+  "home.selected": "HOME: {axes}",
+  "home.all": "alle",
+  "home.cancelled": "HOME abgebrochen",
+  "refused": "Abgelehnt: {reason}",
+  "status.unreadable": "Status nicht lesbar",
+  "devices.none": "Keine Eingabegeräte unter /dev/input/by-id",
+  "keys.prompt": "Tasten drücken, Ende mit Strg+C. Es fährt nichts.",
+  "input.linux_only": "Eingabegeräte lesen geht bisher nur unter Linux."
 }

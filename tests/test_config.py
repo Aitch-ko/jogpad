@@ -36,3 +36,35 @@ def test_negative_feed_rate_is_rejected(tmp_path: Path) -> None:
     path = write(tmp_path, "[jog]\nfeed_z = -5\n")
     with pytest.raises(ValidationError):
         load_config(path)
+
+
+def test_own_key_keeps_numpad_default_for_others(tmp_path: Path) -> None:
+    path = write(tmp_path, '[input.keys]\nx_plus = ["KEY_D"]\n')
+    assert load_config(path).input.keys[Action.STOP] == ["KEY_KP0"]
+
+
+def test_own_key_replaces_numpad_key_of_that_action(tmp_path: Path) -> None:
+    path = write(tmp_path, '[input.keys]\nx_plus = ["KEY_D"]\n')
+    assert load_config(path).input.actions_by_code().get(77) is None
+
+
+def test_empty_list_switches_an_action_off(tmp_path: Path) -> None:
+    path = write(tmp_path, "[input.keys]\nstop = []\n")
+    assert 82 not in load_config(path).input.actions_by_code()
+
+
+def test_key_used_twice_is_rejected(tmp_path: Path) -> None:
+    path = write(tmp_path, '[input.keys]\nx_plus = ["KEY_D"]\nhome = ["KEY_D"]\n')
+    with pytest.raises(ValidationError):
+        load_config(path)
+
+
+def test_unknown_key_name_is_rejected(tmp_path: Path) -> None:
+    path = write(tmp_path, '[input.keys]\nx_plus = ["KEY_NOPE"]\n')
+    with pytest.raises(ValidationError):
+        load_config(path)
+
+
+def test_lock_from_file_is_read(tmp_path: Path) -> None:
+    text = '[[machine.locks]]\nobject = "spindle"\nfield = "speed"\nreason = "spindle on"\n'
+    assert load_config(write(tmp_path, text)).machine.locks[0].reason == "spindle on"

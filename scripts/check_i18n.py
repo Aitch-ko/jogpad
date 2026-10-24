@@ -16,7 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src" / "jogpad"
 LOCALES = SRC / "locales"
 REQUIRED = ("en", "de")
-KEY_CALL = re.compile(r"""\bt\(\s*["']([a-z0-9_.]+)["']""")
+# t("key", ...) and the core's self._notify("key", ...), which calls t() itself.
+KEY_CALL = re.compile(r"""\b(?:t|_notify)\(\s*["']([a-z0-9_.]+)["']""")
 
 
 def used_keys() -> set[str]:
