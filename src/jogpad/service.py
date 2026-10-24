@@ -7,7 +7,8 @@ import queue
 import threading
 import time
 
-from jogpad.core import KEY_PRESS, Backend, BackendError, Jogger, State
+from jogpad.core import KEY_AUTOREPEAT, KEY_PRESS, Backend, BackendError, Jogger, State
+from jogpad.events import EventHub
 from jogpad.linux_input import read_device
 
 log = logging.getLogger(__name__)
@@ -21,6 +22,7 @@ class Service:
         self.stop_event = threading.Event()
         self._events: queue.Queue[tuple[int, int]] = queue.Queue()
         self._state = jogger.state()
+        self.events = EventHub()
 
     def state(self) -> State:
         return self._state
@@ -45,6 +47,8 @@ class Service:
                 log.warning("STOP: emergency stop sent")
             except BackendError as exc:
                 log.error("STOP failed: %s", exc)
+        if value != KEY_AUTOREPEAT:
+            self.events.publish((code, value))
 
     def _work(self) -> None:
         while not self.stop_event.is_set():

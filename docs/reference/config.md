@@ -30,6 +30,7 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 | --- | --- | --- |
 | `devices` | `[]` | Input devices to read, e.g. `/dev/input/by-id/usb-...-event-kbd`. jogpad grabs them exclusively. |
 | `keys` | `see below` | Key names or numbers per action, as in `linux/input-event-codes.h`. Merged over the numeric keypad defaults; `[]` switches an action off. |
+| `layout` | `"numpad"` | Pad drawn on the web page: `numpad`, `ch57x-9k3`, or `none` to list pressed keys only. |
 
 ## `[server]`
 

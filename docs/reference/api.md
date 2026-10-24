@@ -7,6 +7,11 @@ A running instance serves the interactive Swagger UI at `/docs` and ReDoc at `/r
 | Method | Path | Summary |
 | --- | --- | --- |
 | `GET` | `/api/config` | Active configuration |
+| `GET` | `/api/events` | Live key presses as server-sent events (KeyEvent as JSON) |
 | `GET` | `/api/health` | Liveness check |
+| `GET` | `/api/layouts` | Known pad layouts |
+| `GET` | `/api/layouts/{layout_id}` | One pad layout |
+| `GET` | `/api/messages` | Texts of the web page in the configured language |
+| `GET` | `/api/pad` | Configured pad layout and the action of each control |
 | `GET` | `/api/state` | Current step size, selected axis and HOME selection |
 | `GET` | `/api/version` | Installed jogpad version |

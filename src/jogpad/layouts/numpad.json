@@ -1,0 +1,23 @@
+{
+  "name": "Numeric keypad",
+  "note": "A separate USB keypad or the keypad of a full-size keyboard.",
+  "controls": [
+    {"id": "numlock", "kind": "key", "x": 0, "y": 0, "label": "Num", "keys": {"press": "KEY_NUMLOCK"}},
+    {"id": "slash", "kind": "key", "x": 1, "y": 0, "label": "/", "keys": {"press": "KEY_KPSLASH"}},
+    {"id": "asterisk", "kind": "key", "x": 2, "y": 0, "label": "*", "keys": {"press": "KEY_KPASTERISK"}},
+    {"id": "minus", "kind": "key", "x": 3, "y": 0, "label": "-", "keys": {"press": "KEY_KPMINUS"}},
+    {"id": "7", "kind": "key", "x": 0, "y": 1, "label": "7", "keys": {"press": "KEY_KP7"}},
+    {"id": "8", "kind": "key", "x": 1, "y": 1, "label": "8", "keys": {"press": "KEY_KP8"}},
+    {"id": "9", "kind": "key", "x": 2, "y": 1, "label": "9", "keys": {"press": "KEY_KP9"}},
+    {"id": "plus", "kind": "key", "x": 3, "y": 1, "h": 2, "label": "+", "keys": {"press": "KEY_KPPLUS"}},
+    {"id": "4", "kind": "key", "x": 0, "y": 2, "label": "4", "keys": {"press": "KEY_KP4"}},
+    {"id": "5", "kind": "key", "x": 1, "y": 2, "label": "5", "keys": {"press": "KEY_KP5"}},
+    {"id": "6", "kind": "key", "x": 2, "y": 2, "label": "6", "keys": {"press": "KEY_KP6"}},
+    {"id": "1", "kind": "key", "x": 0, "y": 3, "label": "1", "keys": {"press": "KEY_KP1"}},
+    {"id": "2", "kind": "key", "x": 1, "y": 3, "label": "2", "keys": {"press": "KEY_KP2"}},
+    {"id": "3", "kind": "key", "x": 2, "y": 3, "label": "3", "keys": {"press": "KEY_KP3"}},
+    {"id": "enter", "kind": "key", "x": 3, "y": 3, "h": 2, "label": "Enter", "keys": {"press": "KEY_KPENTER"}},
+    {"id": "0", "kind": "key", "x": 0, "y": 4, "w": 2, "label": "0", "keys": {"press": "KEY_KP0"}},
+    {"id": "dot", "kind": "key", "x": 2, "y": 4, "label": ".", "keys": {"press": "KEY_KPDOT"}}
+  ]
+}

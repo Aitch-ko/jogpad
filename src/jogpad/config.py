@@ -14,6 +14,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from jogpad.keys import parse_key
+from jogpad.layouts import NO_LAYOUT, load_layout
 
 if sys.version_info >= (3, 11):
     import tomllib
@@ -118,6 +119,18 @@ class InputConfig(_Section):
         description="Key names or numbers per action, as in `linux/input-event-codes.h`. "
         "Merged over the numeric keypad defaults; `[]` switches an action off.",
     )
+    layout: str = Field(
+        "numpad",
+        description="Pad drawn on the web page: `numpad`, `ch57x-9k3`, or `none` to "
+        "list pressed keys only.",
+    )
+
+    @field_validator("layout")
+    @classmethod
+    def _layout_exists(cls, value: str) -> str:
+        if value != NO_LAYOUT:
+            load_layout(value)
+        return value
 
     @field_validator("keys", mode="before")
     @classmethod

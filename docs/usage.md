@@ -91,6 +91,21 @@ Every move and every homing shows up in the Mainsail or Fluidd console, for
 example `jogpad X +0.3 mm`, so others at the machine can see who moved it. Merged
 presses give one line. Set `announce_moves = false` under `[jog]` to turn this off.
 
+## Web page
+
+`jogpad serve` also serves a page at `http://127.0.0.1:7150/`. It draws your
+pad and lights up every key you press, with the action it triggers, and shows
+step size, knob axis and the last refusal. Keys outside the drawing are listed
+on the right, so the page also tells you which code an unknown key sends. The
+page only shows; it never moves the machine.
+
+Pick the drawing with `layout` under `[input]`: `numpad` (default),
+`ch57x-9k3`, or `none` for the list only.
+
+By default the page is only reachable on the machine itself. To open it from
+another computer, set `host = "0.0.0.0"` under `[server]`. Anyone in your
+network can then watch the key presses; there is no login yet.
+
 ## Locks
 
 By default jogpad refuses to move or home while a print is running or paused.

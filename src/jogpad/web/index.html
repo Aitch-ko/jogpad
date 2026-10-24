@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>jogpad</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>jogpad <span id="version"></span></h1>
+    <span id="link" class="link"></span>
+  </header>
+  <main>
+    <section class="state" aria-live="polite">
+      <div><span id="label-step"></span><strong id="step">–</strong></div>
+      <div><span id="label-axis"></span><strong id="axis">–</strong></div>
+      <div><span id="label-home"></span><strong id="home">–</strong></div>
+      <div><span id="label-refusal"></span><strong id="refusal">–</strong></div>
+    </section>
+    <section class="pad">
+      <h2 id="layout-name"></h2>
+      <p id="layout-note" class="note"></p>
+      <svg id="pad" role="img"></svg>
+    </section>
+    <section class="recent">
+      <h2 id="label-recent"></h2>
+      <ol id="recent"></ol>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

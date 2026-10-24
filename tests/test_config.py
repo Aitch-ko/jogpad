@@ -68,3 +68,9 @@ def test_unknown_key_name_is_rejected(tmp_path: Path) -> None:
 def test_lock_from_file_is_read(tmp_path: Path) -> None:
     text = '[[machine.locks]]\nobject = "spindle"\nfield = "speed"\nreason = "spindle on"\n'
     assert load_config(write(tmp_path, text)).machine.locks[0].reason == "spindle on"
+
+
+def test_unknown_layout_is_rejected_in_config(tmp_path: Path) -> None:
+    path = write(tmp_path, '[input]\nlayout = "nope"\n')
+    with pytest.raises(ValidationError):
+        load_config(path)

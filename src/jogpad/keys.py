@@ -12,6 +12,7 @@ KEY_CODES: dict[str, int] = {
     "ENTER": 28,
     "SPACE": 57,
     "KPASTERISK": 55,
+    "NUMLOCK": 69,
     "KP7": 71,
     "KP8": 72,
     "KP9": 73,

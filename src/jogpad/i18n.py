@@ -23,6 +23,12 @@ def _catalog(language: str) -> dict[str, str]:
     return data
 
 
+def messages(prefix: str, language: str) -> dict[str, str]:
+    """All messages starting with `prefix`, for the web page."""
+    merged = {**_catalog(FALLBACK), **_catalog(language)}
+    return {key: text for key, text in merged.items() if key.startswith(prefix)}
+
+
 def t(key: str, language: str = FALLBACK, **values: object) -> str:
     text = _catalog(language).get(key) or _catalog(FALLBACK).get(key) or key
     return text.format(**values)

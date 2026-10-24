@@ -104,7 +104,7 @@ def _serve(config: Config) -> int:
     host, port = config.server.host, config.server.port
     print(t("server.starting", config.server.language, version=__version__, host=host, port=port))
     try:
-        uvicorn.run(create_app(config, service.state), host=host, port=port)
+        uvicorn.run(create_app(config, service.state, service.events), host=host, port=port)
     finally:
         service.stop()
     return 0

@@ -1,0 +1,123 @@
+:root {
+  --bg: #f4f4f2;
+  --surface: #ffffff;
+  --text: #1d1d1b;
+  --muted: #6b6b66;
+  --line: #d9d9d4;
+  --key: #fbfbfa;
+  --key-edge: #c8c8c2;
+  --accent: #e0661b;
+  --accent-text: #ffffff;
+  --ok: #2f8f4e;
+  --warn: #b3261e;
+  --radius: 8px;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161615;
+    --surface: #20201f;
+    --text: #ececea;
+    --muted: #9a9a94;
+    --line: #34342f;
+    --key: #2a2a28;
+    --key-edge: #45453f;
+    --ok: #5bbf7a;
+    --warn: #f2726a;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+h1 { margin: 0; font-size: 1.25rem; }
+h1 span { color: var(--muted); font-weight: 400; font-size: 0.9rem; }
+h2 { margin: 0 0 0.25rem; font-size: 1rem; }
+
+.link { font-size: 0.9rem; color: var(--warn); }
+.link.on { color: var(--ok); }
+
+main {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  max-width: 960px;
+  margin: 0 auto;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 760px) {
+  main { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+  .state { grid-column: 1 / -1; }
+}
+
+section {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.state {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.state div { display: grid; gap: 0.15rem; }
+.state span { color: var(--muted); font-size: 0.85rem; }
+.state strong { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+
+.note { margin: 0 0 0.75rem; color: var(--muted); font-size: 0.85rem; }
+.note:empty { display: none; }
+
+#pad { width: 100%; height: auto; max-height: 60vh; display: block; }
+
+.control rect, .control circle {
+  fill: var(--key);
+  stroke: var(--key-edge);
+  stroke-width: 1.5;
+  transition: fill 120ms ease-out;
+}
+
+.control text { fill: var(--text); pointer-events: none; }
+.control .label { fill: var(--muted); font-size: 11px; }
+.control .action { font-size: 12px; font-weight: 600; }
+.control .turn { fill: var(--accent); font-size: 14px; font-weight: 700; }
+
+.control.active rect, .control.active circle { fill: var(--accent); stroke: var(--accent); }
+.control.active text { fill: var(--accent-text); }
+
+.recent ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: ui-monospace, "Cascadia Mono", Menlo, monospace;
+  font-size: 0.85rem;
+}
+
+.recent li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.recent li span:last-child { color: var(--muted); }
+.recent li.empty { display: block; color: var(--muted); font-family: inherit; border: 0; }
