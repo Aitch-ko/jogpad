@@ -100,6 +100,11 @@ class JogConfig(_Section):
     home_timeout: float = Field(
         5, gt=0, description="Seconds after which an unfinished HOME selection is dropped."
     )
+    announce_moves: bool = Field(
+        True,
+        description="Report every move and homing in the firmware console, so others "
+        "can see who moved the machine.",
+    )
 
 
 class InputConfig(_Section):

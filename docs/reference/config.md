@@ -22,6 +22,7 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 | `feed_e` | `300.0` | Feed rate for the extruder in mm/min. |
 | `select_axes` | `["X", "Y"]` | Axes that `select_next` cycles through for a knob. |
 | `home_timeout` | `5.0` | Seconds after which an unfinished HOME selection is dropped. |
+| `announce_moves` | `true` | Report every move and homing in the firmware console, so others can see who moved the machine. |
 
 ## `[input]`
 

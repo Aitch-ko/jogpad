@@ -139,6 +139,10 @@ class Jogger:
             return
         if self._refused():
             return
+        # Announced before, because homing can take a minute without any feedback.
+        if self.config.jog.announce_moves:
+            label = " ".join(axes) or t("home.all", self.language)
+            self._notify("home.started", axes=label)
         self._call(self.backend.home, axes)
 
     @staticmethod
@@ -156,8 +160,11 @@ class Jogger:
         jog = self.config.jog
         feeds = {"X": jog.feed_xy, "Y": jog.feed_xy, "Z": jog.feed_z, "E": jog.feed_e}
         for axis, distance in pending:
-            if not self._call(self.backend.move, axis, round(distance, 6), feeds[axis]):
+            distance = round(distance, 6)
+            if not self._call(self.backend.move, axis, distance, feeds[axis]):
                 break
+            if jog.announce_moves:
+                self._notify("moved", axis=axis, distance=f"{distance:+g}")
 
     def _refused(self) -> bool:
         reason = self._lock_reason()

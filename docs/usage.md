@@ -91,6 +91,10 @@ journalctl -u jogpad -f
 
 Holding a key does not repeat it: one press is one step.
 
+Every move and every homing shows up in the Mainsail or Fluidd console, for
+example `jogpad X +0.3 mm`, so others at the machine can see who moved it. Merged
+presses give one line. Set `announce_moves = false` under `[jog]` to turn this off.
+
 ## Locks
 
 By default jogpad refuses to move or home while a print is running or paused.

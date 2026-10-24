@@ -111,6 +111,25 @@ def test_step_change_is_announced() -> None:
     assert run(press(KPASTERISK)).notes == ["Step 0.1 mm"]
 
 
+def test_merged_move_is_announced_once() -> None:
+    assert run(press(KP4, KP4, KP4)).notes == ["X -0.03 mm"]
+
+
+def test_failed_move_is_not_announced() -> None:
+    backend = FakeBackend()
+    backend.fail_move = True
+    assert run(press(KP6), backend).notes == []
+
+
+def test_moves_are_silent_when_switched_off() -> None:
+    config = Config.model_validate({"jog": {"announce_moves": False}})
+    assert run(press(KP6), config=config).notes == []
+
+
+def test_homing_is_announced_with_its_axes() -> None:
+    assert run(press(KPENTER, KP8, KPENTER)).notes[-1] == "Homing: Y"
+
+
 @pytest.mark.parametrize("state", ["printing", "paused"])
 def test_running_job_refuses_moves(state: str) -> None:
     backend = FakeBackend({"print_stats": {"state": state}})
