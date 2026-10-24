@@ -26,6 +26,7 @@ jobs:
       - run: ruff format --check .
       - run: ruff check .
       - run: mypy
+      - run: shellcheck scripts/*.sh
 
   test:
     name: Tests (${{ matrix.os }}, Python ${{ matrix.python }})

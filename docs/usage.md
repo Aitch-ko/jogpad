@@ -70,14 +70,10 @@ jogpad check-config jogpad.toml
 jogpad serve --config jogpad.toml
 ```
 
-As a service, with the example unit from the repository
-(`contrib/jogpad.service`, adjust user and paths):
-
-```bash
-sudo cp contrib/jogpad.service /etc/systemd/system/
-sudo systemctl enable --now jogpad
-journalctl -u jogpad -f
-```
+The installer sets jogpad up as a service that starts with the machine, see
+[Installation](installation.md). After editing `jogpad.toml`, restart it from
+the service menu in Mainsail or Fluidd, or with `sudo systemctl restart jogpad`.
+Stop the service before running `jogpad keys`: it holds the pad exclusively.
 
 ## Using it
 
