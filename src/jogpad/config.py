@@ -165,7 +165,11 @@ class InputConfig(_Section):
 class ServerConfig(_Section):
     host: str = Field("127.0.0.1", description="Address the web interface and API listen on.")
     port: int = Field(7150, ge=1, le=65535, description="Port of the web interface and API.")
-    language: Literal["en", "de"] = Field("en", description="Language of messages.")
+    language: Literal["en", "de"] = Field(
+        "en",
+        description="Language of console messages, and of the web page for viewers "
+        "whose browser asks for none of the available ones.",
+    )
     allow_remote_changes: bool = Field(
         False,
         description="Let other computers change the configuration through the web page. "

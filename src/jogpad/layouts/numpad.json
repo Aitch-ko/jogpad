@@ -1,6 +1,7 @@
 {
   "name": "Numeric keypad",
   "note": "A separate USB keypad or the keypad of a full-size keyboard.",
+  "translations": {"de": {"name": "Ziffernblock", "note": "Ein eigener USB-Ziffernblock oder der Ziffernblock einer großen Tastatur."}},
   "controls": [
     {"id": "numlock", "kind": "key", "x": 0, "y": 0, "label": "Num", "keys": {"press": "KEY_NUMLOCK"}},
     {"id": "slash", "kind": "key", "x": 1, "y": 0, "label": "/", "keys": {"press": "KEY_KPSLASH"}},

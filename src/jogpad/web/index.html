@@ -5,12 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>jogpad</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="tokens.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>jogpad <span id="version"></span></h1>
-    <span id="link" class="link"></span>
+    <h1><img src="favicon.svg" alt="" width="28" height="28"> jogpad <span id="version"></span></h1>
+    <div class="header-end">
+      <select id="language" aria-label="Language"></select>
+      <span id="link" class="link"></span>
+    </div>
   </header>
   <main>
     <section class="state" aria-live="polite">
@@ -45,6 +49,11 @@
       </div>
     </section>
   </main>
+  <footer>
+    <a id="link-repo" hidden></a>
+    <a id="link-bug" hidden></a>
+    <a id="link-changelog" hidden></a>
+  </footer>
   <script src="app.js"></script>
 </body>
 </html>

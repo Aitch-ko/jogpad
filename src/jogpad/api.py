@@ -6,9 +6,10 @@ import asyncio
 import ipaddress
 import json
 from collections.abc import AsyncIterator, Callable
+from importlib.metadata import PackageNotFoundError, metadata
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, ValidationError
@@ -18,13 +19,14 @@ from jogpad.config import Action, Config
 from jogpad.config_store import assign_keys, conflicts, set_invert
 from jogpad.core import State
 from jogpad.events import EventHub
-from jogpad.i18n import messages
+from jogpad.i18n import languages, messages, t
 from jogpad.keys import key_name
 from jogpad.layouts import NO_LAYOUT, Layout, layout_ids, load_layout
 from jogpad.service import Service
 
 WEB_DIR = Path(__file__).parent / "web"
 KEEPALIVE_S = 15
+LANG = Query(None, description="Language of the page; default: the configured one.")
 MAX_LEARN_S = 60
 
 
@@ -34,6 +36,19 @@ class Health(BaseModel):
 
 class Version(BaseModel):
     version: str
+    links: dict[str, str] = Field(
+        description="Project URLs from the package metadata, e.g. `Homepage`, `Issues`, "
+        "`Changelog`. Empty when jogpad runs from a source tree without installing."
+    )
+
+
+def project_links() -> dict[str, str]:
+    """[project.urls] from pyproject.toml, as installed with the package."""
+    try:
+        entries = metadata("jogpad").get_all("Project-URL") or []
+    except PackageNotFoundError:
+        return {}
+    return dict(entry.split(", ", 1) for entry in entries if ", " in entry)
 
 
 class JogState(BaseModel):
@@ -68,16 +83,21 @@ class KeyEvent(BaseModel):
     part: str | None
 
 
+class Language(BaseModel):
+    code: str
+    name: str = Field(description="Name of the language in that language.")
+
+
 class PadView(BaseModel):
     layout: Layout | None
     actions: dict[str, dict[str, str]]
 
 
-def describe_pad(config: Config) -> PadView:
+def describe_pad(config: Config, language: str | None = None) -> PadView:
     """The configured layout with the action of every control part."""
     if config.input.layout == NO_LAYOUT:
         return PadView(layout=None, actions={})
-    layout = load_layout(config.input.layout)
+    layout = load_layout(config.input.layout).localized(language or config.server.language)
     by_code = config.input.actions_by_code()
     actions: dict[str, dict[str, str]] = {}
     for code, (control, part) in layout.parts_by_code().items():
@@ -119,6 +139,15 @@ def create_app(
     def cfg() -> Config:
         return current[0]
 
+    def page_language(lang: str | None) -> str:
+        # Each viewer may read the page in their own language; console messages
+        # stay in the configured one, since everyone at the machine sees them.
+        if lang is None:
+            return cfg().server.language
+        if lang not in languages():
+            raise HTTPException(422, f"unknown language {lang}, known: {', '.join(languages())}")
+        return lang
+
     def may_change(request: Request) -> None:
         # A changed STOP key from anywhere in the network would be a nasty surprise.
         if cfg().server.allow_remote_changes:
@@ -149,7 +178,7 @@ def create_app(
 
     @app.get("/api/version", summary="Installed jogpad version")
     def version() -> Version:
-        return Version(version=__version__)
+        return Version(version=__version__, links=project_links())
 
     @app.get("/api/config", summary="Active configuration")
     def get_config() -> Config:
@@ -178,12 +207,16 @@ def create_app(
         return load_layout(layout_id)
 
     @app.get("/api/pad", summary="Configured pad layout and the action of each control")
-    def get_pad() -> PadView:
-        return describe_pad(cfg())
+    def get_pad(lang: str | None = LANG) -> PadView:
+        return describe_pad(cfg(), page_language(lang))
 
-    @app.get("/api/messages", summary="Texts of the web page in the configured language")
-    def get_messages() -> dict[str, str]:
-        return messages("ui.", cfg().server.language)
+    @app.get("/api/languages", summary="Languages the web page can be shown in")
+    def get_languages() -> list[Language]:
+        return [Language(code=code, name=t("ui.language_name", code)) for code in languages()]
+
+    @app.get("/api/messages", summary="Texts of the web page")
+    def get_messages(lang: str | None = LANG) -> dict[str, str]:
+        return messages("ui.", page_language(lang))
 
     @app.get(
         "/api/events",

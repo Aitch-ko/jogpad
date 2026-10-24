@@ -50,7 +50,16 @@ class Layout(BaseModel):
     id: str
     name: str
     note: str = ""
+    translations: dict[str, dict[Literal["name", "note"], str]] = Field(
+        {}, description="Name and note per language; English is `name` and `note`."
+    )
     controls: list[Control]
+
+    def localized(self, language: str) -> Layout:
+        texts = self.translations.get(language, {})
+        return self.model_copy(
+            update={"name": texts.get("name", self.name), "note": texts.get("note", self.note)}
+        )
 
     def parts_by_code(self) -> dict[int, tuple[str, Part]]:
         return {

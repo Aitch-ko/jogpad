@@ -67,13 +67,12 @@ Klipper:
 - jog, home and stop from a numeric keypad or any USB keyboard; tested on a
   QIDI Plus 4 with the keypad of a Logitech MX Keys S
 - every move and homing shows up in the Mainsail or Fluidd console
-- a web page that draws the pad, shows each key press live, learns keys and
-  checks the direction of each axis
+- a web page in English and German that draws the pad, shows each key press
+  live, learns keys and checks the direction of each axis
 - an installer that sets jogpad up as a service next to Klipper
   ([installation](docs/installation.md), [setup](docs/usage.md))
 
-Next: programming CH57x macro pads with knobs (waiting for the pad to arrive),
-then skins for the web page.
+Next: programming CH57x macro pads with knobs (waiting for the pad to arrive).
 
 | | Now | Later |
 | --- | --- | --- |

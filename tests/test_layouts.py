@@ -30,3 +30,7 @@ def test_unknown_key_name_in_layout_is_rejected() -> None:
     control = {"id": "a", "kind": "key", "x": 0, "y": 0, "keys": {"press": "KEY_NOPE"}}
     with pytest.raises(ValidationError):
         Layout.model_validate({"id": "x", "name": "x", "controls": [control]})
+
+
+def test_layout_without_translation_keeps_english() -> None:
+    assert load_layout("numpad").localized("fr").name == "Numeric keypad"

@@ -23,6 +23,10 @@ def _catalog(language: str) -> dict[str, str]:
     return data
 
 
+def languages() -> list[str]:
+    return sorted(path.stem for path in LOCALES_DIR.glob("*.json"))
+
+
 def messages(prefix: str, language: str) -> dict[str, str]:
     """All messages starting with `prefix`, for the web page."""
     merged = {**_catalog(FALLBACK), **_catalog(language)}

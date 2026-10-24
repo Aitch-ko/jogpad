@@ -39,7 +39,7 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 | --- | --- | --- |
 | `host` | `"127.0.0.1"` | Address the web interface and API listen on. |
 | `port` | `7150` | Port of the web interface and API. |
-| `language` | `"en"` | Language of messages. |
+| `language` | `"en"` | Language of console messages, and of the web page for viewers whose browser asks for none of the available ones. |
 | `allow_remote_changes` | `false` | Let other computers change the configuration through the web page. Without it only the machine itself may, e.g. through an SSH tunnel. |
 
 ## Default keys

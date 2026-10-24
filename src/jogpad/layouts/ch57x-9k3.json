@@ -1,6 +1,7 @@
 {
   "name": "CH57x macro pad, 9 keys and 3 knobs",
   "note": "Positions from product photos, to be checked against a real pad. Key codes follow once the pad can be programmed.",
+  "translations": {"de": {"name": "CH57x-Makropad, 9 Tasten und 3 Knöpfe", "note": "Positionen nach Produktfotos, am echten Pad zu prüfen. Tastencodes folgen, sobald sich das Pad programmieren lässt."}},
   "controls": [
     {"id": "k1", "kind": "key", "x": 0, "y": 0, "label": "1"},
     {"id": "k2", "kind": "key", "x": 1, "y": 0, "label": "2"},

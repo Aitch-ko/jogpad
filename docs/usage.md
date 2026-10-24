@@ -104,6 +104,14 @@ too, so the page also tells you which code an unknown key sends.
 Pick the drawing with `layout` under `[input]`: `numpad` (default),
 `ch57x-9k3`, or `none` for the list only.
 
+The page speaks English and German. It follows your browser's language; the
+menu at the top switches it, and your browser remembers the choice. Messages in
+the Mainsail or Fluidd console stay in the configured `language`, since
+everyone at the machine reads them.
+
+At the bottom, the page links to the repository, to what is new in each
+version, and to a bug report form with your jogpad version already filled in.
+
 ### Set up keys and directions
 
 Under **Set up** the page changes `jogpad.toml` for you; the running service

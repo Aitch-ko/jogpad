@@ -70,5 +70,9 @@
   "ui.direction_ok": "{axis} fährt richtig herum.",
   "ui.direction_fixed": "{axis} umgedreht. Zur Sicherheit noch einmal prüfen.",
   "ui.forbidden": "Ändern geht nur am Gerät selbst (oder mit allow_remote_changes).",
-  "ui.error": "Nicht gespeichert: {error}"
+  "ui.error": "Nicht gespeichert: {error}",
+  "ui.link.repo": "jogpad auf GitHub",
+  "ui.link.bug": "Fehler melden",
+  "ui.link.changelog": "Was ist neu",
+  "ui.language_name": "Deutsch"
 }

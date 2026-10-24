@@ -70,5 +70,9 @@
   "ui.direction_ok": "{axis} moves the right way.",
   "ui.direction_fixed": "{axis} reversed. Check again to be sure.",
   "ui.forbidden": "Changes are only allowed on the machine itself (or allow_remote_changes).",
-  "ui.error": "Not saved: {error}"
+  "ui.error": "Not saved: {error}",
+  "ui.link.repo": "jogpad on GitHub",
+  "ui.link.bug": "Report a bug",
+  "ui.link.changelog": "What's new",
+  "ui.language_name": "English"
 }

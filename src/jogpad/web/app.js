@@ -6,6 +6,7 @@ const UNIT = 60; // pixels per key unit
 const GAP = 6;
 const RECENT = 12;
 const LEARN_S = 30;
+const LANGUAGE_KEY = "jogpad.language";
 const SVG_NS = "http://www.w3.org/2000/svg";
 const ACTIONS = [
   "x_plus", "x_minus", "y_plus", "y_minus", "z_plus", "z_minus", "e_plus", "e_minus",
@@ -134,7 +135,7 @@ function drawPad(pad) {
     if (c.kind === "knob") {
       svg("circle", { cx: x + w / 2, cy: y + h / 2, r: Math.min(w, h) / 2 }, group);
     } else {
-      svg("rect", { x, y, width: w, height: h, rx: 6 }, group);
+      svg("rect", { x, y, width: w, height: h }, group);
     }
     text(c.label, { class: "label", x: x + 6, y: y + 14 }, group);
 
@@ -286,9 +287,70 @@ function failed(result) {
 
 async function changed(newConfig) {
   config = newConfig;
-  drawPad(await getJson("/api/pad"));
+  drawPad(await getJson(`/api/pad?lang=${document.documentElement.lang}`));
   renderKeys();
   renderDirections();
+}
+
+// -- language -----------------------------------------------------------------
+
+// Storage can be unavailable (private windows, blocked site data); the page then
+// falls back to the browser's language on every visit.
+function storedLanguage() {
+  try {
+    return localStorage.getItem(LANGUAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function pickLanguage(codes, fallback) {
+  const stored = storedLanguage();
+  if (codes.includes(stored)) return stored;
+  for (const tag of navigator.languages || []) {
+    const code = tag.slice(0, 2).toLowerCase();
+    if (codes.includes(code)) return code;
+  }
+  return fallback;
+}
+
+function setUpLanguages(available, current) {
+  const select = $("language");
+  const label = (l) => `${l.code.toUpperCase()} · ${l.name}`;
+  select.replaceChildren(...available.map((l) => el("option", { value: l.code }, label(l))));
+  select.value = current;
+  select.addEventListener("change", () => {
+    try {
+      localStorage.setItem(LANGUAGE_KEY, select.value);
+    } catch {
+      // Not remembered; the URL carries the choice for this visit.
+      location.assign(`${location.pathname}?lang=${select.value}`);
+      return;
+    }
+    // Without ?lang, which would otherwise win over the stored choice.
+    location.assign(location.pathname);
+  });
+}
+
+// -- footer -------------------------------------------------------------------
+
+function showLinks(version) {
+  const links = version.links;
+  const set = (id, href, label) => {
+    if (!href) return;
+    const a = $(id);
+    a.href = href;
+    a.textContent = label;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.hidden = false;
+  };
+  set("link-repo", links.Homepage, t("ui.link.repo"));
+  // The issue form takes field values from the URL, so the version is filled in.
+  const bug = links.Issues &&
+    `${links.Issues}/new?template=bug_report.yml&version=${encodeURIComponent(version.version)}`;
+  set("link-bug", bug, t("ui.link.bug"));
+  set("link-changelog", links.Changelog, t("ui.link.changelog"));
 }
 
 // -- live state ---------------------------------------------------------------
@@ -325,11 +387,21 @@ function connect() {
 
 async function main() {
   let version;
-  [config, version] = await Promise.all([getJson("/api/config"), getJson("/api/version")]);
-  catalog = await getJson("/api/messages");
+  let available;
+  [config, version, available] = await Promise.all([
+    getJson("/api/config"),
+    getJson("/api/version"),
+    getJson("/api/languages"),
+  ]);
+  const codes = available.map((l) => l.code);
+  const fromUrl = new URLSearchParams(location.search).get("lang");
+  const language = codes.includes(fromUrl) ? fromUrl : pickLanguage(codes, config.server.language);
+  catalog = await getJson(`/api/messages?lang=${language}`);
+  document.documentElement.lang = language;
+  setUpLanguages(available, language);
   labels = actionLabels();
-  document.documentElement.lang = config.server.language;
   $("version").textContent = version.version;
+  showLinks(version);
   $("label-step").textContent = t("ui.step");
   $("label-axis").textContent = t("ui.axis");
   $("label-home").textContent = t("ui.home");
@@ -342,7 +414,7 @@ async function main() {
   $("link").textContent = t("ui.disconnected");
   $("recent").append(el("li", { class: "empty" }, t("ui.recent_empty")));
 
-  drawPad(await getJson("/api/pad"));
+  drawPad(await getJson(`/api/pad?lang=${document.documentElement.lang}`));
   renderKeys();
   renderDirections();
   connect();

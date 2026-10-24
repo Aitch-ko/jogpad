@@ -126,3 +126,30 @@ def test_without_config_file_nothing_is_saved() -> None:
 def test_learning_needs_a_running_pad() -> None:
     api = TestClient(create_app(Config()), client=LOCAL)
     assert api.post("/api/learn", json={"seconds": 10}).status_code == 409
+
+
+def test_pad_name_is_in_the_configured_language() -> None:
+    app = create_app(Config.model_validate({"server": {"language": "de"}}))
+    assert TestClient(app).get("/api/pad").json()["layout"]["name"] == "Ziffernblock"
+
+
+def test_version_links_to_the_issues() -> None:
+    links = client().get("/api/version").json()["links"]
+    assert links["Issues"] == "https://github.com/Aitch-ko/jogpad/issues"
+
+
+def test_languages_are_named_in_their_own_language() -> None:
+    names = {lang["code"]: lang["name"] for lang in client().get("/api/languages").json()}
+    assert names["de"] == "Deutsch"
+
+
+def test_page_language_can_differ_from_the_config() -> None:
+    assert client().get("/api/messages?lang=de").json()["ui.step"] == "Schritt"
+
+
+def test_pad_name_follows_the_requested_language() -> None:
+    assert client().get("/api/pad?lang=de").json()["layout"]["name"] == "Ziffernblock"
+
+
+def test_unknown_page_language_is_rejected() -> None:
+    assert client().get("/api/messages?lang=xx").status_code == 422

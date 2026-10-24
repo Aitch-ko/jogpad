@@ -1,0 +1,39 @@
+/* Design tokens. style.css uses only these variables. Text, muted text and
+   the accent stay at 4.5:1 or more against the surface, and the accent text
+   against the accent, in light and dark. */
+
+:root {
+  --bg: #f4f4f2;
+  --surface: #ffffff;
+  --text: #1d1d1b;
+  --muted: #6b6b66;
+  --line: #d9d9d4;
+  --key: #fbfbfa;
+  --key-edge: #c8c8c2;
+  --accent: #c4520f;
+  --accent-text: #ffffff;
+  --ok: #23733d;
+  --warn: #b3261e;
+  --radius: 8px;
+  --radius-small: 6px;
+  --border: 1px;
+  --font: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", Menlo, monospace;
+  --font-scale: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161615;
+    --surface: #20201f;
+    --text: #ececea;
+    --muted: #9a9a94;
+    --line: #34342f;
+    --key: #2a2a28;
+    --key-edge: #45453f;
+    --accent: #e0661b;
+    --accent-text: #161615;
+    --ok: #5bbf7a;
+    --warn: #f2726a;
+  }
+}
