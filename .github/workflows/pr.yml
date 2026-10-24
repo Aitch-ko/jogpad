@@ -19,6 +19,8 @@ jobs:
 
   docs-impact:
     name: Code change has docs or label
+    # Release PRs only bump the version; their documentation is the changelog.
+    if: ${{ !startsWith(github.head_ref, 'release-please--') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
