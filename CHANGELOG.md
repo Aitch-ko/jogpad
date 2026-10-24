@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0](https://github.com/Aitch-ko/jogpad/compare/v0.2.0...v0.3.0) (2026-10-24)
+
+
+### Features
+
+* page header and footer, language menu, design tokens with checked contrast ([#17](https://github.com/Aitch-ko/jogpad/issues/17)) ([4ad5871](https://github.com/Aitch-ko/jogpad/commit/4ad5871c1f26b1496ab59fab2604d071d5313c0a))
+* planned key codes for the CH57x macro pad layout ([#22](https://github.com/Aitch-ko/jogpad/issues/22)) ([f8468b3](https://github.com/Aitch-ko/jogpad/commit/f8468b3caa8d380a9ce8e32e0680399eb068cce1))
+
+
+### Documentation
+
+* an animation at the top of the README showing what jogpad does ([#21](https://github.com/Aitch-ko/jogpad/issues/21)) ([5f42cfb](https://github.com/Aitch-ko/jogpad/commit/5f42cfb9af0376602ea5f858fcaa9e6b187eaac0))
+* screenshots of the web page, made by a script ([#20](https://github.com/Aitch-ko/jogpad/issues/20)) ([8a2747f](https://github.com/Aitch-ko/jogpad/commit/8a2747f5be78920750dcee00dfcbd185c9a373c7))
+
 ## [0.2.0](https://github.com/Aitch-ko/jogpad/compare/v0.1.0...v0.2.0) (2026-10-24)
 
 
