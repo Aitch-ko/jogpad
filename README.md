@@ -17,6 +17,10 @@
   <img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python 3.10+">
 </p>
 
+<p align="center">
+  <img src="docs/assets/demo.svg" alt="Animation: a knob on a macro pad is turned; with every detent the nozzle moves down one step towards a sheet of paper, and the console reports each move" width="760">
+</p>
+
 ## Sound familiar?
 
 You are levelling the bed with a sheet of paper. Eyes on the touchscreen,
