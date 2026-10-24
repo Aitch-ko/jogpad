@@ -22,10 +22,15 @@ fail() { printf 'Error: %s\n' "$*" >&2; exit 1; }
 python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))' \
     || fail "Python 3.10 or newer is needed, found $(python3 --version 2>&1)."
 
+# Ask for the password now rather than after the long pip run, when nobody watches.
+echo "The service part needs sudo."
+sudo -v
+
 say "Python environment in $VENV_DIR"
 [ -x "$VENV_DIR/bin/python" ] || python3 -m venv "$VENV_DIR" \
     || fail "creating the venv failed; on Debian install python3-venv."
-"$VENV_DIR/bin/pip" install --quiet --upgrade "$REPO_DIR"
+echo "Installing jogpad and its dependencies; the first run can take a few minutes."
+"$VENV_DIR/bin/pip" install --upgrade --disable-pip-version-check "$REPO_DIR"
 "$VENV_DIR/bin/jogpad" --version
 
 say "Configuration $CONFIG_FILE"

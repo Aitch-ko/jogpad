@@ -16,7 +16,8 @@ git clone https://github.com/Aitch-ko/jogpad.git
 ./jogpad/scripts/install.sh
 ```
 
-The installer asks for your sudo password for the service part. It
+The installer asks for your sudo password first, then downloads jogpad's
+dependencies, which takes a few minutes on a Raspberry Pi. It
 
 - installs jogpad into its own environment `~/jogpad-env`, next to Klipper's
   `~/klippy-env`
