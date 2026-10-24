@@ -50,6 +50,13 @@ the nozzle.
 - **Installs next to Klipper** as a service with one script, and shows up in
   the service menu of Mainsail and Fluidd.
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/screenshots/web-page-dark.png">
+    <img src="docs/assets/screenshots/web-page-light.png" alt="The jogpad web page: the drawn keypad lights up the pressed key, a list shows the last keys with their actions" width="720">
+  </picture>
+</p>
+
 Useful for bed levelling, setting the Z offset, probing and measuring,
 positioning by eye and loading filament. Mills, lasers, plasma cutters and
 metal deposition machines have the same problem; [use cases](docs/use-cases.md)

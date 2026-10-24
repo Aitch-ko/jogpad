@@ -31,6 +31,8 @@ dependencies = [
 # tomli: mypy checks the Python 3.10 branch of config.py, which imports it
 dev = ["httpx2", "mypy", "pytest", "ruff", "tomli"]
 docs = ["zensical"]
+# scripts/screenshots.py; then once: playwright install chromium
+screenshots = ["playwright"]
 
 [project.scripts]
 jogpad = "jogpad.cli:main"

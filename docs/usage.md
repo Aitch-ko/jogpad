@@ -112,6 +112,9 @@ everyone at the machine reads them.
 At the bottom, the page links to the repository, to what is new in each
 version, and to a bug report form with your jogpad version already filled in.
 
+![The web page: the drawn keypad lights up the pressed key, the list on the right shows the last keys with their actions](assets/screenshots/web-page-light.png#only-light)
+![The web page: the drawn keypad lights up the pressed key, the list on the right shows the last keys with their actions](assets/screenshots/web-page-dark.png#only-dark)
+
 ### Set up keys and directions
 
 Under **Set up** the page changes `jogpad.toml` for you; the running service
@@ -125,6 +128,10 @@ takes the change over at once. Comments in the file are kept.
   "head away from me" or "bed towards me". If it went the wrong way, jogpad
   reverses that axis (`invert` under `[jog]`). Reversing changes only which
   way the keys move, not Klipper's coordinates.
+
+![Learning a key: the page asks to press the key for E+](assets/screenshots/learn-key.png)
+
+![Checking a direction: after pressing Y+, the page asks what moved](assets/screenshots/check-direction.png)
 
 The page itself never moves the machine; moves only come from the pad.
 

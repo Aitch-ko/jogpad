@@ -35,5 +35,7 @@ zensical build --strict
 - Changed behaviour needs a change in `docs/` or the label `docs: not needed`.
 - New features and newly tested hardware also update the Status section of
   `README.md`; CI cannot tell when it is out of date.
+- Visible changes to the web page: run `python scripts/screenshots.py` and
+  commit the new images under `docs/assets/screenshots/`.
 - The HTTP API and the agent interface never move a machine.
 - Commit trailer `Assisted-by: <agent>`, never `Co-Authored-By`.
