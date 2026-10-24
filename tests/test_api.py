@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi.testclient import TestClient
 
 from jogpad.api import create_app, describe_event, describe_pad
@@ -24,11 +26,10 @@ def test_swagger_ui_is_served() -> None:
     assert client().get("/docs").status_code == 200
 
 
-def test_api_offers_no_write_methods() -> None:
-    methods = {
-        method for path in client().get("/openapi.json").json()["paths"].values() for method in path
-    }
-    assert methods == {"get"}
+def test_only_learning_and_saving_config_can_write() -> None:
+    paths = client().get("/openapi.json").json()["paths"]
+    writes = {path for path, methods in paths.items() if set(methods) - {"get"}}
+    assert writes == {"/api/learn", "/api/keys/{action}", "/api/invert"}
 
 
 def test_numpad_six_shows_x_plus() -> None:
@@ -64,3 +65,64 @@ def test_event_of_unknown_key_has_no_control() -> None:
 def test_without_layout_pad_has_none() -> None:
     config = Config.model_validate({"input": {"layout": "none"}})
     assert describe_pad(config).layout is None
+
+
+LOCAL = ("127.0.0.1", 50000)
+REMOTE = ("192.168.1.20", 50000)
+
+
+def writer(
+    tmp_path: Path, config: Config | None = None, client_host: tuple[str, int] = LOCAL
+) -> TestClient:
+    path = tmp_path / "jogpad.toml"
+    path.touch()
+    return TestClient(create_app(config or Config(), config_path=path), client=client_host)
+
+
+def test_assigned_key_shows_in_active_config(tmp_path: Path) -> None:
+    api = writer(tmp_path)
+    api.put("/api/keys/x_plus", json={"keys": ["KEY_F13"]})
+    assert api.get("/api/config").json()["input"]["keys"]["x_plus"] == ["KEY_F13"]
+
+
+def test_key_of_another_action_is_refused(tmp_path: Path) -> None:
+    response = writer(tmp_path).put("/api/keys/home", json={"keys": ["KEY_KP6"]})
+    assert response.json()["detail"] == {"conflicts": {"KEY_KP6": "x_plus"}}
+
+
+def test_key_of_another_action_can_be_taken_over(tmp_path: Path) -> None:
+    api = writer(tmp_path)
+    api.put("/api/keys/home", json={"keys": ["KEY_KP6"], "replace": True})
+    assert api.get("/api/pad").json()["actions"]["6"] == {"press": "home"}
+
+
+def test_unknown_key_name_is_rejected_by_api(tmp_path: Path) -> None:
+    response = writer(tmp_path).put("/api/keys/x_plus", json={"keys": ["KEY_NOPE"]})
+    assert response.status_code == 422
+
+
+def test_invert_is_saved(tmp_path: Path) -> None:
+    api = writer(tmp_path)
+    api.put("/api/invert", json={"axes": ["Y"]})
+    assert api.get("/api/config").json()["jog"]["invert"] == ["Y"]
+
+
+def test_changes_from_the_network_are_refused(tmp_path: Path) -> None:
+    response = writer(tmp_path, client_host=REMOTE).put("/api/invert", json={"axes": ["Y"]})
+    assert response.status_code == 403
+
+
+def test_network_changes_can_be_allowed(tmp_path: Path) -> None:
+    config = Config.model_validate({"server": {"allow_remote_changes": True}})
+    api = writer(tmp_path, config, REMOTE)
+    assert api.put("/api/invert", json={"axes": ["Y"]}).status_code == 200
+
+
+def test_without_config_file_nothing_is_saved() -> None:
+    api = TestClient(create_app(Config()), client=LOCAL)
+    assert api.put("/api/invert", json={"axes": ["Y"]}).status_code == 409
+
+
+def test_learning_needs_a_running_pad() -> None:
+    api = TestClient(create_app(Config()), client=LOCAL)
+    assert api.post("/api/learn", json={"seconds": 10}).status_code == 409

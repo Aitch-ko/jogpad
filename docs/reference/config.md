@@ -23,6 +23,7 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 | `select_axes` | `["X", "Y"]` | Axes that `select_next` cycles through for a knob. |
 | `home_timeout` | `5.0` | Seconds after which an unfinished HOME selection is dropped. |
 | `announce_moves` | `true` | Report every move and homing in the firmware console, so others can see who moved the machine. |
+| `invert` | `[]` | Axes whose keys move the other way, e.g. when the bed moves instead of the tool. Klipper's coordinates stay as they are. |
 
 ## `[input]`
 
@@ -39,6 +40,7 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 | `host` | `"127.0.0.1"` | Address the web interface and API listen on. |
 | `port` | `7150` | Port of the web interface and API. |
 | `language` | `"en"` | Language of messages. |
+| `allow_remote_changes` | `false` | Let other computers change the configuration through the web page. Without it only the machine itself may, e.g. through an SSH tunnel. |
 
 ## Default keys
 

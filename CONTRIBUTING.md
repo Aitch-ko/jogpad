@@ -38,6 +38,8 @@ match the code.
 Rules that make this possible:
 
 - Never edit files under `docs/reference/` by hand; they are generated.
+- A new feature, or hardware tested for the first time, updates the Status
+  section of `README.md`. No check catches a stale README; reviewers do.
 - Every configuration field has a `description`; it becomes the reference.
 - Every user-facing message goes through `t("some.key")` (or, in the core,
   `self._notify("some.key")`) with a literal key, and the key is added to

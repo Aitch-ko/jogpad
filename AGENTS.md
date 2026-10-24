@@ -33,5 +33,7 @@ zensical build --strict
 - New user-facing text: `t("literal.key")`, plus the key in `en.json` and
   `de.json`.
 - Changed behaviour needs a change in `docs/` or the label `docs: not needed`.
+- New features and newly tested hardware also update the Status section of
+  `README.md`; CI cannot tell when it is out of date.
 - The HTTP API and the agent interface never move a machine.
 - Commit trailer `Assisted-by: <agent>`, never `Co-Authored-By`.

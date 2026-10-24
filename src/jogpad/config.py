@@ -106,6 +106,11 @@ class JogConfig(_Section):
         description="Report every move and homing in the firmware console, so others "
         "can see who moved the machine.",
     )
+    invert: list[Literal["X", "Y", "Z", "E"]] = Field(
+        [],
+        description="Axes whose keys move the other way, e.g. when the bed moves instead "
+        "of the tool. Klipper's coordinates stay as they are.",
+    )
 
 
 class InputConfig(_Section):
@@ -161,6 +166,11 @@ class ServerConfig(_Section):
     host: str = Field("127.0.0.1", description="Address the web interface and API listen on.")
     port: int = Field(7150, ge=1, le=65535, description="Port of the web interface and API.")
     language: Literal["en", "de"] = Field("en", description="Language of messages.")
+    allow_remote_changes: bool = Field(
+        False,
+        description="Let other computers change the configuration through the web page. "
+        "Without it only the machine itself may, e.g. through an SSH tunnel.",
+    )
 
 
 class Config(_Section):

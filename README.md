@@ -13,15 +13,25 @@ select the step size, home the machine or send a stop.
 
 ## Status
 
-Early development, not released yet. Jogging Klipper from a numeric keypad or
-a macro pad with knobs works on Linux ([setup](docs/usage.md)); it has not been
-tested on a real printer yet.
+Early development, not released on PyPI yet. Working today, on Linux with
+Klipper:
 
-| | First version | Later |
+- jog, home and stop from a numeric keypad or any USB keyboard; tested on a
+  QIDI Plus 4 with the keypad of a Logitech MX Keys S
+- every move and homing shows up in the Mainsail or Fluidd console
+- a web page that draws the pad, shows each key press live, learns keys and
+  checks the direction of each axis
+- an installer that sets jogpad up as a service next to Klipper
+  ([installation](docs/installation.md), [setup](docs/usage.md))
+
+Next: programming CH57x macro pads with knobs (waiting for the pad to arrive),
+then skins for the web page.
+
+| | Now | Later |
 | --- | --- | --- |
 | Firmware | Klipper (Moonraker) | RepRapFirmware, FluidNC |
 | Operating system | Linux | Windows, macOS |
-| Pads | CH57x macro pads with knobs, numeric keypads | any USB keyboard |
+| Pads | numeric keypads, any USB keyboard | CH57x macro pads with knobs, programmed by jogpad |
 
 ## Why
 

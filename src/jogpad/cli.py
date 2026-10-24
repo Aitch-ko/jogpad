@@ -57,7 +57,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     if args.command == "keys":
         return _keys(config, args.device or config.input.devices)
-    return _serve(config)
+    return _serve(config, path)
 
 
 def _devices() -> int:
@@ -90,7 +90,7 @@ def _keys(config: Config, devices: list[str]) -> int:
     return 0
 
 
-def _serve(config: Config) -> int:
+def _serve(config: Config, path: Path | None) -> int:
     import uvicorn
 
     from jogpad.api import create_app
@@ -104,7 +104,10 @@ def _serve(config: Config) -> int:
     host, port = config.server.host, config.server.port
     print(t("server.starting", config.server.language, version=__version__, host=host, port=port))
     try:
-        uvicorn.run(create_app(config, service.state, service.events), host=host, port=port)
+        # Open live streams never close by themselves; without a limit a restart
+        # waits until systemd kills the process.
+        app = create_app(config, service, path)
+        uvicorn.run(app, host=host, port=port, timeout_graceful_shutdown=3)
     finally:
         service.stop()
     return 0

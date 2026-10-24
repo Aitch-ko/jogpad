@@ -3,25 +3,29 @@
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import json
 from collections.abc import AsyncIterator, Callable
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ValidationError
 
 from jogpad import __version__
-from jogpad.config import Config
+from jogpad.config import Action, Config
+from jogpad.config_store import assign_keys, conflicts, set_invert
 from jogpad.core import State
 from jogpad.events import EventHub
 from jogpad.i18n import messages
 from jogpad.keys import key_name
 from jogpad.layouts import NO_LAYOUT, Layout, layout_ids, load_layout
+from jogpad.service import Service
 
 WEB_DIR = Path(__file__).parent / "web"
 KEEPALIVE_S = 15
+MAX_LEARN_S = 60
 
 
 class Health(BaseModel):
@@ -37,6 +41,22 @@ class JogState(BaseModel):
     selected_axis: str
     home_selection: list[str] | None
     last_refusal: str | None
+    learning: bool
+
+
+class LearnRequest(BaseModel):
+    seconds: float = Field(30, ge=0, le=MAX_LEARN_S, description="0 ends learning.")
+
+
+class KeysRequest(BaseModel):
+    keys: list[str]
+    replace: bool = Field(
+        False, description="Take the keys away from other actions instead of refusing."
+    )
+
+
+class InvertRequest(BaseModel):
+    axes: list[str]
 
 
 class KeyEvent(BaseModel):
@@ -83,17 +103,45 @@ def describe_event(config: Config, code: int, value: int) -> KeyEvent:
 
 
 def create_app(
-    config: Config,
-    state: Callable[[], State] | None = None,
-    events: EventHub | None = None,
+    config: Config, service: Service | None = None, config_path: Path | None = None
 ) -> FastAPI:
+    """`service` is the running jogpad; without it the page shows a static state.
+    Changes are written to `config_path`."""
     app = FastAPI(
         title="jogpad",
         version=__version__,
         description="Status and configuration of a jogpad instance. "
         "jogpad never moves a machine through this API.",
     )
-    hub = events or EventHub()
+    hub = service.events if service else EventHub()
+    current = [config]
+
+    def cfg() -> Config:
+        return current[0]
+
+    def may_change(request: Request) -> None:
+        # A changed STOP key from anywhere in the network would be a nasty surprise.
+        if cfg().server.allow_remote_changes:
+            return
+        host = request.client.host if request.client else ""
+        try:
+            if ipaddress.ip_address(host).is_loopback:
+                return
+        except ValueError:
+            pass
+        raise HTTPException(403, "changes are only allowed from this computer")
+
+    def save(change: Callable[[Path], Config]) -> Config:
+        if config_path is None:
+            raise HTTPException(409, "jogpad runs without a config file (serve --config)")
+        try:
+            new = change(config_path)
+        except (ValueError, ValidationError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+        current[0] = new
+        if service:
+            service.reload(new)
+        return new
 
     @app.get("/api/health", summary="Liveness check")
     def health() -> Health:
@@ -105,16 +153,18 @@ def create_app(
 
     @app.get("/api/config", summary="Active configuration")
     def get_config() -> Config:
-        return config
+        return cfg()
 
     @app.get("/api/state", summary="Current step size, selected axis and HOME selection")
     def get_state() -> JogState:
-        s = state() if state else State(config.jog.steps[0], config.jog.select_axes[0], None, None)
+        c = cfg()
+        s = service.state() if service else State(c.jog.steps[0], c.jog.select_axes[0], None, None)
         return JogState(
             step=s.step,
             selected_axis=s.selected_axis,
             home_selection=s.home_selection,
             last_refusal=s.last_refusal,
+            learning=service.is_learning() if service else False,
         )
 
     @app.get("/api/layouts", summary="Known pad layouts")
@@ -129,11 +179,11 @@ def create_app(
 
     @app.get("/api/pad", summary="Configured pad layout and the action of each control")
     def get_pad() -> PadView:
-        return describe_pad(config)
+        return describe_pad(cfg())
 
     @app.get("/api/messages", summary="Texts of the web page in the configured language")
     def get_messages() -> dict[str, str]:
-        return messages("ui.", config.server.language)
+        return messages("ui.", cfg().server.language)
 
     @app.get(
         "/api/events",
@@ -151,7 +201,7 @@ def create_app(
                         yield ": keepalive\n\n"
                         continue
                     code, value = event
-                    payload = describe_event(config, code, value).model_dump()
+                    payload = describe_event(cfg(), code, value).model_dump()
                     yield f"data: {json.dumps(payload)}\n\n"
             finally:
                 hub.unsubscribe(queue)
@@ -159,6 +209,41 @@ def create_app(
         return StreamingResponse(
             stream(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"}
         )
+
+    @app.post(
+        "/api/learn",
+        summary="For a while keys only show up here and move nothing; STOP still works",
+        dependencies=[Depends(may_change)],
+    )
+    def learn(request: LearnRequest) -> JogState:
+        if service is None:
+            raise HTTPException(409, "no pad is being read")
+        service.learn(request.seconds)
+        return get_state()
+
+    @app.put(
+        "/api/keys/{action}",
+        summary="Assign keys to an action and save the configuration",
+        dependencies=[Depends(may_change)],
+        responses={409: {"description": "A key belongs to another action"}},
+    )
+    def put_keys(action: Action, request: KeysRequest) -> Config:
+        try:
+            taken = conflicts(cfg(), action, request.keys)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        if taken and not request.replace:
+            detail = {name: other.value for name, other in taken.items()}
+            raise HTTPException(409, {"conflicts": detail})
+        return save(lambda path: assign_keys(path, cfg(), action, request.keys))
+
+    @app.put(
+        "/api/invert",
+        summary="Set the axes whose keys move the other way and save the configuration",
+        dependencies=[Depends(may_change)],
+    )
+    def put_invert(request: InvertRequest) -> Config:
+        return save(lambda path: set_invert(path, request.axes))
 
     # Last: the page must not shadow the API or the docs.
     app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")

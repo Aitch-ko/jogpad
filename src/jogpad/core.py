@@ -77,6 +77,15 @@ class Jogger:
         home = None if self._home_axes is None else sorted(self._home_axes)
         return State(self.step, self._selected, home, self._last_refusal)
 
+    def reconfigure(self, config: Config) -> None:
+        """Take over a changed configuration, keeping step size and axis where possible."""
+        self.config = config
+        self.actions = config.input.actions_by_code()
+        self.language = config.server.language
+        self._step_index = min(self._step_index, len(config.jog.steps) - 1)
+        if self._selected not in config.jog.select_axes:
+            self._selected = config.jog.select_axes[0]
+
     def is_stop(self, code: int) -> bool:
         return self.actions.get(code) is Action.STOP
 
@@ -160,7 +169,7 @@ class Jogger:
         jog = self.config.jog
         feeds = {"X": jog.feed_xy, "Y": jog.feed_xy, "Z": jog.feed_z, "E": jog.feed_e}
         for axis, distance in pending:
-            distance = round(distance, 6)
+            distance = round(-distance if axis in jog.invert else distance, 6)
             if not self._call(self.backend.move, axis, distance, feeds[axis]):
                 break
             if jog.announce_moves:

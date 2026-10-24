@@ -1,14 +1,28 @@
-// Live view of the pad. Read-only: this page never sends anything to the machine.
+// Live view and setup of the pad. Nothing here moves the machine: moves only
+// come from the pad itself, and learning keeps even those back.
 "use strict";
 
 const UNIT = 60; // pixels per key unit
 const GAP = 6;
 const RECENT = 12;
+const LEARN_S = 30;
 const SVG_NS = "http://www.w3.org/2000/svg";
+const ACTIONS = [
+  "x_plus", "x_minus", "y_plus", "y_minus", "z_plus", "z_minus", "e_plus", "e_minus",
+  "selected_plus", "selected_minus", "select_next", "step", "home", "stop",
+];
 
 let catalog = {};
-const t = (key) => catalog[key] || key;
+let config = null;
+let labels = {};
+let controls = new Map();
+// Set while the page waits for a key press: learning or a direction check.
+let waiter = null;
+
 const $ = (id) => document.getElementById(id);
+function t(key, values = {}) {
+  return (catalog[key] || key).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
+}
 
 function actionLabels() {
   return {
@@ -29,10 +43,55 @@ function actionLabels() {
   };
 }
 
+// What the user saw after pressing the + key of an axis. `right` is whether
+// that matches the standard: the tool moves in + relative to the bed.
+function directionAnswers(axis) {
+  return {
+    X: [
+      { text: t("ui.dir.head_right"), right: true },
+      { text: t("ui.dir.head_left"), right: false },
+      { text: t("ui.dir.bed_left"), right: true },
+      { text: t("ui.dir.bed_right"), right: false },
+    ],
+    Y: [
+      { text: t("ui.dir.head_back"), right: true },
+      { text: t("ui.dir.head_front"), right: false },
+      { text: t("ui.dir.bed_front"), right: true },
+      { text: t("ui.dir.bed_back"), right: false },
+    ],
+    Z: [
+      { text: t("ui.dir.head_up"), right: true },
+      { text: t("ui.dir.head_down"), right: false },
+      { text: t("ui.dir.bed_down"), right: true },
+      { text: t("ui.dir.bed_up"), right: false },
+    ],
+  }[axis];
+}
+
 async function getJson(path) {
   const response = await fetch(path);
   if (!response.ok) throw new Error(`${path}: ${response.status}`);
   return response.json();
+}
+
+async function send(method, path, body) {
+  const response = await fetch(path, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await response.json().catch(() => ({}));
+  return { status: response.status, data };
+}
+
+function el(tag, attrs = {}, ...children) {
+  const node = document.createElement(tag);
+  for (const [name, value] of Object.entries(attrs)) {
+    if (name.startsWith("on")) node.addEventListener(name.slice(2), value);
+    else node.setAttribute(name, value);
+  }
+  node.append(...children);
+  return node;
 }
 
 function svg(tag, attrs, parent) {
@@ -48,13 +107,14 @@ function text(content, attrs, parent) {
   return node;
 }
 
-function drawPad(pad, labels) {
+function drawPad(pad) {
   const root = $("pad");
-  const controls = new Map();
+  root.replaceChildren();
+  controls = new Map();
   if (!pad.layout) {
     $("layout-name").textContent = t("ui.no_layout");
-    root.remove();
-    return controls;
+    root.hidden = true;
+    return;
   }
   $("layout-name").textContent = pad.layout.name;
   $("layout-note").textContent = pad.layout.note;
@@ -91,10 +151,9 @@ function drawPad(pad, labels) {
     controls.set(c.id, { group, turn });
   }
   root.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  return controls;
 }
 
-function showEvent(event, controls, labels) {
+function showEvent(event) {
   const control = event.control && controls.get(event.control);
   if (control) {
     if (event.part === "press") {
@@ -113,15 +172,126 @@ function showEvent(event, controls, labels) {
   if (!event.pressed) return;
   const list = $("recent");
   list.querySelector(".empty")?.remove();
-  const item = document.createElement("li");
-  const key = document.createElement("span");
-  key.textContent = `${event.name} (${event.code})`;
-  const action = document.createElement("span");
-  action.textContent = event.action ? labels[event.action] || event.action : t("ui.unassigned");
-  item.append(key, action);
-  list.prepend(item);
+  const action = event.action ? labels[event.action] || event.action : t("ui.unassigned");
+  list.prepend(el("li", {}, el("span", {}, `${event.name} (${event.code})`), el("span", {}, action)));
   while (list.children.length > RECENT) list.lastChild.remove();
+  if (waiter) waiter(event);
 }
+
+function say(message, kind = "") {
+  const node = $("setup-message");
+  node.textContent = message;
+  node.className = `message ${kind}`;
+}
+
+// -- setup: keys --------------------------------------------------------------
+
+function renderKeys() {
+  const rows = ACTIONS.map((action) => {
+    const keys = config.input.keys[action] || [];
+    return el(
+      "tr",
+      {},
+      el("th", { scope: "row" }, labels[action]),
+      el("td", { class: "mono" }, keys.join(", ") || "–"),
+      el("td", {}, el("button", { type: "button", onclick: () => learnKey(action) }, t("ui.learn"))),
+    );
+  });
+  $("keys").replaceChildren(...rows);
+}
+
+async function learnKey(action) {
+  const started = await send("POST", "/api/learn", { seconds: LEARN_S });
+  if (started.status !== 200) return failed(started);
+  say(t("ui.press_key", { action: labels[action] }), "wait");
+  const timer = setTimeout(() => endWait(t("ui.timeout")), LEARN_S * 1000);
+  waiter = async (event) => {
+    clearTimeout(timer);
+    waiter = null;
+    await send("POST", "/api/learn", { seconds: 0 });
+    await assign(action, event.name);
+  };
+}
+
+async function assign(action, key, replace = false) {
+  const result = await send("PUT", `/api/keys/${action}`, { keys: [key], replace });
+  if (result.status === 409 && result.data.detail?.conflicts) {
+    const other = result.data.detail.conflicts[key];
+    const question = t("ui.taken", { key, action: labels[other], target: labels[action] });
+    if (window.confirm(question)) return assign(action, key, true);
+    return say(t("ui.unchanged"));
+  }
+  if (result.status !== 200) return failed(result);
+  await changed(result.data);
+  say(t("ui.assigned", { key, action: labels[action] }), "ok");
+}
+
+// -- setup: directions --------------------------------------------------------
+
+function renderDirections() {
+  const rows = ["X", "Y", "Z"].map((axis) => {
+    const inverted = config.jog.invert.includes(axis);
+    return el(
+      "tr",
+      {},
+      el("th", { scope: "row" }, axis),
+      el("td", {}, inverted ? t("ui.inverted") : "–"),
+      el("td", {}, el("button", { type: "button", onclick: () => checkDirection(axis) }, t("ui.check"))),
+    );
+  });
+  $("directions").replaceChildren(...rows);
+}
+
+function checkDirection(axis) {
+  const plus = `${axis.toLowerCase()}_plus`;
+  say(t("ui.press_axis", { action: labels[plus] }), "wait");
+  waiter = (event) => {
+    if (event.action !== plus) return;
+    waiter = null;
+    const buttons = directionAnswers(axis).map((answer) =>
+      el("button", { type: "button", onclick: () => answerDirection(axis, answer.right) }, answer.text),
+    );
+    buttons.push(el("button", { type: "button", onclick: () => endWait(t("ui.dir.nothing_hint")) }, t("ui.dir.nothing")));
+    $("answers").replaceChildren(...buttons);
+    say(t("ui.what_moved"), "wait");
+  };
+}
+
+async function answerDirection(axis, right) {
+  $("answers").replaceChildren();
+  if (right) return say(t("ui.direction_ok", { axis }), "ok");
+  const invert = new Set(config.jog.invert);
+  if (invert.has(axis)) invert.delete(axis);
+  else invert.add(axis);
+  const result = await send("PUT", "/api/invert", { axes: [...invert] });
+  if (result.status !== 200) return failed(result);
+  await changed(result.data);
+  say(t("ui.direction_fixed", { axis }), "ok");
+}
+
+// -- setup: shared ------------------------------------------------------------
+
+function endWait(message) {
+  waiter = null;
+  $("answers").replaceChildren();
+  send("POST", "/api/learn", { seconds: 0 });
+  say(message);
+}
+
+function failed(result) {
+  if (result.status === 403) return say(t("ui.forbidden"), "error");
+  const error = typeof result.data.detail === "string" ? result.data.detail : result.status;
+  say(t("ui.error", { error }), "error");
+}
+
+async function changed(newConfig) {
+  config = newConfig;
+  drawPad(await getJson("/api/pad"));
+  renderKeys();
+  renderDirections();
+}
+
+// -- live state ---------------------------------------------------------------
 
 async function refreshState() {
   try {
@@ -135,7 +305,7 @@ async function refreshState() {
   }
 }
 
-function connect(controls, labels) {
+function connect() {
   const link = $("link");
   const source = new EventSource("/api/events");
   source.onopen = () => {
@@ -148,18 +318,16 @@ function connect(controls, labels) {
     link.classList.remove("on");
   };
   source.onmessage = (message) => {
-    showEvent(JSON.parse(message.data), controls, labels);
+    showEvent(JSON.parse(message.data));
     refreshState();
   };
 }
 
 async function main() {
-  const [config, version, pad] = await Promise.all([
-    getJson("/api/config"),
-    getJson("/api/version"),
-    getJson("/api/pad"),
-  ]);
+  let version;
+  [config, version] = await Promise.all([getJson("/api/config"), getJson("/api/version")]);
   catalog = await getJson("/api/messages");
+  labels = actionLabels();
   document.documentElement.lang = config.server.language;
   $("version").textContent = version.version;
   $("label-step").textContent = t("ui.step");
@@ -167,15 +335,17 @@ async function main() {
   $("label-home").textContent = t("ui.home");
   $("label-refusal").textContent = t("ui.refusal");
   $("label-recent").textContent = t("ui.recent");
+  $("label-setup").textContent = t("ui.setup");
+  $("label-keys").textContent = t("ui.keys");
+  $("label-directions").textContent = t("ui.directions");
+  $("setup-note").textContent = t("ui.setup_note");
   $("link").textContent = t("ui.disconnected");
-  const empty = document.createElement("li");
-  empty.className = "empty";
-  empty.textContent = t("ui.recent_empty");
-  $("recent").append(empty);
+  $("recent").append(el("li", { class: "empty" }, t("ui.recent_empty")));
 
-  const labels = actionLabels();
-  const controls = drawPad(pad, labels);
-  connect(controls, labels);
+  drawPad(await getJson("/api/pad"));
+  renderKeys();
+  renderDirections();
+  connect();
   refreshState();
   setInterval(refreshState, 2000);
 }

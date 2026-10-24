@@ -9,8 +9,11 @@ A running instance serves the interactive Swagger UI at `/docs` and ReDoc at `/r
 | `GET` | `/api/config` | Active configuration |
 | `GET` | `/api/events` | Live key presses as server-sent events (KeyEvent as JSON) |
 | `GET` | `/api/health` | Liveness check |
+| `PUT` | `/api/invert` | Set the axes whose keys move the other way and save the configuration |
+| `PUT` | `/api/keys/{action}` | Assign keys to an action and save the configuration |
 | `GET` | `/api/layouts` | Known pad layouts |
 | `GET` | `/api/layouts/{layout_id}` | One pad layout |
+| `POST` | `/api/learn` | For a while keys only show up here and move nothing; STOP still works |
 | `GET` | `/api/messages` | Texts of the web page in the configured language |
 | `GET` | `/api/pad` | Configured pad layout and the action of each control |
 | `GET` | `/api/state` | Current step size, selected axis and HOME selection |

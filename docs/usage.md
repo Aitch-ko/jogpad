@@ -63,6 +63,9 @@ anything:
 jogpad keys --config jogpad.toml
 ```
 
+The [web page](#web-page) does the same with a drawing of the pad, and can
+assign keys for you.
+
 ## 3. Run it
 
 ```bash
@@ -96,15 +99,42 @@ presses give one line. Set `announce_moves = false` under `[jog]` to turn this o
 `jogpad serve` also serves a page at `http://127.0.0.1:7150/`. It draws your
 pad and lights up every key you press, with the action it triggers, and shows
 step size, knob axis and the last refusal. Keys outside the drawing are listed
-on the right, so the page also tells you which code an unknown key sends. The
-page only shows; it never moves the machine.
+too, so the page also tells you which code an unknown key sends.
 
 Pick the drawing with `layout` under `[input]`: `numpad` (default),
 `ch57x-9k3`, or `none` for the list only.
 
-By default the page is only reachable on the machine itself. To open it from
+### Set up keys and directions
+
+Under **Set up** the page changes `jogpad.toml` for you; the running service
+takes the change over at once. Comments in the file are kept.
+
+- **Learn**: click it next to an action, then press the key on the pad. For
+  30 seconds keys only show up on the page and move nothing; STOP still works.
+  If the key already belongs to another action, the page asks before moving it.
+- **Check** a direction: press the + key of that axis on the pad. The machine
+  moves. Then pick what you saw from the front of the machine, for example
+  "head away from me" or "bed towards me". If it went the wrong way, jogpad
+  reverses that axis (`invert` under `[jog]`). Reversing changes only which
+  way the keys move, not Klipper's coordinates.
+
+The page itself never moves the machine; moves only come from the pad.
+
+### Access from other computers
+
+By default the page is only reachable on the machine itself, for example
+through an SSH tunnel:
+
+```bash
+ssh -L 7150:127.0.0.1:7150 pi@printer.local
+```
+
+and then `http://127.0.0.1:7150/` on your computer. To open it directly from
 another computer, set `host = "0.0.0.0"` under `[server]`. Anyone in your
-network can then watch the key presses; there is no login yet.
+network can then watch the key presses; there is no login yet. Changes stay
+limited to the machine itself unless you also set
+`allow_remote_changes = true`, which lets anyone in the network reassign your
+keys, STOP included.
 
 ## Locks
 

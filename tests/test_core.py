@@ -230,3 +230,13 @@ def test_lock_without_values_ignores_false() -> None:
     config = Config.model_validate({"machine": {"locks": [lock.model_dump()]}})
     backend = FakeBackend({"laser": {"on": False}})
     assert run(press(KP6), backend, config).calls == [("move", "X", 0.01, 3000)]
+
+
+def test_inverted_axis_moves_the_other_way() -> None:
+    config = Config.model_validate({"jog": {"invert": ["Y"]}})
+    assert run(press(KP8), config=config).calls == [("move", "Y", -0.01, 3000)]
+
+
+def test_invert_leaves_other_axes_alone() -> None:
+    config = Config.model_validate({"jog": {"invert": ["Y"]}})
+    assert run(press(KP6), config=config).calls == [("move", "X", 0.01, 3000)]
