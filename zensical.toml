@@ -1,6 +1,6 @@
 [project]
 site_name = "jogpad"
-site_description = "A jog pendant for 3D printers and CNC machines, built from a programmable macro pad."
+site_description = "Jog your 3D printer or CNC machine with keys and knobs you can feel. A jog pendant for Klipper from a numeric keypad or macro pad."
 site_url = "https://aitch-ko.github.io/jogpad/"
 repo_url = "https://github.com/Aitch-ko/jogpad"
 repo_name = "Aitch-ko/jogpad"
@@ -9,6 +9,7 @@ copyright = "MIT License, Aitch-ko and the jogpad contributors"
 
 nav = [
   { "Home" = "index.md" },
+  { "Use cases" = "use-cases.md" },
   { "Safety" = "safety.md" },
   { "Installation" = "installation.md" },
   { "Klipper setup" = "usage.md" },
@@ -22,6 +23,8 @@ nav = [
 
 [project.theme]
 language = "en"
+logo = "assets/icon.svg"
+favicon = "assets/icon.svg"
 features = [
   "content.code.copy",
   "content.action.edit",
