@@ -1,0 +1,33 @@
+name: Pull request
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  title:
+    name: Title follows Conventional Commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docs-impact:
+    name: Code change has docs or label
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check
+        env:
+          NOT_NEEDED: "${{ contains(github.event.pull_request.labels.*.name, 'docs: not needed') && '--not-needed' || '' }}"
+        run: python scripts/check_docs_impact.py "origin/${{ github.base_ref }}" $NOT_NEEDED

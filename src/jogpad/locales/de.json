@@ -1,0 +1,4 @@
+{
+  "server.starting": "jogpad {version} lauscht auf http://{host}:{port}",
+  "config.invalid": "Konfiguration {path} ist ungültig:\n{error}"
+}

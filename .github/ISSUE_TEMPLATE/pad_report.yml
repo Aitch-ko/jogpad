@@ -1,0 +1,43 @@
+name: Pad report
+description: Tell us whether a macro pad works with jogpad.
+labels: ["pad report"]
+body:
+  - type: input
+    id: model
+    attributes:
+      label: Pad
+      description: Name or listing, number of keys and knobs.
+      placeholder: "9 keys + 3 knobs, wired"
+    validations:
+      required: true
+  - type: input
+    id: usb
+    attributes:
+      label: USB ID
+      description: From `lsusb` on Linux.
+      placeholder: "1189:8890"
+    validations:
+      required: true
+  - type: dropdown
+    id: works
+    attributes:
+      label: Does it work?
+      options:
+        - "Yes, fully"
+        - "Partly"
+        - "No"
+    validations:
+      required: true
+  - type: dropdown
+    id: detents
+    attributes:
+      label: Do the knobs have noticeable detents?
+      options:
+        - "Yes"
+        - "No"
+        - "No knobs"
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: What works, what does not, how you programmed the pad.

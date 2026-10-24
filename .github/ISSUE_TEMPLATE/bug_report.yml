@@ -1,0 +1,41 @@
+name: Bug report
+description: Something does not work as documented.
+labels: ["type: bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What did you do, what did you expect, what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: jogpad version
+      placeholder: "jogpad --version"
+    validations:
+      required: true
+  - type: input
+    id: firmware
+    attributes:
+      label: Firmware and host
+      placeholder: "Klipper v0.13 on Raspberry Pi 4, Raspberry Pi OS 12"
+    validations:
+      required: true
+  - type: input
+    id: pad
+    attributes:
+      label: Pad
+      placeholder: "CH57x 3x3 with 2 knobs, USB ID 1189:8890"
+  - type: textarea
+    id: config
+    attributes:
+      label: Configuration
+      description: Your jogpad.toml, without passwords or tokens.
+      render: toml
+  - type: textarea
+    id: log
+    attributes:
+      label: Log output
+      render: text

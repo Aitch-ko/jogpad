@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jogpad"
+version = "0.0.0"
+description = "Turn a programmable macro pad with knobs into a jog pendant for 3D printers and CNC machines."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Aitch-ko" }]
+requires-python = ">=3.10"
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Environment :: Web Environment",
+  "Intended Audience :: Manufacturing",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Topic :: Printing",
+]
+dependencies = [
+  "fastapi>=0.115",
+  "pydantic>=2.7",
+  "uvicorn>=0.30",
+  "tomli>=2.0; python_version < '3.11'",
+]
+
+[project.optional-dependencies]
+# tomli: mypy checks the Python 3.10 branch of config.py, which imports it
+dev = ["httpx2", "mypy", "pytest", "ruff", "tomli"]
+docs = ["zensical"]
+
+[project.scripts]
+jogpad = "jogpad.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Aitch-ko/jogpad"
+Issues = "https://github.com/Aitch-ko/jogpad/issues"
+Changelog = "https://github.com/Aitch-ko/jogpad/blob/main/CHANGELOG.md"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/jogpad"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.mypy]
+python_version = "3.10"
+packages = ["jogpad"]
+mypy_path = "src"
+strict = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
