@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.5.0](https://github.com/Aitch-ko/jogpad/compare/v0.4.0...v0.5.0) (2026-10-25)
+
+
+### Features
+
+* setup section of the web page starts folded away ([#29](https://github.com/Aitch-ko/jogpad/issues/29)) ([f4cce37](https://github.com/Aitch-ko/jogpad/commit/f4cce3744a2f7d5b947e72c489a270e2b39b5364))
+* show the pad as a camera panel in Mainsail and Fluidd ([#30](https://github.com/Aitch-ko/jogpad/issues/30)) ([2c4f3fc](https://github.com/Aitch-ko/jogpad/commit/2c4f3fc129b7c01b73a60795106b0ec6b17ab300))
+* switch jogpad on and off from its page and camera panel ([#32](https://github.com/Aitch-ko/jogpad/issues/32)) ([bdc67cb](https://github.com/Aitch-ko/jogpad/commit/bdc67cba6a953bddb91f10ed6f49f0ad1a0c5bac))
+* switch jogpad on and off in Mainsail and Fluidd ([#28](https://github.com/Aitch-ko/jogpad/issues/28)) ([ee6f8ac](https://github.com/Aitch-ko/jogpad/commit/ee6f8acb2e2427dd6dc574469354fe5904dfa290))
+
+
+### Bug Fixes
+
+* keep web page requests out of the journal ([#27](https://github.com/Aitch-ko/jogpad/issues/27)) ([ac58baf](https://github.com/Aitch-ko/jogpad/commit/ac58bafa53bfb89e953f51e7376c5422d5522d91))
+
+
+### Documentation
+
+* usage.md switch section, API reference, panel screenshot. ([bdc67cb](https://github.com/Aitch-ko/jogpad/commit/bdc67cba6a953bddb91f10ed6f49f0ad1a0c5bac))
+
 ## [0.4.0](https://github.com/Aitch-ko/jogpad/compare/v0.3.0...v0.4.0) (2026-10-25)
 
 
