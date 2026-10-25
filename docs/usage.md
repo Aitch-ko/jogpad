@@ -125,8 +125,9 @@ version, and to a bug report form with your jogpad version already filled in.
 
 ### Set up keys and directions
 
-Under **Set up** the page changes `jogpad.toml` for you; the running service
-takes the change over at once. Comments in the file are kept.
+Under **Set up**, folded away until you click it, the page changes
+`jogpad.toml` for you; the running service takes the change over at once.
+Comments in the file are kept.
 
 - **Learn**: click it next to an action, then press the key on the pad. For
   30 seconds keys only show up on the page and move nothing; STOP still works.

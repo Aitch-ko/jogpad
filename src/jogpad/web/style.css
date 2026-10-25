@@ -110,6 +110,9 @@ section {
 .recent li.empty { display: block; color: var(--muted); font-family: inherit; border: 0; }
 
 .setup { grid-column: 1 / -1; }
+.setup summary { cursor: pointer; }
+.setup summary h2 { display: inline; }
+.setup details[open] summary { margin-bottom: 0.25rem; }
 
 footer {
   display: flex;

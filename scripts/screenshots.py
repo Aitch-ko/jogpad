@@ -75,7 +75,7 @@ def serve(config_path: Path) -> str:
 
 def open_page(page: Page, url: str) -> None:
     page.goto(url)
-    page.wait_for_selector("#keys tr")
+    page.wait_for_selector("#keys tr", state="attached")
     # Screenshots must not catch a colour halfway through a transition.
     page.add_style_tag(content="* { transition: none !important; }")
     # A version number in the pictures would be outdated with the next release.
@@ -102,6 +102,8 @@ def live_view(page: Page, name: str) -> None:
 
 
 def learning(page: Page, name: str) -> None:
+    # The setup part starts folded away.
+    page.evaluate("$('setup-details').open = true")
     page.evaluate("say(t('ui.press_key', {action: labels.e_plus}), 'wait')")
     page.locator(".setup").screenshot(path=OUT / name)
     page.evaluate("say('')")
