@@ -20,7 +20,8 @@ log = logging.getLogger(__name__)
 
 KEY_RELEASE, KEY_PRESS, KEY_AUTOREPEAT = 0, 1, 2
 
-# Klipper macro behind the on/off switch in Mainsail and Fluidd, see klipper/jogpad.cfg.
+# Klipper macro behind the on/off switch in Mainsail and Fluidd, see klipper/jogpad.cfg
+# next to this module.
 SWITCH = "gcode_macro _JOGPAD"
 
 AXIS_ACTIONS: dict[Action, tuple[str, int]] = {

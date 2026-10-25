@@ -38,6 +38,18 @@ def build_parser() -> argparse.ArgumentParser:
     keys = sub.add_parser("keys", help="Show pressed keys and their actions. Moves nothing.")
     keys.add_argument("--config", type=Path, help="Path to jogpad.toml.")
     keys.add_argument("--device", action="append", help="Device to read; overrides the config.")
+
+    switch = sub.add_parser(
+        "setup-switch",
+        help="Add the on/off switch for Mainsail and Fluidd to printer.cfg and "
+        "moonraker.conf, with backups.",
+    )
+    switch.add_argument(
+        "--config-dir",
+        type=Path,
+        default=Path("~/printer_data/config"),
+        help="Folder with printer.cfg and moonraker.conf.",
+    )
     return parser
 
 
@@ -46,6 +58,8 @@ def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     if args.command == "devices":
         return _devices()
+    if args.command == "setup-switch":
+        return _setup_switch(args.config_dir.expanduser())
     path = getattr(args, "config", None)
     try:
         config = load_config(path)
@@ -60,6 +74,25 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "keys":
         return _keys(config, args.device or config.input.devices)
     return _serve(config, path)
+
+
+def _setup_switch(config_dir: Path) -> int:
+    from datetime import datetime
+
+    from jogpad.klipper_setup import setup_switch
+
+    try:
+        backups = setup_switch(config_dir, datetime.now())
+    except OSError as exc:
+        print(t("switch.setup_failed", error=exc))
+        return 2
+    for backup in backups:
+        print(t("switch.backup", path=backup))
+    if backups:
+        print(t("switch.ready", path=config_dir))
+    else:
+        print(t("switch.unchanged", path=config_dir))
+    return 0
 
 
 def _devices() -> int:

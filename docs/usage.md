@@ -190,20 +190,26 @@ A switch in Mainsail and Fluidd turns jogpad off while you do not need it.
 Off means every key does nothing, STOP included, and nothing appears in the
 console. After a Klipper restart jogpad is on again.
 
-The installer writes the macro `_JOGPAD` to `~/printer_data/config/jogpad.cfg`.
-Include it in `printer.cfg`:
+The installer asks whether to set the switch up. Later, run:
 
-```ini
-[include jogpad.cfg]
+```bash
+jogpad setup-switch
 ```
 
-and add the switch to `moonraker.conf`:
+It writes the macro `_JOGPAD` to `~/printer_data/config/jogpad.cfg`, adds
+`[include jogpad.cfg]` to `printer.cfg` above the `SAVE_CONFIG` block and
 
 ```ini
 [power jogpad]
 type: klipper_device
 object_name: gcode_macro _JOGPAD
 ```
+
+to the end of `moonraker.conf`. Before changing a file it keeps a copy next
+to it, such as `printer.cfg.bak-20261025-143000`. Entries that are already
+there stay as they are, so running it again only refreshes the macro; the
+installer does that on every update. `--config-dir` points it at another
+folder.
 
 After restarting Klipper and Moonraker, `jogpad` shows up among the power
 devices in Mainsail and Fluidd; in Mainsail that is the power menu at the top

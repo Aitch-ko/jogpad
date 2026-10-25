@@ -77,11 +77,22 @@ sudo systemctl daemon-reload
 sudo systemctl enable --quiet jogpad
 sudo systemctl restart jogpad
 
-# The macro behind the on/off switch in Mainsail and Fluidd. It is jogpad's file,
-# so updates replace it; it does nothing until printer.cfg includes it.
-if [ -d "$DATA_DIR/config" ]; then
-    cp "$REPO_DIR/klipper/jogpad.cfg" "$DATA_DIR/config/jogpad.cfg"
-    echo "wrote $DATA_DIR/config/jogpad.cfg; see the docs to switch jogpad on and off in Mainsail"
+# The on/off switch in Mainsail and Fluidd changes printer.cfg and moonraker.conf,
+# which belong to the user: ask once, and on updates only refresh the macro.
+if [ -f "$DATA_DIR/config/printer.cfg" ] && [ -f "$DATA_DIR/config/moonraker.conf" ]; then
+    say "Switch in Mainsail and Fluidd"
+    if grep -qE '^\[include[[:space:]]+jogpad\.cfg\]' "$DATA_DIR/config/printer.cfg"; then
+        "$VENV_DIR/bin/jogpad" setup-switch --config-dir "$DATA_DIR/config"
+    else
+        echo "jogpad can add an on/off switch to Mainsail and Fluidd. That adds"
+        echo "[include jogpad.cfg] to printer.cfg and [power jogpad] to moonraker.conf;"
+        echo "both files are backed up first."
+        read -r -p "Set it up? [y/N] " answer || answer=""
+        case "$answer" in
+            [yYjJ]*) "$VENV_DIR/bin/jogpad" setup-switch --config-dir "$DATA_DIR/config" ;;
+            *) echo "skipped; run 'jogpad setup-switch' later to add it" ;;
+        esac
+    fi
 fi
 
 # Moonraker only lets Mainsail and Fluidd control services listed here.

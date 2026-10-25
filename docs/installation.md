@@ -27,6 +27,9 @@ dependencies, which takes a few minutes on a Raspberry Pi. It
 - sets up the systemd service `jogpad`, which starts with the machine
 - adds `jogpad` to `~/printer_data/moonraker.asvc`. After a Moonraker restart,
   Mainsail and Fluidd can start, stop and restart jogpad from their service menu
+- asks whether to add the on/off switch for Mainsail and Fluidd to
+  `printer.cfg` and `moonraker.conf`, with a backup of each, see
+  [the switch](usage.md#switch-it-on-and-off-in-mainsail-or-fluidd)
 
 Then enter your pad in `jogpad.toml`, see [Klipper setup](usage.md).
 

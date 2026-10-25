@@ -3,16 +3,18 @@
 # Command line
 
 ```text
-usage: jogpad [-h] [--version] {serve,check-config,devices,keys} ...
+usage: jogpad [-h] [--version] {serve,check-config,devices,keys,setup-switch} ...
 
 Jog pendant for 3D printers and CNC machines.
 
 positional arguments:
-  {serve,check-config,devices,keys}
+  {serve,check-config,devices,keys,setup-switch}
     serve               Read the pad, jog the machine, serve the API.
     check-config        Validate a configuration file and exit.
     devices             List input devices (Linux).
     keys                Show pressed keys and their actions. Moves nothing.
+    setup-switch        Add the on/off switch for Mainsail and Fluidd to printer.cfg
+                        and moonraker.conf, with backups.
 
 options:
   -h, --help            show this help message and exit
@@ -59,4 +61,15 @@ options:
   -h, --help       show this help message and exit
   --config CONFIG  Path to jogpad.toml.
   --device DEVICE  Device to read; overrides the config.
+```
+
+## `jogpad setup-switch`
+
+```text
+usage: jogpad setup-switch [-h] [--config-dir CONFIG_DIR]
+
+options:
+  -h, --help            show this help message and exit
+  --config-dir CONFIG_DIR
+                        Folder with printer.cfg and moonraker.conf.
 ```
