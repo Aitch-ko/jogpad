@@ -236,7 +236,12 @@ class Jogger:
             log.warning("status not readable: %s", exc)
             return t("status.unreadable", self.language)
         for lock in locks:
-            if _is_locked(lock, status.get(lock.object, {}).get(lock.field)):
+            value = status.get(lock.object, {}).get(lock.field)
+            # Klipper answers for an object or field that does not exist with null.
+            # A typo in a laser lock must not quietly switch it off.
+            if value is None:
+                return t("lock.missing", self.language, object=lock.object, field=lock.field)
+            if _is_locked(lock, value):
                 return lock.reason
         return None
 

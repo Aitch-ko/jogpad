@@ -14,7 +14,8 @@ KP6, KP8, KP0 = 77, 72, 82
 
 class FakeBackend:
     def __init__(self, status: dict[str, dict[str, Any]] | None = None) -> None:
-        self.status = status or {}
+        # A printer at rest, so the default print lock finds its object.
+        self.status = {"print_stats": {"state": "standby"}, **(status or {})}
         self.fail_query = False
         self.calls: list[tuple[Any, ...]] = []
         self.called = threading.Event()

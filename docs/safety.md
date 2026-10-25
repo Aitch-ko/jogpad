@@ -25,7 +25,8 @@ after you stop turning.
 
 jogpad refuses to move while a print or job is running or paused. Further
 conditions, such as a spindle or laser being on, can be added per machine in
-the configuration.
+the configuration. A lock whose object or field the firmware does not know
+refuses as well, so a misspelt lock does not quietly stop working.
 
 ## Holding a key
 

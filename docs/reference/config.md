@@ -10,7 +10,7 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 | --- | --- | --- |
 | `backend` | `"moonraker"` | Firmware interface. Only Moonraker (Klipper) for now. |
 | `url` | `"http://127.0.0.1:7125"` | Base URL of the firmware's HTTP interface. |
-| `locks` | `[{"object": "print_stats", "field": "state", "equals": ["printing", "paused"], "reason": "job running"}]` | Conditions under which jogpad refuses to move or home. STOP always works. If the status cannot be read, jogpad refuses as well. |
+| `locks` | `[{"object": "print_stats", "field": "state", "equals": ["printing", "paused"], "reason": "job running"}]` | Conditions under which jogpad refuses to move or home. STOP always works. If the status cannot be read, or a lock's object or field does not exist, jogpad refuses as well. |
 
 ## `[jog]`
 

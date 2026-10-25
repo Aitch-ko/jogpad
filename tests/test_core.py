@@ -25,7 +25,8 @@ F13, F14, F15, F16 = 183, 184, 185, 186
 
 class FakeBackend:
     def __init__(self, status: dict[str, dict[str, Any]] | None = None) -> None:
-        self.status = status or {}
+        # A printer at rest, so the default print lock finds its object.
+        self.status = {"print_stats": {"state": "standby"}, **(status or {})}
         self.calls: list[tuple[Any, ...]] = []
         self.notes: list[str] = []
         self.fail_query = False
@@ -311,3 +312,28 @@ def test_missing_switch_macro_is_told_apart_from_on() -> None:
 
 def test_switch_macro_at_zero_is_off() -> None:
     assert Jogger(Config(), switched(0)).switch() is Switch.OFF
+
+
+def laser_lock_config() -> Config:
+    lock = {"object": "gcode_macro LASER_VARS", "field": "laser_on", "reason": "laser on"}
+    return Config.model_validate({"machine": {"locks": [lock]}})
+
+
+def test_lock_on_an_object_klipper_does_not_know_refuses_moves() -> None:
+    # What Klipper answers for a macro that does not exist, e.g. after a typo.
+    backend = FakeBackend({"gcode_macro LASER_VARS": {"laser_on": None}})
+    assert run(press(KP6), backend, laser_lock_config()).calls == []
+
+
+def test_lock_missing_from_the_reply_refuses_moves() -> None:
+    assert run(press(KP6), FakeBackend(), laser_lock_config()).calls == []
+
+
+def test_missing_lock_object_is_named_in_the_refusal() -> None:
+    notes = run(press(KP6), FakeBackend(), laser_lock_config()).notes
+    assert notes == ["Refused: lock gcode_macro LASER_VARS laser_on not found in the firmware"]
+
+
+def test_lock_on_an_existing_field_that_is_off_allows_moves() -> None:
+    backend = FakeBackend({"gcode_macro LASER_VARS": {"laser_on": False}})
+    assert run(press(KP6), backend, laser_lock_config()).calls == [("move", "X", 0.01, 3000)]

@@ -11,6 +11,7 @@
   "home.started": "Homing: {axes}",
   "refused": "Refused: {reason}",
   "status.unreadable": "status not readable",
+  "lock.missing": "lock {object} {field} not found in the firmware",
   "switch.off": "jogpad is switched off in Mainsail or Fluidd",
   "switch.setup_failed": "Switch not set up: {error}",
   "switch.backup": "Backup: {path}",

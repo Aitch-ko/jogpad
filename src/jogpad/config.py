@@ -82,7 +82,8 @@ class MachineConfig(_Section):
     locks: list[Lock] = Field(
         DEFAULT_LOCKS,
         description="Conditions under which jogpad refuses to move or home. "
-        "STOP always works. If the status cannot be read, jogpad refuses as well.",
+        "STOP always works. If the status cannot be read, or a lock's object or field "
+        "does not exist, jogpad refuses as well.",
     )
 
 

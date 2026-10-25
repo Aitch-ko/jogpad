@@ -242,5 +242,8 @@ reason = "laser on"
 ```
 
 Without `equals`, a lock applies when the field is true or non-zero. When the
-status cannot be read, jogpad refuses as well. Defining `[[machine.locks]]`
+status cannot be read, jogpad refuses as well, and so it does when a lock's
+object or field does not exist: Klipper reports those as null, and a typo in
+the name of a laser lock must not switch it off unnoticed. The refusal names
+the lock, so check the console after adding one. Defining `[[machine.locks]]`
 replaces the default list, so repeat the print lock if you want to keep it.

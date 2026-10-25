@@ -11,6 +11,7 @@
   "home.started": "Referenzfahrt: {axes}",
   "refused": "Abgelehnt: {reason}",
   "status.unreadable": "Status nicht lesbar",
+  "lock.missing": "Sperre {object} {field} in der Firmware nicht gefunden",
   "switch.off": "jogpad ist in Mainsail oder Fluidd ausgeschaltet",
   "switch.setup_failed": "Schalter nicht eingerichtet: {error}",
   "switch.backup": "Sicherung: {path}",
