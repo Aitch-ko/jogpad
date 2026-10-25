@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.0](https://github.com/Aitch-ko/jogpad/compare/v0.6.1...v0.7.0) (2026-10-25)
+
+
+### Features
+
+* installer builds jogpad's venv from JOGPAD_PYTHON, with a way out of Python 3.9 ([#39](https://github.com/Aitch-ko/jogpad/issues/39)) ([49bd37c](https://github.com/Aitch-ko/jogpad/commit/49bd37c34f72e8623d5196a25842072d22108264))
+
+
+### Documentation
+
+* one note on Claude Code instead of a trailer in every commit ([#38](https://github.com/Aitch-ko/jogpad/issues/38)) ([3158e41](https://github.com/Aitch-ko/jogpad/commit/3158e41062e3baf1f27cc648acb55fea4b72bf0e))
+
 ## [0.6.1](https://github.com/Aitch-ko/jogpad/compare/v0.6.0...v0.6.1) (2026-10-25)
 
 
