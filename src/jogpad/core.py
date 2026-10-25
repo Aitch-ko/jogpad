@@ -19,6 +19,9 @@ log = logging.getLogger(__name__)
 
 KEY_RELEASE, KEY_PRESS, KEY_AUTOREPEAT = 0, 1, 2
 
+# Klipper macro behind the on/off switch in Mainsail and Fluidd, see klipper/jogpad.cfg.
+SWITCH = "gcode_macro _JOGPAD"
+
 AXIS_ACTIONS: dict[Action, tuple[str, int]] = {
     Action.X_PLUS: ("X", 1),
     Action.X_MINUS: ("X", -1),
@@ -89,7 +92,31 @@ class Jogger:
     def is_stop(self, code: int) -> bool:
         return self.actions.get(code) is Action.STOP
 
+    def switch_state(self) -> bool | None:
+        """Whether the switch in Mainsail or Fluidd is on; None if it cannot be read.
+
+        Without the macro in Klipper there is no switch, and jogpad is always on.
+        """
+        try:
+            status = self.backend.query({SWITCH: ["value"]})
+        except BackendError as exc:
+            log.warning("switch not readable: %s", exc)
+            return None
+        # Klipper answers for a macro that does not exist with value null.
+        value = status.get(SWITCH, {}).get("value")
+        return value is None or bool(value)
+
     def handle(self, events: list[tuple[int, int]], now: float) -> None:
+        if any(value == KEY_PRESS for _, value in events):
+            switch = self.switch_state()
+            if switch is False:
+                # Switched off means off: no moves, no console messages.
+                self._last_refusal = t("switch.off", self.language)
+                return
+            if switch is None:
+                self._last_refusal = t("status.unreadable", self.language)
+                self._notify("refused", reason=self._last_refusal)
+                return
         moves: list[list[Any]] = []
         for code, value in events:
             action = self.actions.get(code)

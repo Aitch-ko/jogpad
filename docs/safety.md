@@ -11,6 +11,9 @@ computer and the network, any of which can fail. Keep a wired emergency stop on
 the machine. Do not label or build the STOP key like an emergency stop device
 (red mushroom head on a yellow background).
 
+While jogpad is switched off in Mainsail or Fluidd, STOP does nothing either,
+like every other key. If jogpad cannot read the switch, STOP still goes out.
+
 ## No runaway moves
 
 jogpad sends the next move only after the firmware has finished the previous

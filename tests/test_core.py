@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 
 from jogpad.config import Config, Lock
-from jogpad.core import KEY_AUTOREPEAT, KEY_PRESS, KEY_RELEASE, BackendError, Jogger
+from jogpad.core import KEY_AUTOREPEAT, KEY_PRESS, KEY_RELEASE, SWITCH, BackendError, Jogger
 
 # Numeric keypad codes from linux/input-event-codes.h, written out here so the
 # tests do not depend on the key table they would otherwise check against.
@@ -240,3 +240,58 @@ def test_inverted_axis_moves_the_other_way() -> None:
 def test_invert_leaves_other_axes_alone() -> None:
     config = Config.model_validate({"jog": {"invert": ["Y"]}})
     assert run(press(KP6), config=config).calls == [("move", "X", 0.01, 3000)]
+
+
+def switched(value: int) -> FakeBackend:
+    return FakeBackend({SWITCH: {"value": value}})
+
+
+def switched_null() -> FakeBackend:
+    return FakeBackend({SWITCH: {"value": None}})
+
+
+def test_switched_off_pad_moves_nothing() -> None:
+    assert run(press(KP6), switched(0)).calls == []
+
+
+def test_switched_off_pad_writes_nothing_to_the_console() -> None:
+    assert run(press(KPASTERISK, KPENTER), switched(0)).notes == []
+
+
+def test_switched_off_pad_keeps_its_step_size() -> None:
+    jogger = Jogger(Config(), switched(0))
+    jogger.handle(press(KPASTERISK), now=100.0)
+    assert jogger.step == 0.01
+
+
+def test_switched_off_pad_names_the_switch_as_refusal() -> None:
+    jogger = Jogger(Config(), switched(0))
+    jogger.handle(press(KP6), now=100.0)
+    assert jogger.state().last_refusal == "jogpad is switched off in Mainsail or Fluidd"
+
+
+def test_switched_on_pad_moves() -> None:
+    assert run(press(KP6), switched(1)).calls == [("move", "X", 0.01, 3000)]
+
+
+def test_without_switch_macro_jogpad_is_on() -> None:
+    # What Klipper answers for a macro that does not exist.
+    assert Jogger(Config(), switched_null()).switch_state() is True
+
+
+def test_without_switch_macro_pad_moves() -> None:
+    assert run(press(KP6), switched_null()).calls == [("move", "X", 0.01, 3000)]
+
+
+def test_unreadable_switch_is_unknown() -> None:
+    backend = FakeBackend()
+    backend.fail_query = True
+    assert Jogger(Config(), backend).switch_state() is None
+
+
+def test_unreadable_switch_keeps_the_step_size() -> None:
+    backend = FakeBackend()
+    backend.fail_query = True
+    jogger = Jogger(Config(), backend)
+    jogger.handle(press(KPASTERISK), now=100.0)
+    assert jogger.step == 0.01

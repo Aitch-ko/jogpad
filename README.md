@@ -51,6 +51,8 @@ the nozzle.
 - **Visible to everyone at the machine**: every move appears in the Mainsail
   or Fluidd console.
 - **Refuses to move during a print**, and you can add your own locks.
+- **Switch it off in Mainsail or Fluidd** when you do not need it; then no key
+  does anything.
 - **Installs next to Klipper** as a service with one script, and shows up in
   the service menu of Mainsail and Fluidd.
 
@@ -81,6 +83,7 @@ Klipper:
 - a web page in English and German that draws the pad, shows each key press
   live, learns keys and checks the direction of each axis; reachable from
   every computer in the network, changes only from those Moonraker trusts
+- a switch in Mainsail and Fluidd that turns jogpad off, STOP included
 - an installer that sets jogpad up as a service next to Klipper
   ([installation](docs/installation.md), [setup](docs/usage.md))
 

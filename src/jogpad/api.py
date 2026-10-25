@@ -54,6 +54,9 @@ def project_links() -> dict[str, str]:
 
 
 class JogState(BaseModel):
+    switched_on: bool | None = Field(
+        description="The switch in Mainsail or Fluidd; true without one, null if unreadable."
+    )
     step: float
     selected_axis: str
     home_selection: list[str] | None
@@ -206,6 +209,7 @@ def create_app(
         c = cfg()
         s = service.state() if service else State(c.jog.steps[0], c.jog.select_axes[0], None, None)
         return JogState(
+            switched_on=service.jogger.switch_state() if service else True,
             step=s.step,
             selected_axis=s.selected_axis,
             home_selection=s.home_selection,

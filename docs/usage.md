@@ -167,6 +167,32 @@ ssh -N -L 7150:127.0.0.1:7150 pi@printer.local
 and then `http://127.0.0.1:7150/` on your computer. `allow_remote_changes =
 true` lets every computer in the network reassign your keys, STOP included.
 
+## Switch it on and off in Mainsail or Fluidd
+
+A switch in Mainsail and Fluidd turns jogpad off while you do not need it.
+Off means every key does nothing, STOP included, and nothing appears in the
+console. After a Klipper restart jogpad is on again.
+
+The installer writes the macro `_JOGPAD` to `~/printer_data/config/jogpad.cfg`.
+Include it in `printer.cfg`:
+
+```ini
+[include jogpad.cfg]
+```
+
+and add the switch to `moonraker.conf`:
+
+```ini
+[power jogpad]
+type: klipper_device
+object_name: gcode_macro _JOGPAD
+```
+
+After restarting Klipper and Moonraker, `jogpad` shows up among the power
+devices in Mainsail and Fluidd. The web page shows the switch as well. Without
+the macro there is no switch, and jogpad is always on. If jogpad cannot read
+the switch, it refuses to move, but STOP still goes out.
+
 ## Locks
 
 By default jogpad refuses to move or home while a print is running or paused.

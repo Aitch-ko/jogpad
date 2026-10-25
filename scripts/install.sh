@@ -77,6 +77,13 @@ sudo systemctl daemon-reload
 sudo systemctl enable --quiet jogpad
 sudo systemctl restart jogpad
 
+# The macro behind the on/off switch in Mainsail and Fluidd. It is jogpad's file,
+# so updates replace it; it does nothing until printer.cfg includes it.
+if [ -d "$DATA_DIR/config" ]; then
+    cp "$REPO_DIR/klipper/jogpad.cfg" "$DATA_DIR/config/jogpad.cfg"
+    echo "wrote $DATA_DIR/config/jogpad.cfg; see the docs to switch jogpad on and off in Mainsail"
+fi
+
 # Moonraker only lets Mainsail and Fluidd control services listed here.
 ASVC="$DATA_DIR/moonraker.asvc"
 if [ -f "$ASVC" ] && ! grep -qx jogpad "$ASVC"; then

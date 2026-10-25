@@ -6,19 +6,23 @@ import threading
 from typing import Any
 
 from jogpad.config import Config
-from jogpad.core import KEY_PRESS, KEY_RELEASE, Jogger
+from jogpad.core import KEY_PRESS, KEY_RELEASE, SWITCH, BackendError, Jogger
 from jogpad.service import Service
 
 KP6, KP8, KP0 = 77, 72, 82
 
 
 class FakeBackend:
-    def __init__(self) -> None:
+    def __init__(self, status: dict[str, dict[str, Any]] | None = None) -> None:
+        self.status = status or {}
+        self.fail_query = False
         self.calls: list[tuple[Any, ...]] = []
         self.called = threading.Event()
 
     def query(self, objects: dict[str, list[str]]) -> dict[str, dict[str, Any]]:
-        return {}
+        if self.fail_query:
+            raise BackendError("down")
+        return self.status
 
     def move(self, axis: str, distance: float, feed: float) -> None:
         self.calls.append(("move", axis))
@@ -34,8 +38,10 @@ class FakeBackend:
         pass
 
 
-def started(config: Config | None = None) -> tuple[Service, FakeBackend]:
-    backend = FakeBackend()
+def started(
+    config: Config | None = None, backend: FakeBackend | None = None
+) -> tuple[Service, FakeBackend]:
+    backend = backend or FakeBackend()
     service = Service(Jogger(config or Config(), backend), backend, devices=[])
     service.start()
     return service, backend
@@ -60,6 +66,22 @@ def test_keys_while_learning_move_nothing() -> None:
 def test_stop_works_while_learning() -> None:
     service, backend = started()
     service.learn(30)
+    tap(service, KP0)
+    service.stop()
+    assert backend.calls == [("stop",)]
+
+
+def test_stop_does_nothing_while_switched_off() -> None:
+    service, backend = started(backend=FakeBackend({SWITCH: {"value": 0}}))
+    tap(service, KP0)
+    service.stop()
+    assert backend.calls == []
+
+
+def test_stop_works_while_the_switch_is_unreadable() -> None:
+    backend = FakeBackend()
+    backend.fail_query = True
+    service, _ = started(backend=backend)
     tap(service, KP0)
     service.stop()
     assert backend.calls == [("stop",)]

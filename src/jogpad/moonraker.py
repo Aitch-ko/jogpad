@@ -25,7 +25,7 @@ class Moonraker:
         self.url = url.rstrip("/")
 
     def query(self, objects: dict[str, list[str]]) -> dict[str, dict[str, Any]]:
-        # Objects that do not exist on this printer are simply missing from the reply.
+        # Objects that do not exist on this printer come back with every field null.
         query = "&".join(
             urllib.parse.quote(name) + "=" + ",".join(fields) for name, fields in objects.items()
         )

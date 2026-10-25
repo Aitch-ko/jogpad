@@ -55,9 +55,10 @@ class Service:
 
     def on_key(self, code: int, value: int) -> None:
         # STOP goes out from the reader thread and does not wait for a running move.
-        # It works while learning, too.
+        # It works while learning, too, but not while jogpad is switched off. A
+        # switch that cannot be read does not hold STOP back.
         if self.jogger.is_stop(code):
-            if value == KEY_PRESS:
+            if value == KEY_PRESS and self.jogger.switch_state() is not False:
                 self._emergency_stop()
         elif not self.is_learning():
             self._events.put((code, value))

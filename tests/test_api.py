@@ -26,6 +26,10 @@ def test_state_without_service_reports_first_step() -> None:
     assert client().get("/api/state").json()["step"] == 0.01
 
 
+def test_state_without_service_reports_jogpad_on() -> None:
+    assert client().get("/api/state").json()["switched_on"] is True
+
+
 def test_swagger_ui_is_served() -> None:
     assert client().get("/docs").status_code == 200
 

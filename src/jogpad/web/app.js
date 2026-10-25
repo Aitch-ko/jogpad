@@ -358,6 +358,8 @@ function showLinks(version) {
 async function refreshState() {
   try {
     const s = await getJson("/api/state");
+    const switched = { true: t("ui.switch_on"), false: t("ui.switch_off") };
+    $("switch").textContent = switched[s.switched_on] ?? "–";
     $("step").textContent = `${s.step} mm`;
     $("axis").textContent = s.selected_axis;
     $("home").textContent = s.home_selection === null ? "–" : s.home_selection.join(" ") || t("ui.home_all");
@@ -403,6 +405,7 @@ async function main() {
   $("version").textContent = version.version;
   showLinks(version);
   $("label-step").textContent = t("ui.step");
+  $("label-switch").textContent = t("ui.switch");
   $("label-axis").textContent = t("ui.axis");
   $("label-home").textContent = t("ui.home");
   $("label-refusal").textContent = t("ui.refusal");
