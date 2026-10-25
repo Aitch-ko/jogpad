@@ -20,6 +20,8 @@
   "ui.switch": "jogpad",
   "ui.switch_on": "an",
   "ui.switch_off": "aus",
+  "ui.switch_off_note": "jogpad ist aus: Keine Taste tut etwas, auch STOP nicht.",
+  "ui.switch_turn_on": "Einschalten",
   "ui.step": "Schritt",
   "ui.axis": "Achse am Knopf",
   "ui.home": "HOME-Auswahl",

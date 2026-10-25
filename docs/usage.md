@@ -206,9 +206,16 @@ object_name: gcode_macro _JOGPAD
 ```
 
 After restarting Klipper and Moonraker, `jogpad` shows up among the power
-devices in Mainsail and Fluidd. The web page shows the switch as well. Without
-the macro there is no switch, and jogpad is always on. If jogpad cannot read
-the switch, it refuses to move, but STOP still goes out.
+devices in Mainsail and Fluidd; in Mainsail that is the power menu at the top
+right. The field `jogpad` on the web page and in the
+[camera panel](#show-the-pad-in-mainsail-and-fluidd) switches as well, from
+the computers that may change settings. While jogpad is off, the pad there is
+greyed out under a note with a button to switch it on again.
+
+The include alone is enough for the switch on the web page and in the panel;
+`[power jogpad]` adds the one in the power menu. Without the macro there is
+no switch, and jogpad is always on. If jogpad cannot read the switch, it
+refuses to move, but STOP still goes out.
 
 ## Locks
 

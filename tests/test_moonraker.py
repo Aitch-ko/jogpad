@@ -92,3 +92,15 @@ def test_panel_is_removed_by_name(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(urllib.request, "urlopen", urlopen)
     Moonraker("http://moonraker").remove_panel()
     assert requests == [("DELETE", "http://moonraker/server/webcams/item?name=jogpad")]
+
+
+def test_switch_runs_the_macro(monkeypatch: pytest.MonkeyPatch) -> None:
+    sent: list[dict[str, Any]] = []
+
+    def urlopen(request: urllib.request.Request, timeout: float) -> io.BytesIO:
+        sent.append(json.loads(request.data))  # type: ignore[arg-type]
+        return io.BytesIO(b"{}")
+
+    monkeypatch.setattr(urllib.request, "urlopen", urlopen)
+    Moonraker("http://moonraker").set_switch(False)
+    assert sent == [{"script": "_JOGPAD VALUE=0"}]

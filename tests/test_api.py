@@ -36,7 +36,13 @@ def test_swagger_ui_is_served() -> None:
 def test_only_learning_and_saving_config_can_write() -> None:
     paths = client().get("/openapi.json").json()["paths"]
     writes = {path for path, methods in paths.items() if set(methods) - {"get"}}
-    assert writes == {"/api/learn", "/api/keys/{action}", "/api/invert", "/api/panel"}
+    assert writes == {
+        "/api/learn",
+        "/api/keys/{action}",
+        "/api/invert",
+        "/api/panel",
+        "/api/switch",
+    }
 
 
 def test_numpad_six_shows_x_plus() -> None:
@@ -85,10 +91,15 @@ class FakeMoonraker(Moonraker):
         super().__init__("http://moonraker")
         self.reachable = reachable
         self.camera: tuple[str, str] | None = None
+        self.switched_on: bool | None = None
 
     def trusted_networks(self) -> list[IPNetwork]:
         self._check()
         return [ipaddress.ip_network("192.168.1.0/24")]
+
+    def set_switch(self, on: bool) -> None:
+        self._check()
+        self.switched_on = on
 
     def panel_url(self) -> str | None:
         self._check()
@@ -254,4 +265,24 @@ def test_panel_while_moonraker_is_down_fails_visibly(tmp_path: Path) -> None:
 
 
 def test_panel_of_the_keypad_fits_the_pad_and_the_state_bar() -> None:
-    assert panel_aspect_ratio(Config()) == "40:65"
+    assert panel_aspect_ratio(Config()) == "40:58"
+
+
+def test_switch_turns_jogpad_off_through_moonraker(tmp_path: Path) -> None:
+    moonraker = FakeMoonraker()
+    writer(tmp_path, moonraker=moonraker).put("/api/switch", json={"on": False})
+    assert moonraker.switched_on is False
+
+
+def test_switch_from_an_untrusted_computer_is_refused(tmp_path: Path) -> None:
+    api = writer(tmp_path, client_host=("10.0.0.5", 50000), moonraker=FakeMoonraker())
+    assert api.put("/api/switch", json={"on": False}).status_code == 403
+
+
+def test_switch_while_moonraker_is_down_fails_visibly(tmp_path: Path) -> None:
+    api = writer(tmp_path, moonraker=FakeMoonraker(reachable=False))
+    assert api.put("/api/switch", json={"on": True}).status_code == 503
+
+
+def test_state_without_service_has_no_switch() -> None:
+    assert client().get("/api/state").json()["has_switch"] is False

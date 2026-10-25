@@ -10,7 +10,7 @@ import urllib.parse
 import urllib.request
 from typing import Any
 
-from jogpad.core import BackendError
+from jogpad.core import SWITCH, BackendError
 
 MOVE_TIMEOUT_S = 30
 HOME_TIMEOUT_S = 180
@@ -89,6 +89,11 @@ class Moonraker:
                     "trusted_clients: ignoring %r, jogpad takes addresses and ranges only", entry
                 )
         return networks
+
+    def set_switch(self, on: bool) -> None:
+        # Through the macro rather than Moonraker's power device, so it also works
+        # without [power jogpad]; Mainsail's switch follows the macro either way.
+        self._script(f"{SWITCH.split()[-1]} VALUE={int(on)}", 5)
 
     def panel_url(self) -> str | None:
         """Address of jogpad's camera in Mainsail and Fluidd, None if there is none."""

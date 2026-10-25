@@ -17,6 +17,8 @@ let catalog = {};
 let config = null;
 let labels = {};
 let controls = new Map();
+// Last known switch: true, false, or null while it cannot be read.
+let switchedOn = null;
 // Set while the page waits for a key press: learning or a direction check.
 let waiter = null;
 
@@ -379,14 +381,32 @@ async function togglePanel(added) {
   renderMainsail();
 }
 
+// -- switch -------------------------------------------------------------------
+
+async function setSwitch(on) {
+  const result = await send("PUT", "/api/switch", { on });
+  const message = $("switch-message");
+  if (result.status === 403) message.textContent = t("ui.forbidden");
+  else if (result.status !== 200) message.textContent = t("ui.error", { error: result.data.detail ?? result.status });
+  else message.textContent = "";
+  refreshState();
+}
+
 // -- live state ---------------------------------------------------------------
 
 async function refreshState() {
   try {
     const s = await getJson("/api/state");
     const switched = { true: t("ui.switch_on"), false: t("ui.switch_off") };
-    $("switch").textContent = switched[s.switched_on] ?? "–";
-    document.body.classList.toggle("switched-off", s.switched_on === false);
+    switchedOn = s.switched_on;
+    $("switch").textContent = switched[switchedOn] ?? "–";
+    $("switch").hidden = s.has_switch;
+    const button = $("switch-button");
+    button.textContent = switched[switchedOn] ?? "–";
+    button.setAttribute("aria-pressed", String(switchedOn === true));
+    button.hidden = !s.has_switch;
+    $("switched-off").hidden = switchedOn !== false;
+    document.body.classList.toggle("switched-off", switchedOn === false);
     $("step").textContent = `${s.step} mm`;
     $("axis").textContent = s.selected_axis;
     $("home").textContent = s.home_selection === null ? "–" : s.home_selection.join(" ") || t("ui.home_all");
@@ -434,6 +454,10 @@ async function main() {
   showLinks(version);
   $("label-step").textContent = t("ui.step");
   $("label-switch").textContent = t("ui.switch");
+  $("switched-off-text").textContent = t("ui.switch_off_note");
+  $("switch-on").textContent = t("ui.switch_turn_on");
+  $("switch-on").onclick = () => setSwitch(true);
+  $("switch-button").onclick = () => setSwitch(switchedOn === false);
   $("label-axis").textContent = t("ui.axis");
   $("label-home").textContent = t("ui.home");
   $("label-refusal").textContent = t("ui.refusal");

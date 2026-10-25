@@ -7,7 +7,15 @@ from typing import Any
 import pytest
 
 from jogpad.config import Config, Lock
-from jogpad.core import KEY_AUTOREPEAT, KEY_PRESS, KEY_RELEASE, SWITCH, BackendError, Jogger
+from jogpad.core import (
+    KEY_AUTOREPEAT,
+    KEY_PRESS,
+    KEY_RELEASE,
+    SWITCH,
+    BackendError,
+    Jogger,
+    Switch,
+)
 
 # Numeric keypad codes from linux/input-event-codes.h, written out here so the
 # tests do not depend on the key table they would otherwise check against.
@@ -295,3 +303,11 @@ def test_unreadable_switch_keeps_the_step_size() -> None:
     jogger = Jogger(Config(), backend)
     jogger.handle(press(KPASTERISK), now=100.0)
     assert jogger.step == 0.01
+
+
+def test_missing_switch_macro_is_told_apart_from_on() -> None:
+    assert Jogger(Config(), switched_null()).switch() is Switch.MISSING
+
+
+def test_switch_macro_at_zero_is_off() -> None:
+    assert Jogger(Config(), switched(0)).switch() is Switch.OFF

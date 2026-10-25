@@ -20,6 +20,8 @@
   "ui.switch": "jogpad",
   "ui.switch_on": "on",
   "ui.switch_off": "off",
+  "ui.switch_off_note": "jogpad is off: no key does anything, STOP included.",
+  "ui.switch_turn_on": "Switch on",
   "ui.step": "Step",
   "ui.axis": "Knob axis",
   "ui.home": "HOME selection",

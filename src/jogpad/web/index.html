@@ -18,16 +18,24 @@
   </header>
   <main>
     <section class="state" aria-live="polite">
-      <div><span id="label-switch"></span><strong id="switch">–</strong></div>
+      <div>
+        <span id="label-switch"></span><strong id="switch">–</strong>
+        <button id="switch-button" type="button" class="toggle" aria-pressed="false" hidden></button>
+      </div>
       <div><span id="label-step"></span><strong id="step">–</strong></div>
       <div><span id="label-axis"></span><strong id="axis">–</strong></div>
       <div><span id="label-home"></span><strong id="home">–</strong></div>
       <div><span id="label-refusal"></span><strong id="refusal">–</strong></div>
+      <p id="switch-message" class="message error"></p>
     </section>
     <section class="pad">
       <h2 id="layout-name"></h2>
       <p id="layout-note" class="note"></p>
       <svg id="pad" role="img"></svg>
+      <div id="switched-off" class="off-note" hidden>
+        <p id="switched-off-text"></p>
+        <button id="switch-on" type="button"></button>
+      </div>
     </section>
     <section class="recent">
       <h2 id="label-recent"></h2>

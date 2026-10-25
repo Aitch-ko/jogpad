@@ -10,6 +10,7 @@ from __future__ import annotations
 import contextlib
 import logging
 from dataclasses import dataclass
+from enum import Enum
 from typing import Any, Protocol
 
 from jogpad.config import Action, Config, Lock
@@ -52,6 +53,13 @@ class Backend(Protocol):
     def notify(self, message: str) -> None: ...
 
 
+class Switch(Enum):
+    ON = "on"
+    OFF = "off"
+    MISSING = "missing"
+    UNREADABLE = "unreadable"
+
+
 @dataclass(frozen=True)
 class State:
     step: float
@@ -92,19 +100,26 @@ class Jogger:
     def is_stop(self, code: int) -> bool:
         return self.actions.get(code) is Action.STOP
 
-    def switch_state(self) -> bool | None:
-        """Whether the switch in Mainsail or Fluidd is on; None if it cannot be read.
-
-        Without the macro in Klipper there is no switch, and jogpad is always on.
-        """
+    def switch(self) -> Switch:
+        """The switch in Mainsail or Fluidd, read from its macro in Klipper."""
         try:
             status = self.backend.query({SWITCH: ["value"]})
         except BackendError as exc:
             log.warning("switch not readable: %s", exc)
-            return None
+            return Switch.UNREADABLE
         # Klipper answers for a macro that does not exist with value null.
         value = status.get(SWITCH, {}).get("value")
-        return value is None or bool(value)
+        if value is None:
+            return Switch.MISSING
+        return Switch.ON if value else Switch.OFF
+
+    def switch_state(self) -> bool | None:
+        """Whether jogpad is on; None if the switch cannot be read.
+
+        Without the macro in Klipper there is no switch, and jogpad is always on.
+        """
+        switch = self.switch()
+        return None if switch is Switch.UNREADABLE else switch is not Switch.OFF
 
     def handle(self, events: list[tuple[int, int]], now: float) -> None:
         if any(value == KEY_PRESS for _, value in events):

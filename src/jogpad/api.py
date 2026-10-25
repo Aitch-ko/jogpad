@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field, ValidationError
 from jogpad import __version__
 from jogpad.config import Action, Config
 from jogpad.config_store import assign_keys, conflicts, set_invert
-from jogpad.core import BackendError, State
+from jogpad.core import BackendError, State, Switch
 from jogpad.events import EventHub
 from jogpad.i18n import languages, messages, t
 from jogpad.keys import key_name
@@ -29,8 +29,9 @@ WEB_DIR = Path(__file__).parent / "web"
 KEEPALIVE_S = 15
 LANG = Query(None, description="Language of the page; default: the configured one.")
 MAX_LEARN_S = 60
-# Height of the state bar in the panel view, in key units.
-PANEL_STATE_ROWS = 1.5
+# Height of the state bar in the panel view, in key units: one row of cells at the
+# usual width of a camera panel.
+PANEL_STATE_ROWS = 0.8
 FORBIDDEN = "changes are only allowed from this computer and from computers Moonraker trusts"
 
 
@@ -59,6 +60,9 @@ class JogState(BaseModel):
     switched_on: bool | None = Field(
         description="The switch in Mainsail or Fluidd; true without one, null if unreadable."
     )
+    has_switch: bool = Field(
+        description="Whether Klipper has the switch macro, so `PUT /api/switch` works."
+    )
     step: float
     selected_axis: str
     home_selection: list[str] | None
@@ -75,6 +79,10 @@ class KeysRequest(BaseModel):
     replace: bool = Field(
         False, description="Take the keys away from other actions instead of refusing."
     )
+
+
+class SwitchRequest(BaseModel):
+    on: bool
 
 
 class InvertRequest(BaseModel):
@@ -227,8 +235,10 @@ def create_app(
     def get_state() -> JogState:
         c = cfg()
         s = service.state() if service else State(c.jog.steps[0], c.jog.select_axes[0], None, None)
+        switch = service.jogger.switch() if service else Switch.MISSING
         return JogState(
-            switched_on=service.jogger.switch_state() if service else True,
+            switched_on=None if switch is Switch.UNREADABLE else switch is not Switch.OFF,
+            has_switch=switch in (Switch.ON, Switch.OFF),
             step=s.step,
             selected_axis=s.selected_axis,
             home_selection=s.home_selection,
@@ -322,6 +332,18 @@ def create_app(
         if moonraker is None:
             raise HTTPException(503, "jogpad runs without Moonraker")
         return moonraker
+
+    @app.put(
+        "/api/switch",
+        summary="Switch jogpad on or off, like its switch in Mainsail and Fluidd",
+        dependencies=[Depends(may_change)],
+    )
+    def put_switch(request: SwitchRequest) -> JogState:
+        try:
+            firmware().set_switch(request.on)
+        except BackendError as exc:
+            raise HTTPException(503, f"cannot switch jogpad: {exc}") from exc
+        return get_state()
 
     @app.get("/api/panel", summary="jogpad's view in Mainsail and Fluidd")
     def get_panel() -> Panel:

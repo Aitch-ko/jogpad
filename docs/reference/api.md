@@ -21,4 +21,5 @@ A running instance serves the interactive Swagger UI at `/docs` and ReDoc at `/r
 | `PUT` | `/api/panel` | Show jogpad's view in Mainsail and Fluidd as the camera `jogpad` |
 | `DELETE` | `/api/panel` | Remove jogpad's view from Mainsail and Fluidd |
 | `GET` | `/api/state` | Current step size, selected axis and HOME selection |
+| `PUT` | `/api/switch` | Switch jogpad on or off, like its switch in Mainsail and Fluidd |
 | `GET` | `/api/version` | Installed jogpad version |
