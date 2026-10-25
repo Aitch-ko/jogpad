@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/Aitch-ko/jogpad/compare/v0.5.0...v0.6.0) (2026-10-25)
+
+
+### Features
+
+* installer and jogpad setup-switch add the switch to Klipper and Moonraker ([#33](https://github.com/Aitch-ko/jogpad/issues/33)) ([eaf72e4](https://github.com/Aitch-ko/jogpad/commit/eaf72e434b736a264c7c77a903ebb4a0f74842a7))
+
 ## [0.5.0](https://github.com/Aitch-ko/jogpad/compare/v0.4.0...v0.5.0) (2026-10-25)
 
 
