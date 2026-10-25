@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/Aitch-ko/jogpad/compare/v0.6.0...v0.6.1) (2026-10-25)
+
+
+### Documentation
+
+* installer names the web page, installation guide says what to do there ([#35](https://github.com/Aitch-ko/jogpad/issues/35)) ([25bfa23](https://github.com/Aitch-ko/jogpad/commit/25bfa239657681bf159e3afadad296ec0c4e1033))
+
 ## [0.6.0](https://github.com/Aitch-ko/jogpad/compare/v0.5.0...v0.6.0) (2026-10-25)
 
 
