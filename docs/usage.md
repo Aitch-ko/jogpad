@@ -96,7 +96,8 @@ presses give one line. Set `announce_moves = false` under `[jog]` to turn this o
 
 ## Web page
 
-`jogpad serve` also serves a page at `http://127.0.0.1:7150/`. It draws your
+`jogpad serve` also serves a page on port 7150 of the machine, for example
+`http://printer.local:7150/`. It draws your
 pad and lights up every key you press, with the action it triggers, and shows
 step size, knob axis and the last refusal. Keys outside the drawing are listed
 too, so the page also tells you which code an unknown key sends.
@@ -142,21 +143,29 @@ takes the change over at once. Comments in the file are kept.
 
 The page itself never moves the machine; moves only come from the pad.
 
-### Access from other computers
+### Who may change what
 
-By default the page is only reachable on the machine itself, for example
-through an SSH tunnel:
+Every computer in your network can open the page and watch the key presses;
+there is no login. Changes, such as learning keys or checking directions, are
+allowed from the machine itself and from the computers Moonraker trusts: the
+addresses and ranges under `trusted_clients` in `moonraker.conf`. Whoever may
+move the machine from Mainsail or Fluidd may also change what the keys do.
+jogpad asks Moonraker on every change, so an edited `moonraker.conf` counts as
+soon as Moonraker has restarted.
+
+Host names in `trusted_clients` do not count for jogpad, only addresses and
+ranges. With `force_logins` in Moonraker, only the machine itself may change
+anything.
+
+To keep the page on the machine itself, set `host = "127.0.0.1"` under
+`[server]` and open it through an SSH tunnel:
 
 ```bash
-ssh -L 7150:127.0.0.1:7150 pi@printer.local
+ssh -N -L 7150:127.0.0.1:7150 pi@printer.local
 ```
 
-and then `http://127.0.0.1:7150/` on your computer. To open it directly from
-another computer, set `host = "0.0.0.0"` under `[server]`. Anyone in your
-network can then watch the key presses; there is no login yet. Changes stay
-limited to the machine itself unless you also set
-`allow_remote_changes = true`, which lets anyone in the network reassign your
-keys, STOP included.
+and then `http://127.0.0.1:7150/` on your computer. `allow_remote_changes =
+true` lets every computer in the network reassign your keys, STOP included.
 
 ## Locks
 

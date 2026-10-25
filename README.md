@@ -79,7 +79,8 @@ Klipper:
   QIDI Plus 4 with the keypad of a Logitech MX Keys S
 - every move and homing shows up in the Mainsail or Fluidd console
 - a web page in English and German that draws the pad, shows each key press
-  live, learns keys and checks the direction of each axis
+  live, learns keys and checks the direction of each axis; reachable from
+  every computer in the network, changes only from those Moonraker trusts
 - an installer that sets jogpad up as a service next to Klipper
   ([installation](docs/installation.md), [setup](docs/usage.md))
 
@@ -104,20 +105,14 @@ git clone https://github.com/Aitch-ko/jogpad.git
 Then enter your pad in `~/printer_data/config/jogpad.toml`, see
 [Klipper setup](docs/usage.md).
 
-The web page and the API listen on the printer itself only. Open them from
-your computer through an SSH tunnel:
+Then open, with your printer's name or address:
 
-```bash
-ssh -N -L 7150:127.0.0.1:7150 pi@printer.local
-```
+- `http://printer.local:7150/` for the web page
+- `http://printer.local:7150/docs` for the Swagger UI of the API
 
-While the tunnel is open:
-
-- `http://127.0.0.1:7150/` is the web page
-- `http://127.0.0.1:7150/docs` is the Swagger UI of the API
-
-To reach the page without a tunnel, see
-[access from other computers](docs/usage.md#access-from-other-computers).
+Every computer in your network can watch; only the computers Moonraker trusts
+may change settings, see
+[who may change what](docs/usage.md#who-may-change-what).
 
 ## Documentation
 

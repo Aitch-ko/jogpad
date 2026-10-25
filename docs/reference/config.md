@@ -37,10 +37,10 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 
 | Key | Default | Description |
 | --- | --- | --- |
-| `host` | `"127.0.0.1"` | Address the web interface and API listen on. |
+| `host` | `"0.0.0.0"` | Address the web interface and API listen on. `0.0.0.0` lets every computer in the network watch; `127.0.0.1` keeps the page on the machine itself. |
 | `port` | `7150` | Port of the web interface and API. |
 | `language` | `"en"` | Language of console messages, and of the web page for viewers whose browser asks for none of the available ones. |
-| `allow_remote_changes` | `false` | Let other computers change the configuration through the web page. Without it only the machine itself may, e.g. through an SSH tunnel. |
+| `allow_remote_changes` | `false` | Let every computer change the configuration through the web page. Without it only the machine itself and the computers Moonraker trusts (`trusted_clients`) may. |
 
 ## Default keys
 

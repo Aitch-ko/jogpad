@@ -106,7 +106,7 @@ def _serve(config: Config, path: Path | None) -> int:
     try:
         # Open live streams never close by themselves; without a limit a restart
         # waits until systemd kills the process.
-        app = create_app(config, service, path)
+        app = create_app(config, service, path, backend.trusted_networks)
         uvicorn.run(app, host=host, port=port, timeout_graceful_shutdown=3)
     finally:
         service.stop()

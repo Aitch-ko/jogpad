@@ -163,7 +163,11 @@ class InputConfig(_Section):
 
 
 class ServerConfig(_Section):
-    host: str = Field("127.0.0.1", description="Address the web interface and API listen on.")
+    host: str = Field(
+        "0.0.0.0",
+        description="Address the web interface and API listen on. `0.0.0.0` lets every "
+        "computer in the network watch; `127.0.0.1` keeps the page on the machine itself.",
+    )
     port: int = Field(7150, ge=1, le=65535, description="Port of the web interface and API.")
     language: Literal["en", "de"] = Field(
         "en",
@@ -172,8 +176,9 @@ class ServerConfig(_Section):
     )
     allow_remote_changes: bool = Field(
         False,
-        description="Let other computers change the configuration through the web page. "
-        "Without it only the machine itself may, e.g. through an SSH tunnel.",
+        description="Let every computer change the configuration through the web page. "
+        "Without it only the machine itself and the computers Moonraker trusts "
+        "(`trusted_clients`) may.",
     )
 
 

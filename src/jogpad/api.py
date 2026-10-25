@@ -17,17 +17,19 @@ from pydantic import BaseModel, Field, ValidationError
 from jogpad import __version__
 from jogpad.config import Action, Config
 from jogpad.config_store import assign_keys, conflicts, set_invert
-from jogpad.core import State
+from jogpad.core import BackendError, State
 from jogpad.events import EventHub
 from jogpad.i18n import languages, messages, t
 from jogpad.keys import key_name
 from jogpad.layouts import NO_LAYOUT, Layout, layout_ids, load_layout
+from jogpad.moonraker import IPNetwork
 from jogpad.service import Service
 
 WEB_DIR = Path(__file__).parent / "web"
 KEEPALIVE_S = 15
 LANG = Query(None, description="Language of the page; default: the configured one.")
 MAX_LEARN_S = 60
+FORBIDDEN = "changes are only allowed from this computer and from computers Moonraker trusts"
 
 
 class Health(BaseModel):
@@ -123,10 +125,14 @@ def describe_event(config: Config, code: int, value: int) -> KeyEvent:
 
 
 def create_app(
-    config: Config, service: Service | None = None, config_path: Path | None = None
+    config: Config,
+    service: Service | None = None,
+    config_path: Path | None = None,
+    trusted_networks: Callable[[], list[IPNetwork]] | None = None,
 ) -> FastAPI:
     """`service` is the running jogpad; without it the page shows a static state.
-    Changes are written to `config_path`."""
+    Changes are written to `config_path`. They are allowed from this computer and
+    from the addresses `trusted_networks` returns, asked anew for every change."""
     app = FastAPI(
         title="jogpad",
         version=__version__,
@@ -150,15 +156,26 @@ def create_app(
 
     def may_change(request: Request) -> None:
         # A changed STOP key from anywhere in the network would be a nasty surprise.
+        # Computers Moonraker trusts may move the machine anyway, so they may also
+        # change what the keys do.
         if cfg().server.allow_remote_changes:
             return
-        host = request.client.host if request.client else ""
         try:
-            if ipaddress.ip_address(host).is_loopback:
-                return
+            address = ipaddress.ip_address(request.client.host if request.client else "")
         except ValueError:
-            pass
-        raise HTTPException(403, "changes are only allowed from this computer")
+            raise HTTPException(403, FORBIDDEN) from None
+        if address.is_loopback:
+            return
+        if trusted_networks is not None:
+            try:
+                networks = trusted_networks()
+            except BackendError as exc:
+                raise HTTPException(
+                    503, f"cannot ask Moonraker which computers it trusts: {exc}"
+                ) from exc
+            if any(address in network for network in networks):
+                return
+        raise HTTPException(403, FORBIDDEN)
 
     def save(change: Callable[[Path], Config]) -> Config:
         if config_path is None:

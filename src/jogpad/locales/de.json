@@ -69,7 +69,7 @@
   "ui.dir.nothing_hint": "Dann hat die Maschine abgelehnt, siehe Konsole. Ist sie referenziert?",
   "ui.direction_ok": "{axis} fährt richtig herum.",
   "ui.direction_fixed": "{axis} umgedreht. Zur Sicherheit noch einmal prüfen.",
-  "ui.forbidden": "Ändern geht nur am Gerät selbst (oder mit allow_remote_changes).",
+  "ui.forbidden": "Ändern dürfen nur Rechner, denen Moonraker vertraut (trusted_clients), oder alle mit allow_remote_changes.",
   "ui.error": "Nicht gespeichert: {error}",
   "ui.link.repo": "jogpad auf GitHub",
   "ui.link.bug": "Fehler melden",

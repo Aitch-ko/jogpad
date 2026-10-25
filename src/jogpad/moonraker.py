@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import ipaddress
 import json
+import logging
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -12,6 +14,10 @@ from jogpad.core import BackendError
 
 MOVE_TIMEOUT_S = 30
 HOME_TIMEOUT_S = 180
+
+log = logging.getLogger(__name__)
+
+IPNetwork = ipaddress.IPv4Network | ipaddress.IPv6Network
 
 
 class Moonraker:
@@ -53,6 +59,34 @@ class Moonraker:
         # Shown in the Mainsail/Fluidd console; needs [respond] in printer.cfg.
         text = message.replace('"', "'").replace("\n", " ")
         self._script(f'RESPOND PREFIX=jogpad MSG="{text}"', 5)
+
+    def trusted_networks(self) -> list[IPNetwork]:
+        """Addresses Moonraker lets in without a login, from `trusted_clients`.
+
+        Host names are left out: Moonraker looks them up per request, jogpad
+        does not. With `force_logins` the list is empty, since jogpad cannot
+        tell whether Moonraker has users that make it count.
+        """
+        reply = self._request("/server/config")
+        try:
+            authorization: dict[str, Any] = reply["result"]["config"].get("authorization", {})
+        except (KeyError, TypeError, AttributeError) as exc:
+            # The reply holds the whole Moonraker configuration; the start is enough.
+            raise BackendError(f"unexpected reply: {reply!r:.300}") from exc
+        if authorization.get("force_logins"):
+            return []
+        entries = authorization.get("trusted_clients", [])
+        if not isinstance(entries, list):
+            raise BackendError(f"unexpected trusted_clients: {entries!r}")
+        networks: list[IPNetwork] = []
+        for entry in entries:
+            try:
+                networks.append(ipaddress.ip_network(entry))
+            except ValueError:
+                log.warning(
+                    "trusted_clients: ignoring %r, jogpad takes addresses and ranges only", entry
+                )
+        return networks
 
     def _script(self, gcode: str, timeout: float) -> None:
         self._request("/printer/gcode/script", {"script": gcode}, timeout)

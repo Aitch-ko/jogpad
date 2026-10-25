@@ -69,7 +69,7 @@
   "ui.dir.nothing_hint": "Then the machine refused the move, see the console. Is it homed?",
   "ui.direction_ok": "{axis} moves the right way.",
   "ui.direction_fixed": "{axis} reversed. Check again to be sure.",
-  "ui.forbidden": "Changes are only allowed on the machine itself (or allow_remote_changes).",
+  "ui.forbidden": "Changes are only allowed from computers Moonraker trusts (trusted_clients), or with allow_remote_changes.",
   "ui.error": "Not saved: {error}",
   "ui.link.repo": "jogpad on GitHub",
   "ui.link.bug": "Report a bug",

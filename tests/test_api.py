@@ -1,9 +1,13 @@
+import ipaddress
+from collections.abc import Callable
 from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from jogpad.api import create_app, describe_event, describe_pad
 from jogpad.config import Config
+from jogpad.core import BackendError
+from jogpad.moonraker import IPNetwork
 
 
 def client() -> TestClient:
@@ -71,12 +75,24 @@ LOCAL = ("127.0.0.1", 50000)
 REMOTE = ("192.168.1.20", 50000)
 
 
+def home_network() -> list[IPNetwork]:
+    return [ipaddress.ip_network("192.168.1.0/24")]
+
+
+def moonraker_down() -> list[IPNetwork]:
+    raise BackendError("connection refused")
+
+
 def writer(
-    tmp_path: Path, config: Config | None = None, client_host: tuple[str, int] = LOCAL
+    tmp_path: Path,
+    config: Config | None = None,
+    client_host: tuple[str, int] = LOCAL,
+    trusted_networks: Callable[[], list[IPNetwork]] | None = None,
 ) -> TestClient:
     path = tmp_path / "jogpad.toml"
     path.touch()
-    return TestClient(create_app(config or Config(), config_path=path), client=client_host)
+    app = create_app(config or Config(), config_path=path, trusted_networks=trusted_networks)
+    return TestClient(app, client=client_host)
 
 
 def test_assigned_key_shows_in_active_config(tmp_path: Path) -> None:
@@ -110,6 +126,26 @@ def test_invert_is_saved(tmp_path: Path) -> None:
 def test_changes_from_the_network_are_refused(tmp_path: Path) -> None:
     response = writer(tmp_path, client_host=REMOTE).put("/api/invert", json={"axes": ["Y"]})
     assert response.status_code == 403
+
+
+def test_changes_from_a_computer_moonraker_trusts_are_saved(tmp_path: Path) -> None:
+    api = writer(tmp_path, client_host=REMOTE, trusted_networks=home_network)
+    assert api.put("/api/invert", json={"axes": ["Y"]}).status_code == 200
+
+
+def test_changes_from_a_computer_moonraker_does_not_trust_are_refused(tmp_path: Path) -> None:
+    api = writer(tmp_path, client_host=("10.0.0.5", 50000), trusted_networks=home_network)
+    assert api.put("/api/invert", json={"axes": ["Y"]}).status_code == 403
+
+
+def test_network_changes_fail_visibly_while_moonraker_is_down(tmp_path: Path) -> None:
+    api = writer(tmp_path, client_host=REMOTE, trusted_networks=moonraker_down)
+    assert api.put("/api/invert", json={"axes": ["Y"]}).status_code == 503
+
+
+def test_local_changes_work_while_moonraker_is_down(tmp_path: Path) -> None:
+    api = writer(tmp_path, trusted_networks=moonraker_down)
+    assert api.put("/api/invert", json={"axes": ["Y"]}).status_code == 200
 
 
 def test_network_changes_can_be_allowed(tmp_path: Path) -> None:
