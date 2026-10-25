@@ -38,4 +38,5 @@ zensical build --strict
 - Visible changes to the web page: run `python scripts/screenshots.py` and
   commit the new images under `docs/assets/screenshots/`.
 - The HTTP API and the agent interface never move a machine.
-- Commit trailer `Assisted-by: <agent>`, never `Co-Authored-By`.
+- No `Assisted-by` or `Co-Authored-By` trailers; the README says once that
+  jogpad is developed with Claude Code.

@@ -20,7 +20,7 @@ user interface live in `src/jogpad/locales/`.
 4. Pull requests are squash-merged: the PR title becomes the commit title on
    `main` and decides the next version, the PR description becomes the commit
    body. Write the description as a commit message: why the change is needed,
-   plain text, any trailers (`Assisted-by: ...`) on the last lines.
+   plain text.
 
 ## Every change: code, docs and translations together
 
@@ -66,14 +66,10 @@ zensical build --strict
 
 ## Commits with AI assistance
 
-When a coding assistant helped, add a trailer to the commit:
-
-```text
-Assisted-by: Claude (claude.ai/code)
-```
-
-Never use `Co-Authored-By` for an assistant: GitHub shows it as a person. The
-human who opens the pull request is its author and answers for it.
+jogpad is developed with Claude Code; the README says so once. Commits carry
+no trailer for it, neither `Assisted-by` nor `Co-Authored-By`: the latter
+makes GitHub list the assistant as a person among the contributors. The human
+who opens the pull request is its author and answers for it.
 
 ## Releases
 

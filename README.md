@@ -170,6 +170,9 @@ python3 -m venv .venv
 Documentation: `docs/`, built with [Zensical](https://zensical.org/).
 Rules for contributions: [CONTRIBUTING.md](CONTRIBUTING.md).
 
+jogpad is developed with [Claude Code](https://claude.com/claude-code). The
+person who merges a change answers for it.
+
 ## Acknowledgements
 
 Pad programming builds on the protocol work in
