@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.4.0](https://github.com/Aitch-ko/jogpad/compare/v0.3.0...v0.4.0) (2026-10-25)
+
+
+### Features
+
+* web page open in the network, changes only from computers Moonraker trusts ([#25](https://github.com/Aitch-ko/jogpad/issues/25)) ([29fb062](https://github.com/Aitch-ko/jogpad/commit/29fb062703fa313c0e5b1faa8b72d2d9d4407bc2))
+
+
+### Bug Fixes
+
+* start message reaches the journal right away ([#26](https://github.com/Aitch-ko/jogpad/issues/26)) ([6a57431](https://github.com/Aitch-ko/jogpad/commit/6a574318704731aaf7f63bd2d4a2b0ca0feff73f))
+
+
+### Documentation
+
+* getting started, documentation map and repository layout in the README ([#23](https://github.com/Aitch-ko/jogpad/issues/23)) ([47ba03a](https://github.com/Aitch-ko/jogpad/commit/47ba03a5c1e615ceca77c4b13e43a26d15b966c9))
+
 ## [0.3.0](https://github.com/Aitch-ko/jogpad/compare/v0.2.0...v0.3.0) (2026-10-24)
 
 
