@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/Aitch-ko/jogpad/compare/v0.7.0...v0.7.1) (2026-10-25)
+
+
+### Bug Fixes
+
+* a lock on an object the firmware does not know refuses moves ([#41](https://github.com/Aitch-ko/jogpad/issues/41)) ([339efe1](https://github.com/Aitch-ko/jogpad/commit/339efe114bb7970a008955005dfa670b88b73d49))
+
 ## [0.7.0](https://github.com/Aitch-ko/jogpad/compare/v0.6.1...v0.7.0) (2026-10-25)
 
 
