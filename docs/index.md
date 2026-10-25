@@ -30,6 +30,7 @@ Klipper, tested on a QIDI Plus 4 with the keypad of a Logitech MX Keys S:
   axis directions; open in the network, changes only from computers Moonraker
   trusts
 - a switch in Mainsail and Fluidd that turns jogpad off, STOP included
+- the pad and its state as a camera panel in Mainsail and Fluidd
 - an [installer](installation.md) that sets jogpad up as a service next to
   Klipper
 

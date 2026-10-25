@@ -168,6 +168,22 @@ ssh -N -L 7150:127.0.0.1:7150 pi@printer.local
 and then `http://127.0.0.1:7150/` on your computer. `allow_remote_changes =
 true` lets every computer in the network reassign your keys, STOP included.
 
+### Show the pad in Mainsail and Fluidd
+
+Mainsail and Fluidd have no panels for other programs, but both show a web
+page as a camera. Under **Set up**, **Add** registers jogpad's compact view,
+the pad and its state, as the camera `jogpad` in Moonraker; both show it in
+their camera panel. **Remove** takes it out again.
+
+![The compact view in a camera panel: the state bar above the drawn keypad](assets/screenshots/mainsail-panel.png)
+
+Open the page with the printer's address when you add it, for example
+`http://printer.local:7150/`: Mainsail and Fluidd load the view from that
+address, so `127.0.0.1` through a tunnel is refused. The view follows the
+light or dark setting of your browser, not the theme of Mainsail. If you
+reach Mainsail over HTTPS, the browser blocks the view, since jogpad serves
+plain HTTP. The compact view is also at `http://printer.local:7150/?view=panel`.
+
 ## Switch it on and off in Mainsail or Fluidd
 
 A switch in Mainsail and Fluidd turns jogpad off while you do not need it.

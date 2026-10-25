@@ -1,13 +1,12 @@
 import ipaddress
-from collections.abc import Callable
 from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from jogpad.api import create_app, describe_event, describe_pad
+from jogpad.api import create_app, describe_event, describe_pad, panel_aspect_ratio
 from jogpad.config import Config
 from jogpad.core import BackendError
-from jogpad.moonraker import IPNetwork
+from jogpad.moonraker import IPNetwork, Moonraker
 
 
 def client() -> TestClient:
@@ -37,7 +36,7 @@ def test_swagger_ui_is_served() -> None:
 def test_only_learning_and_saving_config_can_write() -> None:
     paths = client().get("/openapi.json").json()["paths"]
     writes = {path for path, methods in paths.items() if set(methods) - {"get"}}
-    assert writes == {"/api/learn", "/api/keys/{action}", "/api/invert"}
+    assert writes == {"/api/learn", "/api/keys/{action}", "/api/invert", "/api/panel"}
 
 
 def test_numpad_six_shows_x_plus() -> None:
@@ -79,24 +78,46 @@ LOCAL = ("127.0.0.1", 50000)
 REMOTE = ("192.168.1.20", 50000)
 
 
-def home_network() -> list[IPNetwork]:
-    return [ipaddress.ip_network("192.168.1.0/24")]
+class FakeMoonraker(Moonraker):
+    """Moonraker at the network boundary: trusts 192.168.1.0/24, keeps cameras in memory."""
 
+    def __init__(self, reachable: bool = True) -> None:
+        super().__init__("http://moonraker")
+        self.reachable = reachable
+        self.camera: tuple[str, str] | None = None
 
-def moonraker_down() -> list[IPNetwork]:
-    raise BackendError("connection refused")
+    def trusted_networks(self) -> list[IPNetwork]:
+        self._check()
+        return [ipaddress.ip_network("192.168.1.0/24")]
+
+    def panel_url(self) -> str | None:
+        self._check()
+        return self.camera[0] if self.camera else None
+
+    def add_panel(self, url: str, aspect_ratio: str) -> None:
+        self._check()
+        self.camera = (url, aspect_ratio)
+
+    def remove_panel(self) -> None:
+        self._check()
+        self.camera = None
+
+    def _check(self) -> None:
+        if not self.reachable:
+            raise BackendError("connection refused")
 
 
 def writer(
     tmp_path: Path,
     config: Config | None = None,
     client_host: tuple[str, int] = LOCAL,
-    trusted_networks: Callable[[], list[IPNetwork]] | None = None,
+    moonraker: Moonraker | None = None,
+    base_url: str = "http://testserver",
 ) -> TestClient:
     path = tmp_path / "jogpad.toml"
     path.touch()
-    app = create_app(config or Config(), config_path=path, trusted_networks=trusted_networks)
-    return TestClient(app, client=client_host)
+    app = create_app(config or Config(), config_path=path, moonraker=moonraker)
+    return TestClient(app, base_url=base_url, client=client_host)
 
 
 def test_assigned_key_shows_in_active_config(tmp_path: Path) -> None:
@@ -133,22 +154,22 @@ def test_changes_from_the_network_are_refused(tmp_path: Path) -> None:
 
 
 def test_changes_from_a_computer_moonraker_trusts_are_saved(tmp_path: Path) -> None:
-    api = writer(tmp_path, client_host=REMOTE, trusted_networks=home_network)
+    api = writer(tmp_path, client_host=REMOTE, moonraker=FakeMoonraker())
     assert api.put("/api/invert", json={"axes": ["Y"]}).status_code == 200
 
 
 def test_changes_from_a_computer_moonraker_does_not_trust_are_refused(tmp_path: Path) -> None:
-    api = writer(tmp_path, client_host=("10.0.0.5", 50000), trusted_networks=home_network)
+    api = writer(tmp_path, client_host=("10.0.0.5", 50000), moonraker=FakeMoonraker())
     assert api.put("/api/invert", json={"axes": ["Y"]}).status_code == 403
 
 
 def test_network_changes_fail_visibly_while_moonraker_is_down(tmp_path: Path) -> None:
-    api = writer(tmp_path, client_host=REMOTE, trusted_networks=moonraker_down)
+    api = writer(tmp_path, client_host=REMOTE, moonraker=FakeMoonraker(reachable=False))
     assert api.put("/api/invert", json={"axes": ["Y"]}).status_code == 503
 
 
 def test_local_changes_work_while_moonraker_is_down(tmp_path: Path) -> None:
-    api = writer(tmp_path, trusted_networks=moonraker_down)
+    api = writer(tmp_path, moonraker=FakeMoonraker(reachable=False))
     assert api.put("/api/invert", json={"axes": ["Y"]}).status_code == 200
 
 
@@ -193,3 +214,44 @@ def test_pad_name_follows_the_requested_language() -> None:
 
 def test_unknown_page_language_is_rejected() -> None:
     assert client().get("/api/messages?lang=xx").status_code == 422
+
+
+PRINTER = "http://192.168.1.5:7150"
+
+
+def test_added_panel_points_at_the_compact_view(tmp_path: Path) -> None:
+    moonraker = FakeMoonraker()
+    writer(tmp_path, moonraker=moonraker, base_url=PRINTER).put("/api/panel")
+    assert moonraker.panel_url() == "http://192.168.1.5:7150/?view=panel"
+
+
+def test_added_panel_is_reported(tmp_path: Path) -> None:
+    api = writer(tmp_path, moonraker=FakeMoonraker(), base_url=PRINTER)
+    api.put("/api/panel")
+    assert api.get("/api/panel").json() == {"url": "http://192.168.1.5:7150/?view=panel"}
+
+
+def test_removed_panel_is_gone(tmp_path: Path) -> None:
+    api = writer(tmp_path, moonraker=FakeMoonraker(), base_url=PRINTER)
+    api.put("/api/panel")
+    api.delete("/api/panel")
+    assert api.get("/api/panel").json() == {"url": None}
+
+
+def test_panel_opened_through_a_tunnel_is_refused(tmp_path: Path) -> None:
+    api = writer(tmp_path, moonraker=FakeMoonraker(), base_url="http://127.0.0.1:7150")
+    assert api.put("/api/panel").status_code == 409
+
+
+def test_panel_from_an_untrusted_computer_is_refused(tmp_path: Path) -> None:
+    api = writer(tmp_path, client_host=("10.0.0.5", 50000), moonraker=FakeMoonraker())
+    assert api.put("/api/panel", headers={"host": "192.168.1.5:7150"}).status_code == 403
+
+
+def test_panel_while_moonraker_is_down_fails_visibly(tmp_path: Path) -> None:
+    api = writer(tmp_path, moonraker=FakeMoonraker(reachable=False), base_url=PRINTER)
+    assert api.get("/api/panel").status_code == 503
+
+
+def test_panel_of_the_keypad_fits_the_pad_and_the_state_bar() -> None:
+    assert panel_aspect_ratio(Config()) == "40:65"

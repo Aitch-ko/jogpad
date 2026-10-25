@@ -22,13 +22,15 @@ from jogpad.events import EventHub
 from jogpad.i18n import languages, messages, t
 from jogpad.keys import key_name
 from jogpad.layouts import NO_LAYOUT, Layout, layout_ids, load_layout
-from jogpad.moonraker import IPNetwork
+from jogpad.moonraker import Moonraker
 from jogpad.service import Service
 
 WEB_DIR = Path(__file__).parent / "web"
 KEEPALIVE_S = 15
 LANG = Query(None, description="Language of the page; default: the configured one.")
 MAX_LEARN_S = 60
+# Height of the state bar in the panel view, in key units.
+PANEL_STATE_ROWS = 1.5
 FORBIDDEN = "changes are only allowed from this computer and from computers Moonraker trusts"
 
 
@@ -88,6 +90,13 @@ class KeyEvent(BaseModel):
     part: str | None
 
 
+class Panel(BaseModel):
+    url: str | None = Field(
+        description="Address that Mainsail and Fluidd show as the camera `jogpad`; "
+        "null while it is not added."
+    )
+
+
 class Language(BaseModel):
     code: str
     name: str = Field(description="Name of the language in that language.")
@@ -111,6 +120,16 @@ def describe_pad(config: Config, language: str | None = None) -> PadView:
     return PadView(layout=layout, actions=actions)
 
 
+def panel_aspect_ratio(config: Config) -> str:
+    """Width to height of the panel view: the pad plus the state bar above it."""
+    if config.input.layout == NO_LAYOUT:
+        return "4:3"
+    controls = load_layout(config.input.layout).controls
+    width = max(c.x + c.w for c in controls)
+    height = max(c.y + c.h for c in controls) + PANEL_STATE_ROWS
+    return f"{round(width * 10)}:{round(height * 10)}"
+
+
 def describe_event(config: Config, code: int, value: int) -> KeyEvent:
     action = config.input.actions_by_code().get(code)
     control: str | None = None
@@ -131,11 +150,11 @@ def create_app(
     config: Config,
     service: Service | None = None,
     config_path: Path | None = None,
-    trusted_networks: Callable[[], list[IPNetwork]] | None = None,
+    moonraker: Moonraker | None = None,
 ) -> FastAPI:
     """`service` is the running jogpad; without it the page shows a static state.
     Changes are written to `config_path`. They are allowed from this computer and
-    from the addresses `trusted_networks` returns, asked anew for every change."""
+    from the addresses `moonraker` trusts, asked anew for every change."""
     app = FastAPI(
         title="jogpad",
         version=__version__,
@@ -169,9 +188,9 @@ def create_app(
             raise HTTPException(403, FORBIDDEN) from None
         if address.is_loopback:
             return
-        if trusted_networks is not None:
+        if moonraker is not None:
             try:
-                networks = trusted_networks()
+                networks = moonraker.trusted_networks()
             except BackendError as exc:
                 raise HTTPException(
                     503, f"cannot ask Moonraker which computers it trusts: {exc}"
@@ -299,6 +318,55 @@ def create_app(
     def put_invert(request: InvertRequest) -> Config:
         return save(lambda path: set_invert(path, request.axes))
 
+    def firmware() -> Moonraker:
+        if moonraker is None:
+            raise HTTPException(503, "jogpad runs without Moonraker")
+        return moonraker
+
+    @app.get("/api/panel", summary="jogpad's view in Mainsail and Fluidd")
+    def get_panel() -> Panel:
+        try:
+            return Panel(url=firmware().panel_url())
+        except BackendError as exc:
+            raise HTTPException(503, f"cannot ask Moonraker: {exc}") from exc
+
+    @app.put(
+        "/api/panel",
+        summary="Show jogpad's view in Mainsail and Fluidd as the camera `jogpad`",
+        dependencies=[Depends(may_change)],
+    )
+    def put_panel(request: Request) -> Panel:
+        # Mainsail and Fluidd load the view from the address this page was opened
+        # with; a tunnel's 127.0.0.1 would point every other browser at itself.
+        host = request.url.hostname or ""
+        if host == "localhost" or _is_loopback(host):
+            raise HTTPException(409, "open this page with the printer's address, not " + host)
+        url = f"{request.base_url}?view=panel"
+        try:
+            firmware().add_panel(url, panel_aspect_ratio(cfg()))
+        except BackendError as exc:
+            raise HTTPException(503, f"cannot add the camera in Moonraker: {exc}") from exc
+        return Panel(url=url)
+
+    @app.delete(
+        "/api/panel",
+        summary="Remove jogpad's view from Mainsail and Fluidd",
+        dependencies=[Depends(may_change)],
+    )
+    def delete_panel() -> Panel:
+        try:
+            firmware().remove_panel()
+        except BackendError as exc:
+            raise HTTPException(503, f"cannot remove the camera in Moonraker: {exc}") from exc
+        return Panel(url=None)
+
     # Last: the page must not shadow the API or the docs.
     app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
     return app
+
+
+def _is_loopback(host: str) -> bool:
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False

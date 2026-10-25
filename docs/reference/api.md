@@ -17,5 +17,8 @@ A running instance serves the interactive Swagger UI at `/docs` and ReDoc at `/r
 | `POST` | `/api/learn` | For a while keys only show up here and move nothing; STOP still works |
 | `GET` | `/api/messages` | Texts of the web page |
 | `GET` | `/api/pad` | Configured pad layout and the action of each control |
+| `GET` | `/api/panel` | jogpad's view in Mainsail and Fluidd |
+| `PUT` | `/api/panel` | Show jogpad's view in Mainsail and Fluidd as the camera `jogpad` |
+| `DELETE` | `/api/panel` | Remove jogpad's view from Mainsail and Fluidd |
 | `GET` | `/api/state` | Current step size, selected axis and HOME selection |
 | `GET` | `/api/version` | Installed jogpad version |

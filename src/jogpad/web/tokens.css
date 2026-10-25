@@ -20,6 +20,7 @@
   --font: system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: ui-monospace, "Cascadia Mono", Menlo, monospace;
   --font-scale: 1;
+  --off-opacity: 0.4;
 }
 
 @media (prefers-color-scheme: dark) {

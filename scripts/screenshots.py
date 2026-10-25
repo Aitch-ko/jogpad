@@ -21,10 +21,13 @@ from playwright.sync_api import Page, sync_playwright
 
 from jogpad.api import create_app
 from jogpad.config import load_config
+from jogpad.moonraker import Moonraker
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "assets" / "screenshots"
 VIEWPORT = {"width": 1100, "height": 860}
+# Width of a camera panel in Mainsail; the height follows the keypad panel's 40:65.
+PANEL_VIEWPORT = {"width": 400, "height": 650}
 
 # KeyEvent payloads as /api/events sends them.
 PRESSES = [
@@ -34,6 +37,16 @@ PRESSES = [
 ]
 HELD = {"code": 77, "name": "KEY_KP6", "action": "x_plus", "control": "6"}
 Y_PLUS = {"code": 72, "name": "KEY_KP8", "action": "y_plus", "control": "8"}
+
+
+class NoCamera(Moonraker):
+    """A Moonraker without jogpad's camera, so the setup shows the Add button."""
+
+    def __init__(self) -> None:
+        super().__init__("http://127.0.0.1:1")
+
+    def panel_url(self) -> str | None:
+        return None
 
 
 def main() -> None:
@@ -55,6 +68,15 @@ def main() -> None:
                     learning(page, "learn-key.png")
                     direction_check(page, "check-direction.png")
                 context.close()
+            # The panel view as Mainsail shows it: a narrow camera panel, dark.
+            context = browser.new_context(
+                viewport=PANEL_VIEWPORT, color_scheme="dark", device_scale_factor=2
+            )
+            page = context.new_page()
+            open_page(page, url + "&view=panel")
+            press(page, HELD)
+            page.screenshot(path=OUT / "mainsail-panel.png")
+            context.close()
             browser.close()
     for path in sorted(OUT.glob("*.png")):
         print(path.relative_to(ROOT))
@@ -65,7 +87,7 @@ def serve(config_path: Path) -> str:
     with socket.socket() as s:
         s.bind(("127.0.0.1", 0))
         port = s.getsockname()[1]
-    app = create_app(load_config(config_path), config_path=config_path)
+    app = create_app(load_config(config_path), config_path=config_path, moonraker=NoCamera())
     server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning"))
     threading.Thread(target=server.run, daemon=True).start()
     while not server.started:

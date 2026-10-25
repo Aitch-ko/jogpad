@@ -113,7 +113,7 @@ def _serve(config: Config, path: Path | None) -> int:
         # Open live streams never close by themselves; without a limit a restart
         # waits until systemd kills the process. No access log: an open page asks
         # for the state every 2 s, which would bury the journal.
-        app = create_app(config, service, path, backend.trusted_networks)
+        app = create_app(config, service, path, backend)
         uvicorn.run(app, host=host, port=port, timeout_graceful_shutdown=3, access_log=False)
     finally:
         service.stop()

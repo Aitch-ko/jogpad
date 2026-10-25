@@ -84,6 +84,7 @@ Klipper:
   live, learns keys and checks the direction of each axis; reachable from
   every computer in the network, changes only from those Moonraker trusts
 - a switch in Mainsail and Fluidd that turns jogpad off, STOP included
+- the pad and its state as a camera panel in Mainsail and Fluidd
 - an installer that sets jogpad up as a service next to Klipper
   ([installation](docs/installation.md), [setup](docs/usage.md))
 

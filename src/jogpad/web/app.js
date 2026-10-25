@@ -353,6 +353,32 @@ function showLinks(version) {
   set("link-changelog", links.Changelog, t("ui.link.changelog"));
 }
 
+// -- setup: Mainsail and Fluidd ------------------------------------------------
+
+async function renderMainsail() {
+  const button = $("mainsail-button");
+  let panel;
+  try {
+    panel = await getJson("/api/panel");
+  } catch {
+    $("mainsail-status").textContent = t("ui.panel_unknown");
+    button.hidden = true;
+    return;
+  }
+  $("mainsail-status").textContent = panel.url ? t("ui.panel_added") : t("ui.panel_missing");
+  button.textContent = panel.url ? t("ui.panel_remove") : t("ui.panel_add");
+  button.onclick = () => togglePanel(Boolean(panel.url));
+  button.hidden = false;
+}
+
+async function togglePanel(added) {
+  const result = await send(added ? "DELETE" : "PUT", "/api/panel");
+  if (result.status === 409) return say(t("ui.panel_local"), "error");
+  if (result.status !== 200) return failed(result);
+  say(added ? t("ui.panel_removed") : t("ui.panel_done"), "ok");
+  renderMainsail();
+}
+
 // -- live state ---------------------------------------------------------------
 
 async function refreshState() {
@@ -360,6 +386,7 @@ async function refreshState() {
     const s = await getJson("/api/state");
     const switched = { true: t("ui.switch_on"), false: t("ui.switch_off") };
     $("switch").textContent = switched[s.switched_on] ?? "–";
+    document.body.classList.toggle("switched-off", s.switched_on === false);
     $("step").textContent = `${s.step} mm`;
     $("axis").textContent = s.selected_axis;
     $("home").textContent = s.home_selection === null ? "–" : s.home_selection.join(" ") || t("ui.home_all");
@@ -388,6 +415,7 @@ function connect() {
 }
 
 async function main() {
+  document.body.classList.toggle("panel", new URLSearchParams(location.search).get("view") === "panel");
   let version;
   let available;
   [config, version, available] = await Promise.all([
@@ -414,12 +442,14 @@ async function main() {
   $("label-keys").textContent = t("ui.keys");
   $("label-directions").textContent = t("ui.directions");
   $("setup-note").textContent = t("ui.setup_note");
+  $("label-mainsail").textContent = t("ui.panel");
   $("link").textContent = t("ui.disconnected");
   $("recent").append(el("li", { class: "empty" }, t("ui.recent_empty")));
 
   drawPad(await getJson(`/api/pad?lang=${document.documentElement.lang}`));
   renderKeys();
   renderDirections();
+  renderMainsail();
   connect();
   refreshState();
   setInterval(refreshState, 2000);

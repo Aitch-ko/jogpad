@@ -18,6 +18,8 @@ HOME_TIMEOUT_S = 180
 log = logging.getLogger(__name__)
 
 IPNetwork = ipaddress.IPv4Network | ipaddress.IPv6Network
+# Name of jogpad's camera in Mainsail and Fluidd.
+PANEL = "jogpad"
 
 
 class Moonraker:
@@ -88,13 +90,40 @@ class Moonraker:
                 )
         return networks
 
+    def panel_url(self) -> str | None:
+        """Address of jogpad's camera in Mainsail and Fluidd, None if there is none."""
+        reply = self._request("/server/webcams/list")
+        try:
+            webcams: list[dict[str, Any]] = reply["result"]["webcams"]
+        except (KeyError, TypeError) as exc:
+            raise BackendError(f"unexpected reply: {reply!r:.300}") from exc
+        for webcam in webcams:
+            if webcam.get("name") == PANEL:
+                return str(webcam.get("stream_url", ""))
+        return None
+
+    def add_panel(self, url: str, aspect_ratio: str) -> None:
+        # Mainsail and Fluidd have no plugin panels, but both show a web page
+        # as a camera of the service "iframe".
+        camera = {"name": PANEL, "service": "iframe", "stream_url": url}
+        self._request("/server/webcams/item", {**camera, "aspect_ratio": aspect_ratio})
+
+    def remove_panel(self) -> None:
+        self._request(f"/server/webcams/item?name={PANEL}", method="DELETE")
+
     def _script(self, gcode: str, timeout: float) -> None:
         self._request("/printer/gcode/script", {"script": gcode}, timeout)
 
-    def _request(self, path: str, body: dict[str, Any] | None = None, timeout: float = 10) -> Any:
+    def _request(
+        self,
+        path: str,
+        body: dict[str, Any] | None = None,
+        timeout: float = 10,
+        method: str | None = None,
+    ) -> Any:
         data = None if body is None else json.dumps(body).encode()
         request = urllib.request.Request(
-            self.url + path, data=data, headers={"Content-Type": "application/json"}
+            self.url + path, data=data, headers={"Content-Type": "application/json"}, method=method
         )
         try:
             with urllib.request.urlopen(request, timeout=timeout) as response:
