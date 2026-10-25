@@ -33,6 +33,12 @@ dependencies, which takes a few minutes on a Raspberry Pi. It
 
 Then enter your pad in `jogpad.toml`, see [Klipper setup](usage.md).
 
+At the end the installer prints the address of jogpad's web page, for example
+`http://192.168.1.50:7150/`. Open it on any computer in your network: it
+shows every key press live, learns keys and checks the direction of each axis.
+Under **Set up** it can also add the pad as a camera panel in Mainsail and
+Fluidd, see [web page](usage.md#web-page).
+
 To update, pull and run the installer again:
 
 ```bash

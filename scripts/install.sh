@@ -105,3 +105,17 @@ fi
 say "Done"
 systemctl --no-pager --lines=0 status jogpad || true
 echo "Logs: journalctl -u jogpad -f"
+
+# Nothing else points to the page, so name it; jogpad.toml may move it.
+read -r HOST PORT < <("$VENV_DIR/bin/python" -c '
+import sys
+from pathlib import Path
+from jogpad.config import load_config
+server = load_config(Path(sys.argv[1])).server
+print(server.host, server.port)' "$CONFIG_FILE")
+if [ "$HOST" = 127.0.0.1 ] || [ "$HOST" = localhost ]; then
+    echo "Web page: on this computer only (host = $HOST), see the docs for an SSH tunnel"
+else
+    IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+    echo "Web page: http://${IP:-$(hostname).local}:$PORT/ (or http://$(hostname).local:$PORT/)"
+fi
