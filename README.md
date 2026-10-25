@@ -91,6 +91,61 @@ Next: programming CH57x macro pads with knobs (waiting for the pad to arrive).
 | Operating system | Linux | Windows, macOS |
 | Pads | numeric keypads, any USB keyboard | CH57x macro pads with knobs, programmed by jogpad |
 
+## Getting started
+
+On the computer that runs Klipper, as the user that runs Klipper:
+
+```bash
+cd ~
+git clone https://github.com/Aitch-ko/jogpad.git
+./jogpad/scripts/install.sh
+```
+
+Then enter your pad in `~/printer_data/config/jogpad.toml`, see
+[Klipper setup](docs/usage.md).
+
+The web page and the API listen on the printer itself only. Open them from
+your computer through an SSH tunnel:
+
+```bash
+ssh -N -L 7150:127.0.0.1:7150 pi@printer.local
+```
+
+While the tunnel is open:
+
+- `http://127.0.0.1:7150/` is the web page
+- `http://127.0.0.1:7150/docs` is the Swagger UI of the API
+
+To reach the page without a tunnel, see
+[access from other computers](docs/usage.md#access-from-other-computers).
+
+## Documentation
+
+The documentation lives in [`docs/`](docs/) and is built with
+[Zensical](https://zensical.org/). It goes online at
+<https://aitch-ko.github.io/jogpad/> once the repository is public; until then
+read it here or run `zensical serve`.
+
+| Page | What |
+| --- | --- |
+| [Installation](docs/installation.md) | installer, updates, development setup |
+| [Klipper setup](docs/usage.md) | find the pad, write `jogpad.toml`, keys, web page |
+| [Safety](docs/safety.md) | what STOP does and does not do |
+| [Use cases](docs/use-cases.md) | machines and tasks jogpad covers |
+| [Configuration](docs/reference/config.md), [CLI](docs/reference/cli.md), [API](docs/reference/api.md) | reference, generated from the code |
+
+## What is in the repository
+
+| Path | What |
+| --- | --- |
+| `src/jogpad/` | the program: input, moves, Moonraker client, web page and API |
+| `src/jogpad/layouts/` | drawings of the supported pads |
+| `src/jogpad/locales/` | English and German texts |
+| `scripts/install.sh` | installer for the Klipper computer |
+| `scripts/` | also: reference generator, screenshots, CI checks |
+| `docs/` | documentation |
+| `tests/` | tests, run with `pytest` |
+
 ## Why another tool
 
 Projects exist for single firmwares (keyboard plugins for OctoPrint and CNCjs,
