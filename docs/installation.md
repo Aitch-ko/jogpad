@@ -3,8 +3,9 @@
 !!! note
     jogpad has not been released on PyPI yet. Install it from the repository.
 
-jogpad needs Python 3.10 or newer. Raspberry Pi OS 11 (Bullseye) ships Python
-3.9 and is not supported; Raspberry Pi OS 12 (Bookworm) ships 3.11.
+jogpad needs Python 3.10 or newer. Raspberry Pi OS 12 (Bookworm) ships 3.11.
+Raspberry Pi OS 11 (Bullseye) ships 3.9; there jogpad gets its own Python, see
+[older systems](#older-systems-with-python-39).
 
 ## On the Klipper computer
 
@@ -46,6 +47,21 @@ cd ~/jogpad && git pull && ./scripts/install.sh
 ```
 
 Logs: `journalctl -u jogpad -f`.
+
+## Older systems with Python 3.9
+
+jogpad runs in its own environment, so it does not need the system's Python.
+[uv](https://docs.astral.sh/uv/) installs a newer one in your home folder,
+without sudo and without touching the system or Klipper:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+~/.local/bin/uv python install 3.12
+JOGPAD_PYTHON="$(~/.local/bin/uv python find 3.12)" ./jogpad/scripts/install.sh
+```
+
+The installer says the same when it finds Python 3.9. Klipper keeps running on
+its own Python; jogpad talks to it only through Moonraker.
 
 ## For development
 

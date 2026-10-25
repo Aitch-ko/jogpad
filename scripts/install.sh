@@ -5,6 +5,8 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VENV_DIR="${JOGPAD_VENV:-$HOME/jogpad-env}"
+# The Python jogpad's own venv is built from; Klipper keeps its own.
+PYTHON="${JOGPAD_PYTHON:-python3}"
 DATA_DIR="${JOGPAD_DATA:-$HOME/printer_data}"
 SERVICE_FILE=/etc/systemd/system/jogpad.service
 
@@ -19,16 +21,31 @@ fail() { printf 'Error: %s\n' "$*" >&2; exit 1; }
 
 [ "$(uname -s)" = Linux ] || fail "jogpad reads input devices on Linux only."
 [ "$(id -u)" -ne 0 ] || fail "run as the user that runs Klipper, not as root."
-python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))' \
-    || fail "Python 3.10 or newer is needed, found $(python3 --version 2>&1)."
+is_new_enough() { "$1" -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2> /dev/null; }
+too_old() {
+    printf 'Error: jogpad needs Python 3.10 or newer; %s is %s.\n' "$1" "$("$2" --version 2>&1)" >&2
+    cat >&2 <<EOF
+On Raspberry Pi OS 11 (Bullseye), install a newer one next to the system's with uv:
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    ~/.local/bin/uv python install 3.12
+and run again with:
+    JOGPAD_PYTHON="\$(~/.local/bin/uv python find 3.12)" $0
+EOF
+    exit 1
+}
+command -v "$PYTHON" > /dev/null || fail "Python not found: $PYTHON"
+is_new_enough "$PYTHON" || too_old "$PYTHON" "$PYTHON"
 
 # Ask for the password now rather than after the long pip run, when nobody watches.
 echo "The service part needs sudo."
 sudo -v
 
 say "Python environment in $VENV_DIR"
-[ -x "$VENV_DIR/bin/python" ] || python3 -m venv "$VENV_DIR" \
+[ -x "$VENV_DIR/bin/python" ] || "$PYTHON" -m venv "$VENV_DIR" \
     || fail "creating the venv failed; on Debian install python3-venv."
+# A venv from an earlier attempt keeps the Python it was made with.
+is_new_enough "$VENV_DIR/bin/python" \
+    || too_old "the venv $VENV_DIR (remove it, then run again)" "$VENV_DIR/bin/python"
 echo "Installing jogpad and its dependencies; the first run can take a few minutes."
 "$VENV_DIR/bin/pip" install --upgrade --disable-pip-version-check "$REPO_DIR"
 "$VENV_DIR/bin/jogpad" --version
