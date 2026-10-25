@@ -16,6 +16,8 @@ from jogpad.config import Config, load_config
 from jogpad.i18n import t
 from jogpad.keys import key_name
 
+log = logging.getLogger(__name__)
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -102,7 +104,11 @@ def _serve(config: Config, path: Path | None) -> int:
     service = Service(Jogger(config, backend), backend, config.input.devices)
     service.start()
     host, port = config.server.host, config.server.port
-    print(t("server.starting", config.server.language, version=__version__, host=host, port=port))
+    # Not print(): under systemd stdout is block-buffered, and the line would reach
+    # the journal late or, if the service stops first, never.
+    log.info(
+        t("server.starting", config.server.language, version=__version__, host=host, port=port)
+    )
     try:
         # Open live streams never close by themselves; without a limit a restart
         # waits until systemd kills the process.
