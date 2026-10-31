@@ -54,26 +54,30 @@ A numeric keypad works without a `[input.keys]` section:
 devices = ["/dev/input/by-id/usb-SIGMACHIP_USB_Keyboard-event-kbd"]
 ```
 
-A CH57x macro pad, programmed with `jogpad program-pad`:
+A CH57x macro pad, programmed with `jogpad program-pad`, needs no
+`[input.keys]` either; its layout brings its own defaults:
 
 ```toml
 [input]
 devices = ["/dev/input/by-id/usb-1189_..."]   # the path jogpad devices shows
 layout = "ch57x-9k3"
-
-[input.keys]
-selected_plus = ["KEY_KPJPCOMMA"]   # big knob right
-selected_minus = ["KEY_MUHENKAN"]   # big knob left
-select_next = ["KEY_F24"]           # big knob press: X -> Y
-z_plus = ["KEY_HENKAN"]             # middle knob right
-z_minus = ["KEY_YEN"]               # middle knob left
-step = ["KEY_F23"]                  # middle knob press
-home = ["KEY_F13"]                  # key 1
-stop = ["KEY_F21"]                  # key 9
 ```
 
-Your keys replace the keypad default of the same action; the others keep their
-default. `[]` switches an action off. All options:
+```text
+Keys                  Knobs, turned right / left
+HOME   Y+     STOP    A  small, top      X+ / X−
+X−     Step   X+      B  small, middle   Y+ / Y−
+E−     Y−     E+      C  big, bottom     Z+ / Z−
+```
+
+The keys around the middle one form a cross for X and Y; the big knob is Z,
+the axis that needs the finest control. Pressing a knob does nothing: knobs
+are easily pressed while turning, and a step that changes unnoticed from
+0.01 to 0.1 mm is exactly what jogpad is meant to prevent.
+
+Your keys replace the default of the same action; the others keep their
+default. `[]` switches an action off. With the `ch57x-9k3` layout the keypad
+defaults are gone, so list the keypad keys too if you use both. All options:
 [configuration reference](reference/config.md).
 
 Check what each key sends and which action it triggers, without moving

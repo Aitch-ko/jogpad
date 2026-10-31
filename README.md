@@ -88,7 +88,8 @@ Klipper:
 - an installer that sets jogpad up as a service next to Klipper
   ([installation](docs/installation.md), [setup](docs/usage.md))
 - `jogpad program-pad` writes its key codes into a CH57x macro pad with 9 keys
-  and 3 knobs (USB ID 1189:8840), without the vendor's software
+  and 3 knobs (USB ID 1189:8840), without the vendor's software; then its knobs
+  move X, Y and Z and its keys form a cross for X and Y, with no key setup
 
 Next: jogging with the programmed CH57x pad on the QIDI Plus 4.
 

@@ -19,7 +19,7 @@ from pydantic import BaseModel
 
 from jogpad.api import create_app
 from jogpad.cli import build_parser
-from jogpad.config import Config
+from jogpad.config import LAYOUT_KEYS, Action, Config, InputConfig
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "reference"
@@ -45,10 +45,20 @@ def config_page() -> str:
             if len(default) > 60:
                 default = "see below" if name == "keys" else default
             lines.append(f"| `{name}` | `{default}` | {sub.description or ''} |\n")
-    keys = defaults.input.model_dump(mode="json")["keys"]
-    lines.append("\n## Default keys\n\n| Action | Keys |\n| --- | --- |\n")
-    for action, names in keys.items():
-        lines.append(f"| `{action}` | {', '.join(f'`{n}`' for n in names)} |\n")
+    inputs = {"numpad": defaults.input} | {
+        layout: InputConfig.model_validate({"layout": layout}) for layout in LAYOUT_KEYS
+    }
+    lines.append(
+        "\n## Default keys\n\nThey depend on `layout`; every layout not listed here, "
+        "`none` included, gets those of `numpad`.\n\n"
+        f"| Action | {' | '.join(f'`{layout}`' for layout in inputs)} |\n"
+        f"| --- |{' --- |' * len(inputs)}\n"
+    )
+    for action in Action:
+        cells = [
+            ", ".join(f"`{n}`" for n in i.keys.get(action, [])) or "–" for i in inputs.values()
+        ]
+        lines.append(f"| `{action.value}` | {' | '.join(cells)} |\n")
     return "".join(lines)
 
 

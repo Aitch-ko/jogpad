@@ -11,7 +11,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from jogpad.keys import parse_key
 from jogpad.layouts import NO_LAYOUT, load_layout
@@ -50,6 +50,24 @@ DEFAULT_KEYS: dict[Action, list[str]] = {
     Action.HOME: ["KEY_KPENTER"],
     Action.STOP: ["KEY_KP0"],
 }
+# A CH57x pad as `jogpad program-pad` programs it: knobs A, B and C move X, Y and
+# Z, and the keys around the middle one form a cross for X and Y. Knob presses
+# stay free, since a knob is easily pressed while it is turned.
+CH57X_KEYS: dict[Action, list[str]] = {
+    Action.X_PLUS: ["KEY_F18", "KEY_KATAKANAHIRAGANA"],
+    Action.X_MINUS: ["KEY_F16", "KEY_RO"],
+    Action.Y_PLUS: ["KEY_F14", "KEY_HENKAN"],
+    Action.Y_MINUS: ["KEY_F20", "KEY_YEN"],
+    Action.Z_PLUS: ["KEY_KPJPCOMMA"],
+    Action.Z_MINUS: ["KEY_MUHENKAN"],
+    Action.E_PLUS: ["KEY_F21"],
+    Action.E_MINUS: ["KEY_F19"],
+    Action.STEP: ["KEY_F17"],
+    Action.HOME: ["KEY_F13"],
+    Action.STOP: ["KEY_F15"],
+}
+# Every other layout, `none` included, gets the keypad's.
+LAYOUT_KEYS = {"ch57x-9k3": CH57X_KEYS}
 
 
 class _Section(BaseModel):
@@ -123,7 +141,9 @@ class InputConfig(_Section):
     keys: dict[Action, list[str]] = Field(
         DEFAULT_KEYS,
         description="Key names or numbers per action, as in `linux/input-event-codes.h`. "
-        "Merged over the numeric keypad defaults; `[]` switches an action off.",
+        "Merged over the defaults of the layout: for `ch57x-9k3` those of a pad "
+        "programmed with `jogpad program-pad`, otherwise the numeric keypad's. `[]` "
+        "switches an action off.",
     )
     layout: str = Field(
         "numpad",
@@ -138,12 +158,14 @@ class InputConfig(_Section):
             load_layout(value)
         return value
 
-    @field_validator("keys", mode="before")
+    @model_validator(mode="before")
     @classmethod
-    def _merge_defaults(cls, value: Any) -> Any:
-        if isinstance(value, dict):
-            return {**{a.value: k for a, k in DEFAULT_KEYS.items()}, **value}
-        return value
+    def _merge_defaults(cls, data: Any) -> Any:
+        if isinstance(data, dict) and isinstance(data.get("keys", {}), dict):
+            defaults = LAYOUT_KEYS.get(str(data.get("layout")), DEFAULT_KEYS)
+            keys = {**{a.value: k for a, k in defaults.items()}, **data.get("keys", {})}
+            return {**data, "keys": keys}
+        return data
 
     @field_validator("keys")
     @classmethod

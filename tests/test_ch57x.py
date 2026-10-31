@@ -13,7 +13,7 @@ KEYBOARD_DESCRIPTOR = bytes.fromhex("05010906a101850105071900")
 
 @pytest.fixture
 def no_pause(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(ch57x, "PAUSE_S", 0)
+    monkeypatch.setattr(ch57x.time, "sleep", lambda seconds: None)
 
 
 def layout(**control: Any) -> Layout:

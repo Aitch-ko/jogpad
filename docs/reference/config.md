@@ -30,7 +30,7 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 | Key | Default | Description |
 | --- | --- | --- |
 | `devices` | `[]` | Input devices to read, e.g. `/dev/input/by-id/usb-...-event-kbd`. jogpad grabs them exclusively. |
-| `keys` | `see below` | Key names or numbers per action, as in `linux/input-event-codes.h`. Merged over the numeric keypad defaults; `[]` switches an action off. |
+| `keys` | `see below` | Key names or numbers per action, as in `linux/input-event-codes.h`. Merged over the defaults of the layout: for `ch57x-9k3` those of a pad programmed with `jogpad program-pad`, otherwise the numeric keypad's. `[]` switches an action off. |
 | `layout` | `"numpad"` | Pad drawn on the web page: `numpad`, `ch57x-9k3`, or `none` to list pressed keys only. |
 
 ## `[server]`
@@ -44,14 +44,21 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 
 ## Default keys
 
-| Action | Keys |
-| --- | --- |
-| `x_plus` | `KEY_KP6` |
-| `x_minus` | `KEY_KP4` |
-| `y_plus` | `KEY_KP8` |
-| `y_minus` | `KEY_KP2` |
-| `z_plus` | `KEY_KPPLUS` |
-| `z_minus` | `KEY_KPMINUS` |
-| `step` | `KEY_KPASTERISK` |
-| `home` | `KEY_KPENTER` |
-| `stop` | `KEY_KP0` |
+They depend on `layout`; every layout not listed here, `none` included, gets those of `numpad`.
+
+| Action | `numpad` | `ch57x-9k3` |
+| --- | --- | --- |
+| `x_plus` | `KEY_KP6` | `KEY_F18`, `KEY_KATAKANAHIRAGANA` |
+| `x_minus` | `KEY_KP4` | `KEY_F16`, `KEY_RO` |
+| `y_plus` | `KEY_KP8` | `KEY_F14`, `KEY_HENKAN` |
+| `y_minus` | `KEY_KP2` | `KEY_F20`, `KEY_YEN` |
+| `z_plus` | `KEY_KPPLUS` | `KEY_KPJPCOMMA` |
+| `z_minus` | `KEY_KPMINUS` | `KEY_MUHENKAN` |
+| `e_plus` | – | `KEY_F21` |
+| `e_minus` | – | `KEY_F19` |
+| `selected_plus` | – | – |
+| `selected_minus` | – | – |
+| `select_next` | – | – |
+| `step` | `KEY_KPASTERISK` | `KEY_F17` |
+| `home` | `KEY_KPENTER` | `KEY_F13` |
+| `stop` | `KEY_KP0` | `KEY_F15` |

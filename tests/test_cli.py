@@ -31,7 +31,7 @@ def test_program_pad_dry_run_shows_the_first_binding(capsys: pytest.CaptureFixtu
 
 
 def test_program_pad_writes_every_binding(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(ch57x, "PAUSE_S", 0)
+    monkeypatch.setattr(ch57x.time, "sleep", lambda seconds: None)
     device = tmp_path / "hidraw0"
     device.write_bytes(b"")
     main(["program-pad", "--device", str(device)])
