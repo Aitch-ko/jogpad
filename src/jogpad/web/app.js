@@ -7,6 +7,7 @@ const GAP = 6;
 const RECENT = 12;
 const LEARN_S = 30;
 const LANGUAGE_KEY = "jogpad.language";
+const THEME_KEY = "jogpad.theme";
 const SVG_NS = "http://www.w3.org/2000/svg";
 const ACTIONS = [
   "x_plus", "x_minus", "y_plus", "y_minus", "z_plus", "z_minus", "e_plus", "e_minus",
@@ -336,6 +337,39 @@ function setUpLanguages(available, current) {
   });
 }
 
+// -- theme --------------------------------------------------------------------
+
+// "auto" follows the browser. Without storage the choice lasts for this visit.
+function storedTheme() {
+  try {
+    const theme = localStorage.getItem(THEME_KEY);
+    return theme === "light" || theme === "dark" ? theme : "auto";
+  } catch {
+    return "auto";
+  }
+}
+
+function applyTheme(theme) {
+  if (theme === "auto") delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = theme;
+}
+
+function setUpThemes() {
+  const select = $("theme");
+  const names = { auto: t("ui.theme_auto"), light: t("ui.theme_light"), dark: t("ui.theme_dark") };
+  select.setAttribute("aria-label", t("ui.theme"));
+  select.replaceChildren(...Object.entries(names).map(([value, name]) => el("option", { value }, name)));
+  select.value = storedTheme();
+  select.addEventListener("change", () => {
+    applyTheme(select.value);
+    try {
+      localStorage.setItem(THEME_KEY, select.value);
+    } catch {
+      // Not remembered beyond this visit.
+    }
+  });
+}
+
 // -- footer -------------------------------------------------------------------
 
 function showLinks(version) {
@@ -484,6 +518,7 @@ async function main() {
   catalog = await getJson(`/api/messages?lang=${language}`);
   document.documentElement.lang = language;
   setUpLanguages(available, language);
+  setUpThemes();
   labels = actionLabels();
   $("version").textContent = version.version;
   showLinks(version);
@@ -514,4 +549,6 @@ async function main() {
   setInterval(refreshState, 2000);
 }
 
+// Before main() waits for anything, so the page does not flash in the other theme.
+applyTheme(storedTheme());
 main();

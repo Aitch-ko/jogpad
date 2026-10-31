@@ -32,10 +32,13 @@
   --font-mono: ui-monospace, "Cascadia Mono", Menlo, monospace;
   --font-scale: 1;
   --off-opacity: 0.4;
+  color-scheme: light;
 }
 
+/* Dark twice: once following the system, unless the page is set to light, and
+   once when the page is set to dark. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #161615;
     --surface: #20201f;
     --text: #ececea;
@@ -50,5 +53,24 @@
     --axis-x: #f2726a;
     --axis-y: #4cc274;
     --axis-z: #60a5fa;
+    color-scheme: dark;
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: #161615;
+  --surface: #20201f;
+  --text: #ececea;
+  --muted: #9a9a94;
+  --line: #34342f;
+  --key: #2a2a28;
+  --key-edge: #45453f;
+  --accent: #e0661b;
+  --accent-text: #161615;
+  --ok: #5bbf7a;
+  --warn: #f2726a;
+  --axis-x: #f2726a;
+  --axis-y: #4cc274;
+  --axis-z: #60a5fa;
+  color-scheme: dark;
 }

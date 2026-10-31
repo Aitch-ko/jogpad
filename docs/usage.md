@@ -144,7 +144,9 @@ and right. The drawing follows a pad with USB ID 1189:8840: nine keys on the
 left, two small knobs and a big one on the right.
 
 The page speaks English and German. It follows your browser's language; the
-menu at the top switches it, and your browser remembers the choice. Messages in
+menu at the top switches it, and your browser remembers the choice. The menu
+next to it switches between light and dark; `Auto` follows your browser's
+setting. Messages in
 the Mainsail or Fluidd console stay in the configured `language`, since
 everyone at the machine reads them.
 
@@ -210,8 +212,9 @@ their camera panel. **Remove** takes it out again.
 
 Open the page with the printer's address when you add it, for example
 `http://printer.local:7150/`: Mainsail and Fluidd load the view from that
-address, so `127.0.0.1` through a tunnel is refused. The view follows the
-light or dark setting of your browser, not the theme of Mainsail. If you
+address, so `127.0.0.1` through a tunnel is refused. The view is light or
+dark as chosen on the page under the same address, otherwise as your browser
+is set; the theme of Mainsail does not count. If you
 reach Mainsail over HTTPS, the browser blocks the view, since jogpad serves
 plain HTTP. The compact view is also at `http://printer.local:7150/?view=panel`.
 

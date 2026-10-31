@@ -100,5 +100,9 @@
   "ui.link.repo": "jogpad on GitHub",
   "ui.link.bug": "Report a bug",
   "ui.link.changelog": "What's new",
+  "ui.theme": "Appearance",
+  "ui.theme_auto": "Auto",
+  "ui.theme_light": "Light",
+  "ui.theme_dark": "Dark",
   "ui.language_name": "English"
 }
