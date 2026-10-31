@@ -131,15 +131,29 @@ def _program_pad(layout_id: str, device: Path | None, dry_run: bool) -> int:
         print(t("pad.not_found"))
         return 2
     print(t("pad.writing", device=device))
+    total = len(ch57x.bindings(layout))
     try:
         ch57x.write(device, data)
+        lacking = ch57x.check(device, layout)
+        if lacking:
+            print(t("pad.rewriting", count=len(lacking), total=total))
+            ch57x.write(device, ch57x.messages_for(lacking))
+            lacking = ch57x.check(device, layout)
     except PermissionError:
         print(t("pad.no_access", device=device))
         return 2
     except OSError as exc:
         print(t("pad.write_failed", device=device, error=exc))
         return 2
-    print(t("pad.done"))
+    if lacking is None:
+        print(t("pad.unchecked"))
+        return 0
+    if lacking:
+        print(t("pad.still_missing"))
+        for control, part, name in lacking:
+            print(f"{control.id:8} {part:6} {name}")
+        return 2
+    print(t("pad.done", total=total))
     return 0
 
 

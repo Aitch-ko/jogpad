@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 
 from jogpad import ch57x
-from jogpad.ch57x import bind, find_pad, messages, write
+from jogpad.ch57x import bind, find_pad, messages, missing, read_request, write
 from jogpad.layouts import Layout, load_layout
 
 VENDOR_DESCRIPTOR = bytes.fromhex("0600ff0901a101850309021500")
@@ -23,6 +23,11 @@ def layout(**control: Any) -> Layout:
 
 def key_id(**control: Any) -> int:
     return messages(layout(**control))[0][2]
+
+
+def answers(layout: Layout) -> list[bytes]:
+    """What a pad holding `layout` answers to a read request: its bindings with FA for FE."""
+    return [bytes([3, 0xFA]) + m[2:] for m in messages(layout)[::4]]
 
 
 def hidraw(sysfs: Path, name: str, usb_id: str, descriptor: bytes) -> None:
@@ -111,3 +116,24 @@ def test_write_sends_the_messages_in_order(tmp_path: Path, no_pause: None) -> No
     device.write_bytes(b"")
     write(device, bind(1, 0x68))
     assert device.read_bytes() == b"".join(bind(1, 0x68))
+
+
+def test_read_request_asks_for_nine_keys_and_three_knobs() -> None:
+    expected = bytes.fromhex("03 fa 09 03 01").ljust(64, b"\0")
+    assert read_request(load_layout("ch57x-9k3")) == (expected, 18)
+
+
+def test_pad_holding_the_layout_lacks_nothing() -> None:
+    pad = load_layout("ch57x-9k3")
+    assert missing(pad, answers(pad)) == []
+
+
+def test_empty_key_in_the_answers_is_missing() -> None:
+    pad = load_layout("ch57x-9k3")
+    held = [a if a[2] != 5 else bytes([3, 0xFA, 5, 1, 1]).ljust(64, b"\0") for a in answers(pad)]
+    assert [control.id for control, part, name in missing(pad, held) or []] == ["k5"]
+
+
+def test_without_read_answers_nothing_can_be_said() -> None:
+    pad = load_layout("ch57x-9k3")
+    assert missing(pad, messages(pad)[:1]) is None

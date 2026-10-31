@@ -39,9 +39,12 @@ jogpad program-pad
 
 It finds a pad with USB ID 1189:8840 or 1189:8842 by itself and lists each
 key with its new code. `--dry-run` shows what it would write, without writing.
-The pad keeps the codes when unplugged. Afterwards press every key and turn
-every knob on the [web page](#web-page) or with `jogpad keys`: if one still
-types a letter or digit, run `jogpad program-pad` again.
+The pad keeps the codes when unplugged. Afterwards jogpad reads them back from
+the pad and writes any that did not arrive once more. If one is still missing,
+it names it: unplug the pad, plug it in again and run `jogpad program-pad`
+once more. Should a pad not answer the read-back, jogpad says so; then press
+every key and turn every knob on the [web page](#web-page) or with
+`jogpad keys`.
 The installer allows the group `input` to program the pad. Pads with USB ID
 1189:8890 speak another protocol and are not supported yet.
 

@@ -1,4 +1,6 @@
 import logging
+from collections import Counter
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
@@ -38,12 +40,71 @@ def test_program_pad_dry_run_shows_the_first_binding(capsys: pytest.CaptureFixtu
     assert "03 fe 01 01 01 00 00 00 00 00 01 00 68 00" in capsys.readouterr().out
 
 
-def test_program_pad_writes_every_binding(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(ch57x.time, "sleep", lambda seconds: None)
-    device = tmp_path / "hidraw0"
-    device.write_bytes(b"")
-    main(["program-pad", "--device", str(device)])
-    assert len(device.read_bytes()) == (9 + 3 * 3) * 4 * 64
+class Pad:
+    """Stands in for the pad's hidraw node: it keeps what is written and answers
+    read requests with it, after losing the first `lose[key_id]` bindings of a key."""
+
+    def __init__(self, lose: dict[int, int] | None = None, silent: bool = False) -> None:
+        self.written: list[bytes] = []
+        self.lose = Counter(lose or {})
+        self.held: dict[int, bytes] = {}
+        self.silent = silent
+
+    def write(self, device: Path, data: Iterable[bytes]) -> None:
+        for message in data:
+            self.written.append(message)
+            if message[1] != 0xFE:
+                continue
+            if self.lose[message[2]]:
+                self.lose[message[2]] -= 1
+            else:
+                self.held[message[2]] = message
+
+    def read(self, device: Path, request: bytes, count: int) -> list[bytes]:
+        return [] if self.silent else [bytes([3, 0xFA]) + m[2:] for m in self.held.values()]
+
+
+def program(monkeypatch: pytest.MonkeyPatch, pad: Pad) -> int:
+    monkeypatch.setattr(ch57x, "write", pad.write)
+    monkeypatch.setattr(ch57x, "read", pad.read)
+    return main(["program-pad", "--device", "/dev/hidraw0"])
+
+
+def test_program_pad_writes_every_binding(monkeypatch: pytest.MonkeyPatch) -> None:
+    pad = Pad()
+    program(monkeypatch, pad)
+    assert len(pad.written) == (9 + 3 * 3) * 4
+
+
+def test_program_pad_reports_every_binding_read_back(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    program(monkeypatch, Pad())
+    assert "all 18 bindings are there" in capsys.readouterr().out
+
+
+def test_program_pad_writes_a_lost_binding_once_more(monkeypatch: pytest.MonkeyPatch) -> None:
+    pad = Pad(lose={5: 1})
+    program(monkeypatch, pad)
+    assert [m[2] for m in pad.written[(9 + 3 * 3) * 4 :] if m[1] == 0xFE] == [5]
+
+
+def test_program_pad_fails_when_a_binding_never_arrives(monkeypatch: pytest.MonkeyPatch) -> None:
+    assert program(monkeypatch, Pad(lose={5: 99})) == 2
+
+
+def test_program_pad_names_the_binding_that_never_arrived(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    program(monkeypatch, Pad(lose={5: 99}))
+    assert "KEY_F17" in capsys.readouterr().out.split("still lacks")[1]
+
+
+def test_program_pad_leaves_the_check_to_the_user_when_the_pad_is_silent(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    program(monkeypatch, Pad(silent=True))
+    assert "did not answer" in capsys.readouterr().out
 
 
 def test_program_pad_refuses_a_layout_without_slots() -> None:
