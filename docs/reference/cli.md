@@ -3,18 +3,20 @@
 # Command line
 
 ```text
-usage: jogpad [-h] [--version] {serve,check-config,devices,keys,setup-switch} ...
+usage: jogpad [-h] [--version]
+              {serve,check-config,devices,keys,setup-switch,program-pad} ...
 
 Jog pendant for 3D printers and CNC machines.
 
 positional arguments:
-  {serve,check-config,devices,keys,setup-switch}
+  {serve,check-config,devices,keys,setup-switch,program-pad}
     serve               Read the pad, jog the machine, serve the API.
     check-config        Validate a configuration file and exit.
     devices             List input devices (Linux).
     keys                Show pressed keys and their actions. Moves nothing.
     setup-switch        Add the on/off switch for Mainsail and Fluidd to printer.cfg
                         and moonraker.conf, with backups.
+    program-pad         Write a layout's key codes into a CH57x macro pad (Linux).
 
 options:
   -h, --help            show this help message and exit
@@ -72,4 +74,16 @@ options:
   -h, --help            show this help message and exit
   --config-dir CONFIG_DIR
                         Folder with printer.cfg and moonraker.conf.
+```
+
+## `jogpad program-pad`
+
+```text
+usage: jogpad program-pad [-h] [--layout LAYOUT] [--device DEVICE] [--dry-run]
+
+options:
+  -h, --help       show this help message and exit
+  --layout LAYOUT  Layout whose codes go in.
+  --device DEVICE  hidraw node of the pad; found automatically if left out.
+  --dry-run        Show the messages for the pad, write nothing.
 ```

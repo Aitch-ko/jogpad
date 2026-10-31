@@ -1,19 +1,19 @@
 {
   "name": "CH57x macro pad, 9 keys and 3 knobs",
-  "note": "Drawn after a pad with USB ID 1189:8840. Key codes are the ones jogpad will program: F13 to F24 for keys and knob presses, International1 to 6 for knob turns. jogpad cannot program the pad yet.",
-  "translations": {"de": {"name": "CH57x-Makropad, 9 Tasten und 3 Knöpfe", "note": "Gezeichnet nach einem Pad mit der USB-ID 1189:8840. Die Tastencodes sind die, die jogpad programmieren wird: F13 bis F24 für Tasten und Knopf-Drücke, International1 bis 6 für Drehungen. Programmieren kann jogpad das Pad noch nicht."}},
+  "note": "Drawn after a pad with USB ID 1189:8840. The key codes are the ones the command jogpad program-pad writes into the pad: F13 to F24 for keys and knob presses, International1 to 6 for knob turns.",
+  "translations": {"de": {"name": "CH57x-Makropad, 9 Tasten und 3 Knöpfe", "note": "Gezeichnet nach einem Pad mit der USB-ID 1189:8840. Die Tastencodes sind die, die der Befehl jogpad program-pad ins Pad schreibt: F13 bis F24 für Tasten und Knopf-Drücke, International1 bis 6 für Drehungen."}},
   "controls": [
-    {"id": "k1", "kind": "key", "x": 0, "y": 0, "label": "1", "keys": {"press": "KEY_F13"}},
-    {"id": "k2", "kind": "key", "x": 1, "y": 0, "label": "2", "keys": {"press": "KEY_F14"}},
-    {"id": "k3", "kind": "key", "x": 2, "y": 0, "label": "3", "keys": {"press": "KEY_F15"}},
-    {"id": "k4", "kind": "key", "x": 0, "y": 1, "label": "4", "keys": {"press": "KEY_F16"}},
-    {"id": "k5", "kind": "key", "x": 1, "y": 1, "label": "5", "keys": {"press": "KEY_F17"}},
-    {"id": "k6", "kind": "key", "x": 2, "y": 1, "label": "6", "keys": {"press": "KEY_F18"}},
-    {"id": "k7", "kind": "key", "x": 0, "y": 2, "label": "7", "keys": {"press": "KEY_F19"}},
-    {"id": "k8", "kind": "key", "x": 1, "y": 2, "label": "8", "keys": {"press": "KEY_F20"}},
-    {"id": "k9", "kind": "key", "x": 2, "y": 2, "label": "9", "keys": {"press": "KEY_F21"}},
-    {"id": "knob1", "kind": "knob", "x": 3.8, "y": 0.1, "w": 1.1, "h": 1.1, "label": "A", "keys": {"press": "KEY_F22", "ccw": "KEY_RO", "cw": "KEY_KATAKANAHIRAGANA"}},
-    {"id": "knob2", "kind": "knob", "x": 3.9, "y": 1.7, "w": 1.1, "h": 1.1, "label": "B", "keys": {"press": "KEY_F23", "ccw": "KEY_YEN", "cw": "KEY_HENKAN"}},
-    {"id": "knob3", "kind": "knob", "x": 3.5, "y": 3.6, "w": 2, "h": 2, "label": "C", "keys": {"press": "KEY_F24", "ccw": "KEY_MUHENKAN", "cw": "KEY_KPJPCOMMA"}}
+    {"id": "k1", "kind": "key", "slot": 0, "x": 0, "y": 0, "label": "1", "keys": {"press": "KEY_F13"}},
+    {"id": "k2", "kind": "key", "slot": 1, "x": 1, "y": 0, "label": "2", "keys": {"press": "KEY_F14"}},
+    {"id": "k3", "kind": "key", "slot": 2, "x": 2, "y": 0, "label": "3", "keys": {"press": "KEY_F15"}},
+    {"id": "k4", "kind": "key", "slot": 3, "x": 0, "y": 1, "label": "4", "keys": {"press": "KEY_F16"}},
+    {"id": "k5", "kind": "key", "slot": 4, "x": 1, "y": 1, "label": "5", "keys": {"press": "KEY_F17"}},
+    {"id": "k6", "kind": "key", "slot": 5, "x": 2, "y": 1, "label": "6", "keys": {"press": "KEY_F18"}},
+    {"id": "k7", "kind": "key", "slot": 6, "x": 0, "y": 2, "label": "7", "keys": {"press": "KEY_F19"}},
+    {"id": "k8", "kind": "key", "slot": 7, "x": 1, "y": 2, "label": "8", "keys": {"press": "KEY_F20"}},
+    {"id": "k9", "kind": "key", "slot": 8, "x": 2, "y": 2, "label": "9", "keys": {"press": "KEY_F21"}},
+    {"id": "knob1", "kind": "knob", "slot": 0, "x": 3.8, "y": 0.1, "w": 1.1, "h": 1.1, "label": "A", "keys": {"press": "KEY_F22", "ccw": "KEY_RO", "cw": "KEY_KATAKANAHIRAGANA"}},
+    {"id": "knob2", "kind": "knob", "slot": 1, "x": 3.9, "y": 1.7, "w": 1.1, "h": 1.1, "label": "B", "keys": {"press": "KEY_F23", "ccw": "KEY_YEN", "cw": "KEY_HENKAN"}},
+    {"id": "knob3", "kind": "knob", "slot": 2, "x": 3.5, "y": 3.6, "w": 2, "h": 2, "label": "C", "keys": {"press": "KEY_F24", "ccw": "KEY_MUHENKAN", "cw": "KEY_KPJPCOMMA"}}
   ]
 }

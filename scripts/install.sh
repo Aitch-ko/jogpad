@@ -73,6 +73,13 @@ if ! id -nG | tr ' ' '\n' | grep -qx input; then
     sudo usermod -aG input "$USER"
     echo "added $USER to the group input"
 fi
+# Only root may write hidraw nodes by default; jogpad program-pad needs to.
+sudo tee /etc/udev/rules.d/70-jogpad.rules > /dev/null <<'EOF'
+# CH57x macro pads: the group input may program them with jogpad program-pad
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1189", ATTRS{idProduct}=="884[02]", MODE="0660", GROUP="input"
+EOF
+sudo udevadm control --reload-rules
+sudo udevadm trigger --subsystem-match=hidraw
 sudo tee "$SERVICE_FILE" > /dev/null <<EOF
 [Unit]
 Description=jogpad jog pendant

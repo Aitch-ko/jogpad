@@ -33,12 +33,14 @@ Klipper, tested on a QIDI Plus 4 with the keypad of a Logitech MX Keys S:
 - the pad and its state as a camera panel in Mainsail and Fluidd
 - an [installer](installation.md) that sets jogpad up as a service next to
   Klipper
+- [programming a CH57x macro pad](usage.md#program-a-ch57x-macro-pad) with
+  9 keys and 3 knobs, without the vendor's software
 
 | Part | Now | Later |
 | --- | --- | --- |
 | Firmware | Klipper (Moonraker) | RepRapFirmware, FluidNC |
 | Operating system | Linux | Windows, macOS |
-| Pads | numeric keypads, any USB keyboard | CH57x macro pads with knobs, programmed by jogpad |
+| Pads | numeric keypads, any USB keyboard, CH57x macro pad 1189:8840 programmed by jogpad | other CH57x macro pads |
 
 ## How it fits together
 

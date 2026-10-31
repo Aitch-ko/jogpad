@@ -50,6 +50,17 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("~/printer_data/config"),
         help="Folder with printer.cfg and moonraker.conf.",
     )
+
+    program = sub.add_parser(
+        "program-pad", help="Write a layout's key codes into a CH57x macro pad (Linux)."
+    )
+    program.add_argument("--layout", default="ch57x-9k3", help="Layout whose codes go in.")
+    program.add_argument(
+        "--device", type=Path, help="hidraw node of the pad; found automatically if left out."
+    )
+    program.add_argument(
+        "--dry-run", action="store_true", help="Show the messages for the pad, write nothing."
+    )
     return parser
 
 
@@ -60,6 +71,8 @@ def main(argv: list[str] | None = None) -> int:
         return _devices()
     if args.command == "setup-switch":
         return _setup_switch(args.config_dir.expanduser())
+    if args.command == "program-pad":
+        return _program_pad(args.layout, args.device, args.dry_run)
     path = getattr(args, "config", None)
     try:
         config = load_config(path)
@@ -92,6 +105,41 @@ def _setup_switch(config_dir: Path) -> int:
         print(t("switch.ready", path=config_dir))
     else:
         print(t("switch.unchanged", path=config_dir))
+    return 0
+
+
+def _program_pad(layout_id: str, device: Path | None, dry_run: bool) -> int:
+    from jogpad import ch57x
+    from jogpad.layouts import load_layout
+
+    try:
+        layout = load_layout(layout_id)
+        data = ch57x.messages(layout)
+    except ValueError as exc:
+        print(t("pad.cannot_program", layout=layout_id, error=exc))
+        return 2
+    for control in layout.controls:
+        for part, name in control.keys.items():
+            print(f"{control.id:8} {part:6} {name}")
+    if dry_run:
+        for message in data:
+            print(message.hex(" "))
+        return 0
+    try:
+        device = device or ch57x.find_pad()
+    except LookupError:
+        print(t("pad.not_found"))
+        return 2
+    print(t("pad.writing", device=device))
+    try:
+        ch57x.write(device, data)
+    except PermissionError:
+        print(t("pad.no_access", device=device))
+        return 2
+    except OSError as exc:
+        print(t("pad.write_failed", device=device, error=exc))
+        return 2
+    print(t("pad.done"))
     return 0
 
 

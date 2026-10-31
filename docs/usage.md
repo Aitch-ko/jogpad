@@ -26,6 +26,25 @@ The user running jogpad must be allowed to read input devices:
 sudo usermod -aG input $USER    # log out and in again
 ```
 
+### Program a CH57x macro pad
+
+Out of the box a CH57x macro pad types letters and digits. jogpad writes other
+codes into it, the ones its drawing `ch57x-9k3` expects: F13 to F24 for the
+nine keys and the three knob presses, International1 to 6 for turning the
+knobs. No program on a printer host reacts to those keys.
+
+```bash
+jogpad program-pad
+```
+
+It finds a pad with USB ID 1189:8840 or 1189:8842 by itself and lists each
+key with its new code. `--dry-run` shows what it would write, without writing.
+The pad keeps the codes when unplugged. Afterwards press every key and turn
+every knob on the [web page](#web-page) or with `jogpad keys`: if one still
+types a letter or digit, run `jogpad program-pad` again.
+The installer allows the group `input` to program the pad. Pads with USB ID
+1189:8890 speak another protocol and are not supported yet.
+
 ## 2. Write `jogpad.toml`
 
 A numeric keypad works without a `[input.keys]` section:
@@ -35,21 +54,22 @@ A numeric keypad works without a `[input.keys]` section:
 devices = ["/dev/input/by-id/usb-SIGMACHIP_USB_Keyboard-event-kbd"]
 ```
 
-A macro pad with knobs, programmed to send F13 to F18 for the knobs:
+A CH57x macro pad, programmed with `jogpad program-pad`:
 
 ```toml
 [input]
-devices = ["/dev/input/by-id/usb-1189_8890-event-kbd"]
+devices = ["/dev/input/by-id/usb-1189_..."]   # the path jogpad devices shows
+layout = "ch57x-9k3"
 
 [input.keys]
-selected_plus = ["KEY_F13"]    # knob 1 right
-selected_minus = ["KEY_F14"]   # knob 1 left
-select_next = ["KEY_F15"]      # knob 1 press: X -> Y
-z_plus = ["KEY_F16"]           # knob 2 right
-z_minus = ["KEY_F17"]          # knob 2 left
-step = ["KEY_F18"]             # knob 2 press
-home = ["KEY_H"]
-stop = ["KEY_ESC"]
+selected_plus = ["KEY_KPJPCOMMA"]   # big knob right
+selected_minus = ["KEY_MUHENKAN"]   # big knob left
+select_next = ["KEY_F24"]           # big knob press: X -> Y
+z_plus = ["KEY_HENKAN"]             # middle knob right
+z_minus = ["KEY_YEN"]               # middle knob left
+step = ["KEY_F23"]                  # middle knob press
+home = ["KEY_F13"]                  # key 1
+stop = ["KEY_F21"]                  # key 9
 ```
 
 Your keys replace the keypad default of the same action; the others keep their
@@ -105,13 +125,13 @@ too, so the page also tells you which code an unknown key sends.
 Pick the drawing with `layout` under `[input]`: `numpad` (default),
 `ch57x-9k3`, or `none` for the list only.
 
-The `ch57x-9k3` drawing expects the codes jogpad will program into the pad:
-F13 to F24 for the nine keys and the three knob presses, and the Japanese
-keys `KEY_RO`, `KEY_KATAKANAHIRAGANA`, `KEY_YEN`, `KEY_HENKAN`,
-`KEY_MUHENKAN` and `KEY_KPJPCOMMA` (International1 to 6 in USB terms) for
-turning the knobs left and right. Nothing on a printer host reacts to those
-keys. jogpad cannot program the pad yet. The drawing follows a pad with USB ID
-1189:8840: nine keys on the left, two small knobs and a big one on the right.
+The `ch57x-9k3` drawing expects the codes `jogpad program-pad` writes into the
+pad, see [Program a CH57x macro pad](#program-a-ch57x-macro-pad): F13 to F24
+for the nine keys and the three knob presses, and the Japanese keys `KEY_RO`,
+`KEY_KATAKANAHIRAGANA`, `KEY_YEN`, `KEY_HENKAN`, `KEY_MUHENKAN` and
+`KEY_KPJPCOMMA` (International1 to 6 in USB terms) for turning the knobs left
+and right. The drawing follows a pad with USB ID 1189:8840: nine keys on the
+left, two small knobs and a big one on the right.
 
 The page speaks English and German. It follows your browser's language; the
 menu at the top switches it, and your browser remembers the choice. Messages in

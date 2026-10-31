@@ -24,7 +24,8 @@ dependencies, which takes a few minutes on a Raspberry Pi. It
   `~/klippy-env`
 - writes `~/printer_data/config/jogpad.toml` if it does not exist yet, so you
   can edit it in Mainsail or Fluidd. Existing files are left alone
-- adds you to the group `input`, which may read keyboards and pads
+- adds you to the group `input`, which may read keyboards and pads, and lets
+  that group program CH57x macro pads (`/etc/udev/rules.d/70-jogpad.rules`)
 - sets up the systemd service `jogpad`, which starts with the machine
 - adds `jogpad` to `~/printer_data/moonraker.asvc`. After a Moonraker restart,
   Mainsail and Fluidd can start, stop and restart jogpad from their service menu

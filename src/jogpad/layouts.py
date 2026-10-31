@@ -35,6 +35,12 @@ class Control(BaseModel):
     keys: dict[Part, str] = Field(
         {}, description="Key sent per part: `press` for keys, `cw`/`ccw`/`press` for knobs."
     )
+    slot: int | None = Field(
+        None,
+        ge=0,
+        description="Number of this key or knob in the pad's own firmware, from 0; "
+        "only for pads that `jogpad program-pad` programs.",
+    )
 
     @field_validator("keys")
     @classmethod

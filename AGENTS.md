@@ -8,6 +8,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) first; its rules apply to agents too.
 | --- | --- |
 | `src/jogpad/core.py` | key events to moves: steps, merging, locks, HOME, knob axis |
 | `src/jogpad/moonraker.py`, `linux_input.py`, `service.py` | firmware, input devices, threads |
+| `src/jogpad/ch57x.py` | programming CH57x macro pads through hidraw |
 | `src/jogpad/config.py` | configuration schema (pydantic); source of `docs/reference/config.md` |
 | `src/jogpad/cli.py` | command line; source of `docs/reference/cli.md` |
 | `src/jogpad/api.py` | FastAPI app; source of `docs/reference/api.md` |

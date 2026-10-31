@@ -87,16 +87,16 @@ Klipper:
 - the pad and its state as a camera panel in Mainsail and Fluidd
 - an installer that sets jogpad up as a service next to Klipper
   ([installation](docs/installation.md), [setup](docs/usage.md))
+- `jogpad program-pad` writes its key codes into a CH57x macro pad with 9 keys
+  and 3 knobs (USB ID 1189:8840), without the vendor's software
 
-Next: jogpad programs CH57x macro pads with knobs itself. The first pad is here
-(USB ID 1189:8840); the web page draws it, and a test bound one of its keys to
-F13.
+Next: jogging with the programmed CH57x pad on the QIDI Plus 4.
 
 | | Now | Later |
 | --- | --- | --- |
 | Firmware | Klipper (Moonraker) | RepRapFirmware, FluidNC |
 | Operating system | Linux | Windows, macOS |
-| Pads | numeric keypads, any USB keyboard | CH57x macro pads with knobs, programmed by jogpad |
+| Pads | numeric keypads, any USB keyboard, CH57x macro pad 1189:8840 programmed by jogpad | other CH57x macro pads |
 
 ## Getting started
 
