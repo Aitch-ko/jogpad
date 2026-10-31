@@ -80,8 +80,9 @@ Klipper:
 - jog, home and stop from a numeric keypad or any USB keyboard; tested on a
   QIDI Plus 4 with the keypad of a Logitech MX Keys S
 - every move and homing shows up in the Mainsail or Fluidd console
-- a web page in English and German that draws the pad, shows each key press
-  live, learns keys and checks the direction of each axis; reachable from
+- a web page in English and German that draws the pad with its axes in
+  colour, shows each key press live and the step size from green to red,
+  learns keys and checks the direction of each axis; reachable from
   every computer in the network, changes only from those Moonraker trusts
 - a switch in Mainsail and Fluidd that turns jogpad off, STOP included
 - the pad and its state as a camera panel in Mainsail and Fluidd

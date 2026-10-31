@@ -68,6 +68,17 @@ section {
 .state div { display: grid; gap: 0.15rem; }
 .state span { color: var(--muted); font-size: 0.85rem; }
 .state strong { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+/* Traffic light for the step size, so a large step is seen before it moves. */
+#step[data-size] {
+  justify-self: start;
+  padding: 0 0.4rem;
+  border-radius: var(--radius-small);
+  color: var(--step-text);
+  white-space: nowrap;
+}
+#step[data-size="small"] { background: var(--step-small); }
+#step[data-size="middle"] { background: var(--step-middle); }
+#step[data-size="large"] { background: var(--step-large); }
 
 .note { margin: 0 0 0.75rem; color: var(--muted); font-size: 0.85rem; }
 .note:empty { display: none; }
@@ -115,6 +126,21 @@ section {
 .control .label { fill: var(--muted); font-size: 11px; }
 .control .action { font-size: 12px; font-weight: 600; }
 .control .turn { fill: var(--accent); font-size: 14px; font-weight: 700; }
+
+/* Axes in the colours slicers use. Fills only for STOP and for the step key,
+   which shows the current step size like the state bar. */
+.control.axis-x rect, .control.axis-x circle { stroke: var(--axis-x); }
+.control.axis-y rect, .control.axis-y circle { stroke: var(--axis-y); }
+.control.axis-z rect, .control.axis-z circle { stroke: var(--axis-z); }
+.control[class*="axis-"] rect, .control[class*="axis-"] circle { stroke-width: calc(var(--border) * 3); }
+.control.stop rect, .control.stop circle { fill: var(--stop); stroke: var(--stop); }
+.control.stop text { fill: var(--stop-text); }
+.control.step-small rect, .control.step-small circle { fill: var(--step-small); }
+.control.step-middle rect, .control.step-middle circle { fill: var(--step-middle); }
+.control.step-large rect, .control.step-large circle { fill: var(--step-large); }
+.control[class*="step-"] text { fill: var(--step-text); }
+/* A knob's label sits outside its circle, on the page. */
+.control circle ~ .label { fill: var(--muted); }
 
 .control.active rect, .control.active circle { fill: var(--accent); stroke: var(--accent); }
 .control.active text { fill: var(--accent-text); }
@@ -200,4 +226,5 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .panel .state { grid-column: auto; gap: 0.4rem; grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .panel .state span { font-size: 0.7rem; }
 .panel .state strong, .panel .state .toggle { font-size: 0.95rem; }
+.panel #step[data-size] { padding: 0 0.2rem; }
 .panel #pad { max-height: none; }

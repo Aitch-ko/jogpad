@@ -126,6 +126,12 @@ pad and lights up every key you press, with the action it triggers, and shows
 step size, knob axis and the last refusal. Keys outside the drawing are listed
 too, so the page also tells you which code an unknown key sends.
 
+Colours help to find your way. The keys of X, Y and Z have red, green and
+blue edges, as in slicers; a knob on the selected axis takes the colour of
+that axis. STOP is red. The step size and the step key are green for the
+smallest step, red for the largest and yellow for those between, so a large
+step is seen before it moves the machine.
+
 Pick the drawing with `layout` under `[input]`: `numpad` (default),
 `ch57x-9k3`, or `none` for the list only.
 

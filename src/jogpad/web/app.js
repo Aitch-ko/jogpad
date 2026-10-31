@@ -151,7 +151,8 @@ function drawPad(pad) {
       text(name, { ...middle, class: "action", y: y + h / 2 + 5 + offset }, group);
     });
     const turn = text("", { ...middle, class: "turn", y: y + h - 8 }, group);
-    controls.set(c.id, { group, turn });
+    group.classList.toggle("stop", Object.values(actions).includes("stop"));
+    controls.set(c.id, { group, turn, actions: Object.values(actions) });
   }
   root.setAttribute("viewBox", `0 0 ${width} ${height}`);
 }
@@ -292,6 +293,7 @@ async function changed(newConfig) {
   drawPad(await getJson(`/api/pad?lang=${document.documentElement.lang}`));
   renderKeys();
   renderDirections();
+  refreshState();
 }
 
 // -- language -----------------------------------------------------------------
@@ -394,6 +396,35 @@ async function setSwitch(on) {
 
 // -- live state ---------------------------------------------------------------
 
+// Ranked by size, not by position in `steps`, which may run from large to small.
+function stepSize(step) {
+  const steps = [...new Set(config.jog.steps)].sort((a, b) => a - b);
+  const i = steps.indexOf(step);
+  if (i < 0 || steps.length < 2) return null;
+  if (i === 0) return "small";
+  return i === steps.length - 1 ? "large" : "middle";
+}
+
+// A knob on the selected axis takes that axis's colour; a control that moves
+// two axes takes none.
+function colourControls(state) {
+  const size = stepSize(state.step);
+  for (const { group, actions } of controls.values()) {
+    const axes = new Set(
+      actions
+        .map((a) => (a.startsWith("selected_") ? state.selected_axis : a.match(/^([xyz])_/)?.[1]))
+        .filter(Boolean)
+        .map((axis) => axis.toLowerCase()),
+    );
+    for (const axis of ["x", "y", "z"]) {
+      group.classList.toggle(`axis-${axis}`, axes.size === 1 && axes.has(axis));
+    }
+    for (const s of ["small", "middle", "large"]) {
+      group.classList.toggle(`step-${s}`, actions.includes("step") && size === s);
+    }
+  }
+}
+
 async function refreshState() {
   try {
     const s = await getJson("/api/state");
@@ -408,6 +439,10 @@ async function refreshState() {
     $("switched-off").hidden = switchedOn !== false;
     document.body.classList.toggle("switched-off", switchedOn === false);
     $("step").textContent = `${s.step} mm`;
+    const size = stepSize(s.step);
+    if (size) $("step").dataset.size = size;
+    else delete $("step").dataset.size;
+    colourControls(s);
     $("axis").textContent = s.selected_axis;
     $("home").textContent = s.home_selection === null ? "–" : s.home_selection.join(" ") || t("ui.home_all");
     $("refusal").textContent = s.last_refusal || "–";
