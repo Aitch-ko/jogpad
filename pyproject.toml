@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jogpad"
-version = "0.9.1"
+version = "0.10.0"
 description = "Turn a programmable macro pad with knobs into a jog pendant for 3D printers and CNC machines."
 readme = "README.md"
 license = "MIT"

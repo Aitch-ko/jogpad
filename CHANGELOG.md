@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.10.0](https://github.com/Aitch-ko/jogpad/compare/v0.9.1...v0.10.0) (2026-10-31)
+
+
+### Features
+
+* jogpad program-pad reads the bindings back and checks them ([#54](https://github.com/Aitch-ko/jogpad/issues/54)) ([f7937d0](https://github.com/Aitch-ko/jogpad/commit/f7937d063b0b63a63806dd094db99d81c24fb8b8))
+* the panel fits the pad, draws its outline and links to the full page ([#55](https://github.com/Aitch-ko/jogpad/issues/55)) ([2fcd1c9](https://github.com/Aitch-ko/jogpad/commit/2fcd1c9cb28f487cb064c1c5ffdde072e12f9893))
+
 ## [0.9.1](https://github.com/Aitch-ko/jogpad/compare/v0.9.0...v0.9.1) (2026-10-31)
 
 
