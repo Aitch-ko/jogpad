@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.9.0](https://github.com/Aitch-ko/jogpad/compare/v0.8.0...v0.9.0) (2026-10-31)
+
+
+### Features
+
+* a programmed CH57x pad works without key setup, a knob per axis ([#48](https://github.com/Aitch-ko/jogpad/issues/48)) ([29649c8](https://github.com/Aitch-ko/jogpad/commit/29649c8d5137b30051572e713bde963daf2d57f0))
+* the web page has a light/dark switch ([#50](https://github.com/Aitch-ko/jogpad/issues/50)) ([58f200a](https://github.com/Aitch-ko/jogpad/commit/58f200aff5c08ac5156aec7f95fdc3aef166e8ac))
+* the web page shows axes, STOP and the step size in colour ([#49](https://github.com/Aitch-ko/jogpad/issues/49)) ([3dd1009](https://github.com/Aitch-ko/jogpad/commit/3dd1009f4fda5528e2d37cfbe03aa900095d1395))
+
 ## [0.8.0](https://github.com/Aitch-ko/jogpad/compare/v0.7.1...v0.8.0) (2026-10-31)
 
 
