@@ -110,7 +110,8 @@ F13 to F24 for the nine keys and the three knob presses, and the Japanese
 keys `KEY_RO`, `KEY_KATAKANAHIRAGANA`, `KEY_YEN`, `KEY_HENKAN`,
 `KEY_MUHENKAN` and `KEY_KPJPCOMMA` (International1 to 6 in USB terms) for
 turning the knobs left and right. Nothing on a printer host reacts to those
-keys. These codes are planned and not yet checked on a real pad.
+keys. jogpad cannot program the pad yet. The drawing follows a pad with USB ID
+1189:8840: nine keys on the left, two small knobs and a big one on the right.
 
 The page speaks English and German. It follows your browser's language; the
 menu at the top switches it, and your browser remembers the choice. Messages in

@@ -88,7 +88,9 @@ Klipper:
 - an installer that sets jogpad up as a service next to Klipper
   ([installation](docs/installation.md), [setup](docs/usage.md))
 
-Next: programming CH57x macro pads with knobs (waiting for the pad to arrive).
+Next: jogpad programs CH57x macro pads with knobs itself. The first pad is here
+(USB ID 1189:8840); the web page draws it, and a test bound one of its keys to
+F13.
 
 | | Now | Later |
 | --- | --- | --- |
