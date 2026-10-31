@@ -150,6 +150,13 @@ class InputConfig(_Section):
         description="Pad drawn on the web page: `numpad`, `ch57x-9k3`, or `none` to "
         "list pressed keys only.",
     )
+    step_light: bool = Field(
+        True,
+        description="With a CH57x layout such as `ch57x-9k3`, light the pad in the colour "
+        "of the step size: green for the smallest, so green after a start, red for the "
+        "largest, yellow between. The pad stores every new colour in its flash memory, "
+        "which takes only so many writes; `false` leaves its light alone.",
+    )
 
     @field_validator("layout")
     @classmethod

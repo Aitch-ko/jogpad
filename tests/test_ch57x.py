@@ -137,3 +137,34 @@ def test_empty_key_in_the_answers_is_missing() -> None:
 def test_without_read_answers_nothing_can_be_said() -> None:
     pad = load_layout("ch57x-9k3")
     assert missing(pad, messages(pad)[:1]) is None
+
+
+def test_backlight_lights_the_first_layer_in_the_colour() -> None:
+    assert ch57x.backlight(ch57x.GREEN)[:13] == bytes.fromhex("03feb001080000000000010041")
+
+
+STEPS = [0.01, 0.1, 1.0]
+
+
+def test_smallest_step_is_green() -> None:
+    assert ch57x.step_colour(0.01, STEPS) == ch57x.GREEN
+
+
+def test_step_between_is_yellow() -> None:
+    assert ch57x.step_colour(0.1, STEPS) == ch57x.YELLOW
+
+
+def test_largest_step_is_red() -> None:
+    assert ch57x.step_colour(1.0, STEPS) == ch57x.RED
+
+
+def test_single_step_has_no_colour() -> None:
+    assert ch57x.step_colour(1.0, [1.0]) is None
+
+
+def test_ch57x_layout_fits_a_ch57x_pad() -> None:
+    assert ch57x.fits(load_layout("ch57x-9k3"))
+
+
+def test_numpad_layout_does_not_fit_a_ch57x_pad() -> None:
+    assert not ch57x.fits(load_layout("numpad"))

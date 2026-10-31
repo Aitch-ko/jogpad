@@ -35,7 +35,8 @@ Klipper, tested on a QIDI Plus 4 with the keypad of a Logitech MX Keys S:
 - an [installer](installation.md) that sets jogpad up as a service next to
   Klipper
 - [programming a CH57x macro pad](usage.md#program-a-ch57x-macro-pad) with
-  9 keys and 3 knobs, without the vendor's software
+  9 keys and 3 knobs, without the vendor's software; it lights up in the
+  colour of the step size
 
 | Part | Now | Later |
 | --- | --- | --- |

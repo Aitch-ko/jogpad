@@ -6,7 +6,9 @@ import logging
 import queue
 import threading
 import time
+from collections.abc import Callable
 
+from jogpad.ch57x import step_colour
 from jogpad.config import Config
 from jogpad.core import KEY_AUTOREPEAT, KEY_PRESS, Backend, BackendError, Jogger, State
 from jogpad.events import EventHub
@@ -16,10 +18,18 @@ log = logging.getLogger(__name__)
 
 
 class Service:
-    def __init__(self, jogger: Jogger, backend: Backend, devices: list[str]) -> None:
+    def __init__(
+        self,
+        jogger: Jogger,
+        backend: Backend,
+        devices: list[str],
+        light: Callable[[int], None] | None = None,
+    ) -> None:
         self.jogger = jogger
         self.backend = backend
         self.devices = devices
+        self.light = light
+        self._colour: int | None = None
         self.stop_event = threading.Event()
         self.events = EventHub()
         self._events: queue.Queue[tuple[int, int]] = queue.Queue()
@@ -87,3 +97,17 @@ class Service:
                 self.jogger.handle(batch, time.monotonic())
                 self.jogger.tick(time.monotonic())
                 self._state = self.jogger.state()
+            self._light_step()
+
+    def _light_step(self) -> None:
+        colour = step_colour(self._state.step, self.jogger.config.jog.steps)
+        # Only a new colour is written: the pad stores each one in flash. One that
+        # fails is not tried again until the step changes, or this loop would log
+        # every half second while the pad is unplugged.
+        if self.light is None or colour is None or colour == self._colour:
+            return
+        self._colour = colour
+        try:
+            self.light(colour)
+        except (OSError, LookupError) as exc:
+            log.warning("pad not lit in the step's colour: %s", exc)

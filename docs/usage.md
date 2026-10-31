@@ -135,6 +135,12 @@ that axis. STOP is red. The step size and the step key are green for the
 smallest step, red for the largest and yellow for those between, so a large
 step is seen before it moves the machine.
 
+A CH57x macro pad shows the step size itself: with a CH57x layout jogpad lights
+the whole pad in the same colours, green after every start. The pad stores each
+new colour in its flash memory, which takes only so many writes, so jogpad
+writes only when the colour changes. `step_light = false` under `[input]`
+leaves the pad's light alone.
+
 Pick the drawing with `layout` under `[input]`: `numpad` (default),
 `ch57x-9k3`, or `none` for the list only.
 

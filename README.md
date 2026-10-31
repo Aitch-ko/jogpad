@@ -92,7 +92,7 @@ Klipper:
 - `jogpad program-pad` writes its key codes into a CH57x macro pad with 9 keys
   and 3 knobs (USB ID 1189:8840), without the vendor's software, and reads them
   back to check; then its knobs move X, Y and Z and its keys form a cross for X
-  and Y, with no key setup
+  and Y, with no key setup, and the pad lights up in the colour of the step size
 
 Next: jogging with the programmed CH57x pad on the QIDI Plus 4.
 

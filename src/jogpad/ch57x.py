@@ -4,7 +4,8 @@ The messages are those of the k884x pads in ch57x-keyboard-tool (MIT): 64 bytes
 each, starting with report ID 3. Every binding is followed by the tool's closing
 messages, after which the pad stores it. The read request comes from the
 vendor's Windows software: the pad answers it with one message per key, laid out
-like the binding it holds.
+like the binding it holds. A backlight message takes effect at once, and the pad
+keeps its colour when unplugged, closing messages or not.
 """
 
 from __future__ import annotations
@@ -34,6 +35,9 @@ READ_TIMEOUT_S = 1.0
 # Usage page 0xFF00 marks the vendor interface; the pad's other hidraw nodes
 # are its keyboard, mouse and media keys.
 VENDOR_PAGE = bytes([0x06, 0x00, 0xFF])
+# Colours as the pad numbers them, and the mode that keeps all keys lit.
+RED, YELLOW, GREEN = 1, 3, 4
+BACKLIGHT = 1
 
 # HID usages of the keys jogpad programs: F13 to F24, then International1 to 6.
 HID_USAGES: dict[int, int] = {KEY_CODES[f"F{13 + i}"]: 0x68 + i for i in range(12)} | {
@@ -69,6 +73,32 @@ def bind(key_id: int, usage: int) -> list[bytes]:
         _message(0xFD, 0xFE, 0xFF),
         _message(0xAA, 0xAA),
     ]
+
+
+def fits(layout: Layout) -> bool:
+    """Whether `layout` is drawn after a CH57x pad, its controls numbered by slot."""
+    return any(c.slot is not None for c in layout.controls)
+
+
+def backlight(colour: int) -> bytes:
+    """All keys of the pad's first layer lit in `colour`."""
+    return _message(0xFE, 0xB0, 1, 0x08, 0, 0, 0, 0, 0, 1, 0, colour << 4 | BACKLIGHT)
+
+
+def step_colour(step: float, steps: list[float]) -> int | None:
+    """Green for the smallest step, red for the largest, yellow between; None with one step."""
+    sizes = sorted(set(steps))
+    if step not in sizes or len(sizes) < 2:
+        return None
+    if step == sizes[0]:
+        return GREEN
+    return RED if step == sizes[-1] else YELLOW
+
+
+def light(colour: int) -> None:
+    """Lights the first pad in `colour`; LookupError if there is none."""
+    # Looked up each time: a pad plugged in again may come back as another node.
+    write(find_pad(), [backlight(colour)])
 
 
 def read_request(layout: Layout) -> tuple[bytes, int]:

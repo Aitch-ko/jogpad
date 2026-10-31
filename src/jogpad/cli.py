@@ -190,8 +190,10 @@ def _keys(config: Config, devices: list[str]) -> int:
 def _serve(config: Config, path: Path | None) -> int:
     import uvicorn
 
+    from jogpad import ch57x
     from jogpad.api import create_app, sync_panel
     from jogpad.core import BackendError, Jogger
+    from jogpad.layouts import NO_LAYOUT, load_layout
     from jogpad.moonraker import Moonraker
     from jogpad.service import Service
 
@@ -202,7 +204,10 @@ def _serve(config: Config, path: Path | None) -> int:
     except BackendError as exc:
         # At boot Moonraker may not be up yet; the next start tries again.
         log.info(t("server.panel_unchecked", config.server.language, error=exc))
-    service = Service(Jogger(config, backend), backend, config.input.devices)
+    layout = config.input.layout
+    is_ch57x = layout != NO_LAYOUT and ch57x.fits(load_layout(layout))
+    light = ch57x.light if config.input.step_light and is_ch57x else None
+    service = Service(Jogger(config, backend), backend, config.input.devices, light)
     service.start()
     host, port = config.server.host, config.server.port
     # Not print(): under systemd stdout is block-buffered, and the line would reach
