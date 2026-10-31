@@ -10,9 +10,10 @@ from importlib.metadata import PackageNotFoundError, metadata
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, ValidationError
+from starlette.types import Scope
 
 from jogpad import __version__
 from jogpad.config import Action, Config
@@ -383,7 +384,7 @@ def create_app(
         return Panel(url=None)
 
     # Last: the page must not shadow the API or the docs.
-    app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
+    app.mount("/", _WebFiles(directory=WEB_DIR, html=True), name="web")
     return app
 
 
@@ -392,3 +393,17 @@ def _is_loopback(host: str) -> bool:
         return ipaddress.ip_address(host).is_loopback
     except ValueError:
         return False
+
+
+class _WebFiles(StaticFiles):
+    """The page's files, which the browser asks for again on every load.
+
+    Without a Cache-Control header browsers keep app.js and the stylesheets for a
+    while by their own estimate, so after an update the old page runs against the
+    new API until the cache expires.
+    """
+
+    async def get_response(self, path: str, scope: Scope) -> Response:
+        response = await super().get_response(path, scope)
+        response.headers["Cache-Control"] = "no-cache"
+        return response

@@ -66,6 +66,10 @@ def test_web_page_is_served_at_root() -> None:
     assert "<svg" in client().get("/").text
 
 
+def test_web_files_are_checked_again_on_every_load() -> None:
+    assert client().get("/app.js").headers["cache-control"] == "no-cache"
+
+
 def test_event_names_control_and_action() -> None:
     event = describe_event(Config(), 77, 1)
     assert (event.control, event.action, event.pressed) == ("6", "x_plus", True)
