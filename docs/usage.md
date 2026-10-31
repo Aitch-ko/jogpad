@@ -135,6 +135,12 @@ that axis. STOP is red. The step size and the step key are green for the
 smallest step, red for the largest and yellow for those between, so a large
 step is seen before it moves the machine.
 
+An arrow over each knob shows what turning it does: the label at its left end
+belongs to turning left, the one at its right end to turning right, for
+example `X−` and `X+`. The labels follow the keys you set, and a knob on
+`selected_plus` and `selected_minus` names the selected axis. With every
+detent the knob and the end of the arrow light up.
+
 A CH57x macro pad shows the step size itself: with a CH57x layout jogpad lights
 the whole pad in the same colours, green after every start. The pad stores each
 new colour in its flash memory, which takes only so many writes, so jogpad
@@ -162,8 +168,8 @@ everyone at the machine reads them.
 At the bottom, the page links to the repository, to what is new in each
 version, and to a bug report form with your jogpad version already filled in.
 
-![The web page: the drawn keypad lights up the pressed key, the list on the right shows the last keys with their actions](assets/screenshots/web-page-light.png#only-light)
-![The web page: the drawn keypad lights up the pressed key, the list on the right shows the last keys with their actions](assets/screenshots/web-page-dark.png#only-dark)
+![The web page: the drawn macro pad lights up the pressed key, an arrow over each knob names the axis direction of each turn, the list on the right shows the last keys with their actions](assets/screenshots/web-page-light.png#only-light)
+![The web page: the drawn macro pad lights up the pressed key, an arrow over each knob names the axis direction of each turn, the list on the right shows the last keys with their actions](assets/screenshots/web-page-dark.png#only-dark)
 
 ### Set up keys and directions
 
@@ -221,7 +227,7 @@ of the view opens the full page in a new tab.
 The camera's aspect ratio follows the drawing of your pad. After a change of
 `layout`, jogpad sets the new one when it starts; the journal says so.
 
-![The compact view in a camera panel: the state bar above the drawn keypad](assets/screenshots/mainsail-panel.png)
+![The compact view in a camera panel: the state bar above the drawn macro pad](assets/screenshots/mainsail-panel.png)
 
 Open the page with the printer's address when you add it, for example
 `http://printer.local:7150/`: Mainsail and Fluidd load the view from that

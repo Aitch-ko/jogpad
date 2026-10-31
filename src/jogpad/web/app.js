@@ -7,6 +7,12 @@ const GAP = 6;
 // The pad's outline runs this far around its controls, in key units; api.py
 // counts it into the panel's aspect ratio.
 const OUTLINE = 0.2;
+// The arrow above a knob, in pixels like UNIT. It clears the knob's real cap,
+// which is as wide as the knob's box, and stays inside the pad's outline.
+const TURN_GAP = 10;
+const TURN_ANGLE = (32 * Math.PI) / 180; // from the top to each end
+const TURN_HEAD = 8;
+const TURN_LABEL = 11; // from the arrow's tip outwards to its label's middle
 const RECENT = 12;
 const LEARN_S = 30;
 const LANGUAGE_KEY = "jogpad.language";
@@ -138,29 +144,24 @@ function drawPad(pad) {
     height = Math.max(height, y + h + GAP / 2);
 
     const group = svg("g", { class: "control" }, root);
-    if (c.kind === "knob") {
+    const knob = c.kind === "knob";
+    const actions = pad.actions[c.id] || {};
+    if (knob) {
       svg("circle", { cx: x + w / 2, cy: y + h / 2, r: Math.min(w, h) / 2 }, group);
     } else {
       svg("rect", { x, y, width: w, height: h }, group);
     }
     // On a knob the corner of the box lies outside the circle, so the label goes inside.
-    const knob = c.kind === "knob";
     const label = knob ? { x: x + w / 2, y: y + 15, "text-anchor": "middle" } : { x: x + 6, y: y + 14 };
     text(c.label, { class: "label", ...label }, group);
-
-    const actions = pad.actions[c.id] || {};
-    const names = ["press", "cw", "ccw"]
-      .filter((part) => actions[part])
-      .map((part) => labels[actions[part]] || actions[part]);
-    const middle = { x: x + w / 2, "text-anchor": "middle" };
-    names.forEach((name, i) => {
-      // Below the knob's label, a little tighter, so three lines fit a small knob.
-      const offset = knob ? (i - (names.length - 1) / 2) * 13 + 5 : (i - (names.length - 1) / 2) * 14;
-      text(name, { ...middle, class: "action", y: y + h / 2 + 5 + offset }, group);
-    });
-    const turn = text("", { ...middle, class: "turn", y: y + h - 8 }, group);
+    if (actions.press) {
+      // Below a knob's label.
+      const press = { x: x + w / 2, y: y + h / 2 + (knob ? 10 : 5), "text-anchor": "middle", class: "action" };
+      text(labels[actions.press] || actions.press, press, group);
+    }
+    const ends = knob ? drawTurns(x + w / 2, y + h / 2, Math.min(w, h) / 2, actions, root) : {};
     group.classList.toggle("stop", Object.values(actions).includes("stop"));
-    controls.set(c.id, { group, turn, actions: Object.values(actions) });
+    controls.set(c.id, { group, ends, actions: Object.values(actions) });
   }
   const shape = pad.layout.outline;
   const margin = OUTLINE * UNIT;
@@ -175,19 +176,57 @@ function drawPad(pad) {
   root.setAttribute("viewBox", `${box.x} ${box.y} ${box.width} ${box.height}`);
 }
 
+// Above a knob, outside its circle: an arc with a head at each end, labelled
+// with what that turn does, anticlockwise on the left. Lines and filled heads
+// in one colour, so the drawing also serves as a template for marking the pad.
+// Outside the knob's group, whose colours for STOP or the step would hide it.
+function drawTurns(cx, cy, r, actions, root) {
+  const radius = r + TURN_GAP;
+  // Angles from the top, clockwise; as "x,y" in a path.
+  const at = (angle, distance) => [cx + distance * Math.sin(angle), cy - distance * Math.cos(angle)];
+  // Where the arc ends and the head begins.
+  const neck = TURN_ANGLE - TURN_HEAD / radius;
+  const group = svg("g", { class: "turns" }, root);
+  svg("path", { class: "arc", d: `M${at(-neck, radius)} A${radius} ${radius} 0 0 1 ${at(neck, radius)}` }, group);
+  const ends = {};
+  for (const [part, side] of [["ccw", -1], ["cw", 1]]) {
+    const node = svg("g", {}, group);
+    const tip = at(side * TURN_ANGLE, radius);
+    const wing = (offset) => at(side * neck, radius + offset);
+    svg("path", { class: "head", d: `M${tip} L${wing(TURN_HEAD / 2)} L${wing(-TURN_HEAD / 2)} Z` }, node);
+    const [x, y] = at(side * TURN_ANGLE, radius + TURN_LABEL);
+    const label = text(turnLabel(actions[part]), { x, y, "text-anchor": "middle", "dominant-baseline": "central" }, node);
+    ends[part] = { node, label, action: actions[part] };
+  }
+  return ends;
+}
+
+// A knob on selected_plus/minus moves whichever axis is selected at the time.
+function turnLabel(action, axis = "") {
+  if (action === "selected_plus") return `${axis}+`;
+  if (action === "selected_minus") return `${axis}−`;
+  return labels[action] || action || "";
+}
+
+function labelTurns(state) {
+  for (const { ends } of controls.values()) {
+    for (const end of Object.values(ends)) end.label.textContent = turnLabel(end.action, state.selected_axis);
+  }
+}
+
 function showEvent(event) {
   const control = event.control && controls.get(event.control);
   if (control) {
     if (event.part === "press") {
       control.group.classList.toggle("active", event.pressed);
     } else if (event.pressed) {
-      // Knob detents have no lasting "down" state: flash and show the direction.
-      control.turn.textContent = event.part === "cw" ? "↻" : "↺";
+      // Knob detents have no lasting "down" state: flash the knob and the end of its arrow.
       control.group.classList.add("active");
+      control.ends[event.part]?.node.classList.add("on");
       clearTimeout(control.timer);
       control.timer = setTimeout(() => {
         control.group.classList.remove("active");
-        control.turn.textContent = "";
+        for (const end of Object.values(control.ends)) end.node.classList.remove("on");
       }, 250);
     }
   }
@@ -494,6 +533,7 @@ async function refreshState() {
     if (size) $("step").dataset.size = size;
     else delete $("step").dataset.size;
     colourControls(s);
+    labelTurns(s);
     $("axis").textContent = s.selected_axis;
     $("home").textContent = s.home_selection === null ? "–" : s.home_selection.join(" ") || t("ui.home_all");
     $("refusal").textContent = s.last_refusal || "–";

@@ -26,17 +26,17 @@ from jogpad.moonraker import Moonraker
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "assets" / "screenshots"
 VIEWPORT = {"width": 1100, "height": 860}
-# Width of a camera panel in Mainsail; the height follows the keypad panel's 44:62.
-PANEL_VIEWPORT = {"width": 400, "height": 564}
+# Width of a camera panel in Mainsail; the height follows the CH57x panel's 53:63.
+PANEL_VIEWPORT = {"width": 400, "height": 475}
 
-# KeyEvent payloads as /api/events sends them.
+# KeyEvent payloads as /api/events sends them, on a CH57x pad with its knobs.
 PRESSES = [
-    {"code": 55, "name": "KEY_KPASTERISK", "action": "step", "control": "asterisk"},
-    {"code": 78, "name": "KEY_KPPLUS", "action": "z_plus", "control": "plus"},
-    {"code": 72, "name": "KEY_KP8", "action": "y_plus", "control": "8"},
+    {"code": 187, "name": "KEY_F17", "action": "step", "control": "k5"},
+    {"code": 95, "name": "KEY_KPJPCOMMA", "action": "z_plus", "control": "knob3", "part": "cw"},
+    {"code": 184, "name": "KEY_F14", "action": "y_plus", "control": "k2"},
 ]
-HELD = {"code": 77, "name": "KEY_KP6", "action": "x_plus", "control": "6"}
-Y_PLUS = {"code": 72, "name": "KEY_KP8", "action": "y_plus", "control": "8"}
+HELD = {"code": 188, "name": "KEY_F18", "action": "x_plus", "control": "k6"}
+Y_PLUS = {"code": 184, "name": "KEY_F14", "action": "y_plus", "control": "k2"}
 
 
 class NoCamera(Moonraker):
@@ -53,7 +53,7 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         config_path = Path(tmp) / "jogpad.toml"
-        config_path.write_text('[input]\nlayout = "numpad"\n', encoding="utf-8")
+        config_path.write_text('[input]\nlayout = "ch57x-9k3"\n', encoding="utf-8")
         url = serve(config_path)
         with sync_playwright() as p:
             browser = p.chromium.launch()
@@ -105,13 +105,15 @@ def open_page(page: Page, url: str) -> None:
 
 
 def press(page: Page, event: dict[str, object], pressed: bool = True) -> None:
-    page.evaluate("e => showEvent({...e, part: 'press'})", {**event, "pressed": pressed})
+    page.evaluate("e => showEvent({part: 'press', ...e})", {**event, "pressed": pressed})
 
 
 def live_view(page: Page, name: str) -> None:
     for event in PRESSES:
         press(page, event)
         press(page, event, pressed=False)
+    # A knob detent flashes for a quarter of a second; past it, every run takes the same picture.
+    page.wait_for_timeout(400)
     press(page, HELD)
     page.evaluate("document.getElementById('link').classList.add('on')")
     page.evaluate("document.getElementById('link').textContent = t('ui.connected')")

@@ -134,7 +134,13 @@ section {
 .control text { fill: var(--text); pointer-events: none; }
 .control .label { fill: var(--muted); font-size: 11px; }
 .control .action { font-size: 12px; font-weight: 600; }
-.control .turn { fill: var(--accent); font-size: 14px; font-weight: 700; }
+
+/* The arrows above the knobs, in one colour like a marking on the pad. */
+.turns { pointer-events: none; }
+.turns .arc { fill: none; stroke: var(--muted); stroke-width: calc(var(--border) * 1.5); }
+.turns .head { fill: var(--muted); }
+.turns text { fill: var(--text); font-size: 11px; font-weight: 600; }
+.turns .on .head, .turns .on text { fill: var(--accent); }
 
 /* Axes in the colours slicers use. Fills only for STOP and for the step key,
    which shows the current step size like the state bar. */

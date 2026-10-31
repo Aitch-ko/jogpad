@@ -59,7 +59,7 @@ the nozzle.
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/screenshots/web-page-dark.png">
-    <img src="docs/assets/screenshots/web-page-light.png" alt="The jogpad web page: the drawn keypad lights up the pressed key, a list shows the last keys with their actions" width="720">
+    <img src="docs/assets/screenshots/web-page-light.png" alt="The jogpad web page: the drawn macro pad lights up the pressed key, an arrow over each knob names the axis direction of each turn, a list shows the last keys with their actions" width="720">
   </picture>
 </p>
 
@@ -81,9 +81,10 @@ Klipper:
   QIDI Plus 4 with the keypad of a Logitech MX Keys S
 - every move and homing shows up in the Mainsail or Fluidd console
 - a web page in English and German, light or dark, that draws the pad with
-  its axes in colour, shows each key press live and the step size from green
-  to red, learns keys and checks the direction of each axis; reachable from
-  every computer in the network, changes only from those Moonraker trusts
+  its axes in colour and an arrow over each knob for its turning directions,
+  shows each key press live and the step size from green to red, learns keys
+  and checks the direction of each axis; reachable from every computer in the
+  network, changes only from those Moonraker trusts
 - a switch in Mainsail and Fluidd that turns jogpad off, STOP included
 - the pad and its state as a camera panel in Mainsail and Fluidd, sized to
   the pad and with a link to the full page
