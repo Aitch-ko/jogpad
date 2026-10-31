@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/Aitch-ko/jogpad/compare/v0.9.0...v0.9.1) (2026-10-31)
+
+
+### Bug Fixes
+
+* the web page loads its new files after an update ([#52](https://github.com/Aitch-ko/jogpad/issues/52)) ([8d58a3d](https://github.com/Aitch-ko/jogpad/commit/8d58a3d987113184c605fd16c9c18a805adfecf8))
+
 ## [0.9.0](https://github.com/Aitch-ko/jogpad/compare/v0.8.0...v0.9.0) (2026-10-31)
 
 
