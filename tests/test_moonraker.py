@@ -1,7 +1,9 @@
 import io
 import ipaddress
 import json
+import urllib.error
 import urllib.request
+from email.message import Message
 from typing import Any
 
 import pytest
@@ -100,6 +102,47 @@ def test_panel_is_removed_by_name(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(urllib.request, "urlopen", urlopen)
     Moonraker("http://moonraker").remove_panel()
     assert requests == [("DELETE", "http://moonraker/server/webcams/item?name=jogpad")]
+
+
+REFUSAL = b'{"error": {"code": 400, "message": "Move out of range"}}'
+
+
+def refuse_moves(monkeypatch: pytest.MonkeyPatch, restore_fails: bool = False) -> list[str]:
+    """Klipper at the network boundary: refuses every G1 and keeps the scripts it got."""
+    scripts: list[str] = []
+
+    def urlopen(request: urllib.request.Request, timeout: float) -> io.BytesIO:
+        script = json.loads(request.data)["script"]  # type: ignore[arg-type]
+        scripts.append(script)
+        if "G1" in script:
+            raise urllib.error.HTTPError(
+                request.full_url, 400, "Bad Request", Message(), io.BytesIO(REFUSAL)
+            )
+        if restore_fails:
+            raise urllib.error.URLError("connection refused")
+        return io.BytesIO(b"{}")
+
+    monkeypatch.setattr(urllib.request, "urlopen", urlopen)
+    return scripts
+
+
+def test_refused_move_restores_the_gcode_state(monkeypatch: pytest.MonkeyPatch) -> None:
+    scripts = refuse_moves(monkeypatch)
+    with pytest.raises(BackendError):
+        Moonraker("http://moonraker").move("E", -1.0, 300)
+    assert scripts[-1] == "RESTORE_GCODE_STATE NAME=JOGPAD"
+
+
+def test_refused_move_still_reports_the_refusal(monkeypatch: pytest.MonkeyPatch) -> None:
+    refuse_moves(monkeypatch)
+    with pytest.raises(BackendError, match="Move out of range"):
+        Moonraker("http://moonraker").move("X", 400.0, 3000)
+
+
+def test_refusal_is_reported_even_when_restoring_fails(monkeypatch: pytest.MonkeyPatch) -> None:
+    refuse_moves(monkeypatch, restore_fails=True)
+    with pytest.raises(BackendError, match="Move out of range"):
+        Moonraker("http://moonraker").move("X", 400.0, 3000)
 
 
 def test_switch_runs_the_macro(monkeypatch: pytest.MonkeyPatch) -> None:

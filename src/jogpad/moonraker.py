@@ -42,14 +42,23 @@ class Moonraker:
         mode = "M83" if axis == "E" else "G91"
         # M400 holds the reply until the move has finished; the core relies on
         # that to merge presses instead of queueing them.
-        self._script(
-            "SAVE_GCODE_STATE NAME=JOGPAD\n"
-            f"{mode}\n"
-            f"G1 {axis}{distance:.3f} F{feed:.0f}\n"
-            "RESTORE_GCODE_STATE NAME=JOGPAD\n"
-            "M400",
-            MOVE_TIMEOUT_S,
-        )
+        try:
+            self._script(
+                "SAVE_GCODE_STATE NAME=JOGPAD\n"
+                f"{mode}\n"
+                f"G1 {axis}{distance:.3f} F{feed:.0f}\n"
+                "RESTORE_GCODE_STATE NAME=JOGPAD\n"
+                "M400",
+                MOVE_TIMEOUT_S,
+            )
+        except BackendError:
+            # Klipper drops the rest of a script at the first error, so a refused
+            # move ("Move out of range", a cold hotend) would leave G91 or M83 behind.
+            try:
+                self._script("RESTORE_GCODE_STATE NAME=JOGPAD", 5)
+            except BackendError as exc:
+                log.warning("G-code state not restored: %s", exc)
+            raise
 
     def home(self, axes: list[str]) -> None:
         self._script(" ".join(["G28", *axes]), HOME_TIMEOUT_S)
