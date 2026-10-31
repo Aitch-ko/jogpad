@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.8.0](https://github.com/Aitch-ko/jogpad/compare/v0.7.1...v0.8.0) (2026-10-31)
+
+
+### Features
+
+* jogpad program-pad writes the layout's key codes into a CH57x pad ([#47](https://github.com/Aitch-ko/jogpad/issues/47)) ([4a8c00e](https://github.com/Aitch-ko/jogpad/commit/4a8c00e01f5ae338a1957c5aac500c4fa640a355))
+
+
+### Bug Fixes
+
+* the CH57x drawing shows the knobs where the real pad has them ([#45](https://github.com/Aitch-ko/jogpad/issues/45)) ([d7a84d0](https://github.com/Aitch-ko/jogpad/commit/d7a84d0107e795ff18a0b526408c8041ccdb9812))
+
 ## [0.7.1](https://github.com/Aitch-ko/jogpad/compare/v0.7.0...v0.7.1) (2026-10-25)
 
 
