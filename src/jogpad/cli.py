@@ -176,12 +176,18 @@ def _keys(config: Config, devices: list[str]) -> int:
 def _serve(config: Config, path: Path | None) -> int:
     import uvicorn
 
-    from jogpad.api import create_app
-    from jogpad.core import Jogger
+    from jogpad.api import create_app, sync_panel
+    from jogpad.core import BackendError, Jogger
     from jogpad.moonraker import Moonraker
     from jogpad.service import Service
 
     backend = Moonraker(config.machine.url)
+    try:
+        if ratio := sync_panel(config, backend):
+            log.info(t("server.panel_resized", config.server.language, ratio=ratio))
+    except BackendError as exc:
+        # At boot Moonraker may not be up yet; the next start tries again.
+        log.info(t("server.panel_unchecked", config.server.language, error=exc))
     service = Service(Jogger(config, backend), backend, config.input.devices)
     service.start()
     host, port = config.server.host, config.server.port

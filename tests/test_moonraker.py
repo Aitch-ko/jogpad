@@ -58,6 +58,14 @@ def test_panel_url_is_read_from_the_camera_list(monkeypatch: pytest.MonkeyPatch)
     assert Moonraker("http://moonraker").panel_url() == "http://printer:7150/?view=panel"
 
 
+def test_panel_reports_the_aspect_ratio_of_the_camera(monkeypatch: pytest.MonkeyPatch) -> None:
+    webcams = [
+        {"name": "jogpad", "stream_url": "http://printer:7150/?view=panel", "aspect_ratio": "40:58"}
+    ]
+    answer_with(monkeypatch, {"result": {"webcams": webcams}})
+    assert Moonraker("http://moonraker").panel() == ("http://printer:7150/?view=panel", "40:58")
+
+
 def test_without_jogpad_camera_there_is_no_panel(monkeypatch: pytest.MonkeyPatch) -> None:
     answer_with(monkeypatch, {"result": {"webcams": [{"name": "Bed"}]}})
     assert Moonraker("http://moonraker").panel_url() is None

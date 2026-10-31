@@ -206,7 +206,11 @@ true` lets every computer in the network reassign your keys, STOP included.
 Mainsail and Fluidd have no panels for other programs, but both show a web
 page as a camera. Under **Set up**, **Add** registers jogpad's compact view,
 the pad and its state, as the camera `jogpad` in Moonraker; both show it in
-their camera panel. **Remove** takes it out again.
+their camera panel. **Remove** takes it out again. **jogpad ↗** at the top left
+of the view opens the full page in a new tab.
+
+The camera's aspect ratio follows the drawing of your pad. After a change of
+`layout`, jogpad sets the new one when it starts; the journal says so.
 
 ![The compact view in a camera panel: the state bar above the drawn keypad](assets/screenshots/mainsail-panel.png)
 

@@ -33,6 +33,8 @@ MAX_LEARN_S = 60
 # Height of the state bar in the panel view, in key units: one row of cells at the
 # usual width of a camera panel.
 PANEL_STATE_ROWS = 0.8
+# The web page draws the pad's outline this far around its controls, in key units.
+PANEL_OUTLINE = 0.2
 FORBIDDEN = "changes are only allowed from this computer and from computers Moonraker trusts"
 
 
@@ -133,10 +135,25 @@ def panel_aspect_ratio(config: Config) -> str:
     """Width to height of the panel view: the pad plus the state bar above it."""
     if config.input.layout == NO_LAYOUT:
         return "4:3"
-    controls = load_layout(config.input.layout).controls
-    width = max(c.x + c.w for c in controls)
-    height = max(c.y + c.h for c in controls) + PANEL_STATE_ROWS
-    return f"{round(width * 10)}:{round(height * 10)}"
+    layout = load_layout(config.input.layout)
+    if layout.outline:
+        width, height = layout.outline.w, layout.outline.h
+    else:
+        width = max(c.x + c.w for c in layout.controls) + 2 * PANEL_OUTLINE
+        height = max(c.y + c.h for c in layout.controls) + 2 * PANEL_OUTLINE
+    return f"{round(width * 10)}:{round((height + PANEL_STATE_ROWS) * 10)}"
+
+
+def sync_panel(config: Config, moonraker: Moonraker) -> str | None:
+    """Gives jogpad's camera the aspect ratio of the configured layout; the new
+    ratio if it changed one. Moonraker keeps the ratio from when the camera was
+    added, so after a change of layout the view would be cut off or too tall."""
+    camera = moonraker.panel()
+    ratio = panel_aspect_ratio(config)
+    if camera is None or camera[1] == ratio:
+        return None
+    moonraker.add_panel(camera[0], ratio)
+    return ratio
 
 
 def describe_event(config: Config, code: int, value: int) -> KeyEvent:

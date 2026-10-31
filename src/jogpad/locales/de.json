@@ -1,5 +1,7 @@
 {
   "server.starting": "jogpad {version} lauscht auf http://{host}:{port}",
+  "server.panel_resized": "Kamera-Panel in Mainsail und Fluidd auf {ratio} für das Layout gesetzt",
+  "server.panel_unchecked": "Kamera-Panel in Moonraker nicht prüfbar: {error}",
   "config.invalid": "Konfiguration {path} ist ungültig:\n{error}",
   "axis.selected": "Achse {axis}",
   "step.changed": "Schritt {step} mm",
@@ -33,6 +35,7 @@
   "ui.switch_off": "aus",
   "ui.switch_off_note": "jogpad ist aus: Keine Taste tut etwas, auch STOP nicht.",
   "ui.switch_turn_on": "Einschalten",
+  "ui.open_page": "Ganze jogpad-Seite öffnen",
   "ui.step": "Schritt",
   "ui.axis": "Achse am Knopf",
   "ui.home": "HOME-Auswahl",

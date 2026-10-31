@@ -38,3 +38,12 @@ def test_unknown_key_name_in_layout_is_rejected() -> None:
 
 def test_layout_without_translation_keeps_english() -> None:
     assert load_layout("numpad").localized("fr").name == "Numeric keypad"
+
+
+def test_ch57x_outline_holds_every_control() -> None:
+    layout = load_layout("ch57x-9k3")
+    box = layout.outline
+    assert box is not None and all(
+        box.x <= c.x and c.x + c.w <= box.x + box.w and box.y <= c.y and c.y + c.h <= box.y + box.h
+        for c in layout.controls
+    )

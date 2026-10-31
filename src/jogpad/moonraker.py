@@ -97,6 +97,11 @@ class Moonraker:
 
     def panel_url(self) -> str | None:
         """Address of jogpad's camera in Mainsail and Fluidd, None if there is none."""
+        camera = self.panel()
+        return camera[0] if camera else None
+
+    def panel(self) -> tuple[str, str] | None:
+        """Address and aspect ratio of jogpad's camera, None if there is none."""
         reply = self._request("/server/webcams/list")
         try:
             webcams: list[dict[str, Any]] = reply["result"]["webcams"]
@@ -104,7 +109,7 @@ class Moonraker:
             raise BackendError(f"unexpected reply: {reply!r:.300}") from exc
         for webcam in webcams:
             if webcam.get("name") == PANEL:
-                return str(webcam.get("stream_url", ""))
+                return str(webcam.get("stream_url", "")), str(webcam.get("aspect_ratio", ""))
         return None
 
     def add_panel(self, url: str, aspect_ratio: str) -> None:

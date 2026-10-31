@@ -50,6 +50,18 @@ class Control(BaseModel):
         return value
 
 
+class Outline(BaseModel):
+    """The pad's real shape, in key units like the controls."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    x: float
+    y: float
+    w: float
+    h: float
+    path: str = Field(description="SVG path of the outline, within the box x, y, w, h.")
+
+
 class Layout(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -60,6 +72,9 @@ class Layout(BaseModel):
         {}, description="Name and note per language; English is `name` and `note`."
     )
     controls: list[Control]
+    outline: Outline | None = Field(
+        None, description="The pad's shape; without it a rounded rectangle around the controls."
+    )
 
     def localized(self, language: str) -> Layout:
         texts = self.translations.get(language, {})

@@ -85,7 +85,8 @@ Klipper:
   to red, learns keys and checks the direction of each axis; reachable from
   every computer in the network, changes only from those Moonraker trusts
 - a switch in Mainsail and Fluidd that turns jogpad off, STOP included
-- the pad and its state as a camera panel in Mainsail and Fluidd
+- the pad and its state as a camera panel in Mainsail and Fluidd, sized to
+  the pad and with a link to the full page
 - an installer that sets jogpad up as a service next to Klipper
   ([installation](docs/installation.md), [setup](docs/usage.md))
 - `jogpad program-pad` writes its key codes into a CH57x macro pad with 9 keys

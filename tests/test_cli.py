@@ -7,10 +7,16 @@ import uvicorn
 
 from jogpad import ch57x
 from jogpad.cli import main
+from jogpad.moonraker import Moonraker
+
+
+@pytest.fixture
+def no_camera(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(Moonraker, "panel", lambda self: None)
 
 
 def test_serve_logs_where_it_listens(
-    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture, no_camera: None
 ) -> None:
     monkeypatch.setattr(uvicorn, "run", lambda app, **options: None)
     with caplog.at_level(logging.INFO, logger="jogpad.cli"):
@@ -18,7 +24,9 @@ def test_serve_logs_where_it_listens(
     assert "listening on http://0.0.0.0:7150" in caplog.text
 
 
-def test_serve_keeps_requests_out_of_the_journal(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_serve_keeps_requests_out_of_the_journal(
+    monkeypatch: pytest.MonkeyPatch, no_camera: None
+) -> None:
     options: dict[str, Any] = {}
     monkeypatch.setattr(uvicorn, "run", lambda app, **given: options.update(given))
     main(["serve"])

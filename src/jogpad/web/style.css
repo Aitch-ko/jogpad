@@ -123,6 +123,14 @@ section {
 }
 
 .control rect { rx: var(--radius-small); }
+.outline {
+  fill: var(--bg);
+  stroke: var(--key-edge);
+  stroke-width: calc(var(--border) * 1.5);
+  rx: calc(var(--radius) * 2);
+  /* A layout's own outline is drawn in key units and scaled up; the line is not. */
+  vector-effect: non-scaling-stroke;
+}
 .control text { fill: var(--text); pointer-events: none; }
 .control .label { fill: var(--muted); font-size: 11px; }
 .control .action { font-size: 12px; font-weight: 600; }
@@ -140,8 +148,6 @@ section {
 .control.step-middle rect, .control.step-middle circle { fill: var(--step-middle); }
 .control.step-large rect, .control.step-large circle { fill: var(--step-large); }
 .control[class*="step-"] text { fill: var(--step-text); }
-/* A knob's label sits outside its circle, on the page. */
-.control circle ~ .label { fill: var(--muted); }
 
 .control.active rect, .control.active circle { fill: var(--accent); stroke: var(--accent); }
 .control.active text { fill: var(--accent-text); }
@@ -221,11 +227,23 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ?view=panel: the pad and its state only, for an iframe in Mainsail or Fluidd. */
 .panel header, .panel footer, .panel .recent, .panel .setup, .panel .pad h2, .panel .note { display: none; }
-.panel main { padding: 0.5rem; gap: 0.5rem; max-width: none; grid-template-columns: minmax(0, 1fr); }
+/* The camera's aspect ratio is a guess at the panel's width, so the pad fits
+   into whatever height is left instead of running off the bottom. */
+.panel main {
+  height: 100vh;
+  padding: 0.5rem;
+  gap: 0.5rem;
+  max-width: none;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+}
 .panel section { padding: 0.5rem; }
 /* One row whatever the width, so the height the camera's aspect ratio expects holds. */
 .panel .state { grid-column: auto; gap: 0.4rem; grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .panel .state span { font-size: 0.7rem; }
 .panel .state strong, .panel .state .toggle { font-size: 0.95rem; }
+.panel #label-switch a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.panel #label-switch a:hover { text-decoration: underline; }
 .panel #step[data-size] { padding: 0 0.2rem; }
-.panel #pad { max-height: none; }
+.panel .pad { display: flex; min-height: 0; }
+.panel #pad { flex: 1; height: 100%; max-height: none; }

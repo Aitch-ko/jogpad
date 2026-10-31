@@ -4,6 +4,9 @@
 
 const UNIT = 60; // pixels per key unit
 const GAP = 6;
+// The pad's outline runs this far around its controls, in key units; api.py
+// counts it into the panel's aspect ratio.
+const OUTLINE = 0.2;
 const RECENT = 12;
 const LEARN_S = 30;
 const LANGUAGE_KEY = "jogpad.language";
@@ -140,7 +143,10 @@ function drawPad(pad) {
     } else {
       svg("rect", { x, y, width: w, height: h }, group);
     }
-    text(c.label, { class: "label", x: x + 6, y: y + 14 }, group);
+    // On a knob the corner of the box lies outside the circle, so the label goes inside.
+    const knob = c.kind === "knob";
+    const label = knob ? { x: x + w / 2, y: y + 15, "text-anchor": "middle" } : { x: x + 6, y: y + 14 };
+    text(c.label, { class: "label", ...label }, group);
 
     const actions = pad.actions[c.id] || {};
     const names = ["press", "cw", "ccw"]
@@ -148,14 +154,25 @@ function drawPad(pad) {
       .map((part) => labels[actions[part]] || actions[part]);
     const middle = { x: x + w / 2, "text-anchor": "middle" };
     names.forEach((name, i) => {
-      const offset = (i - (names.length - 1) / 2) * 14;
+      // Below the knob's label, a little tighter, so three lines fit a small knob.
+      const offset = knob ? (i - (names.length - 1) / 2) * 13 + 5 : (i - (names.length - 1) / 2) * 14;
       text(name, { ...middle, class: "action", y: y + h / 2 + 5 + offset }, group);
     });
     const turn = text("", { ...middle, class: "turn", y: y + h - 8 }, group);
     group.classList.toggle("stop", Object.values(actions).includes("stop"));
     controls.set(c.id, { group, turn, actions: Object.values(actions) });
   }
-  root.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  const shape = pad.layout.outline;
+  const margin = OUTLINE * UNIT;
+  const box = shape
+    ? { x: shape.x * UNIT, y: shape.y * UNIT, width: shape.w * UNIT, height: shape.h * UNIT }
+    : { x: -margin, y: -margin, width: width + 2 * margin, height: height + 2 * margin };
+  const outline = shape
+    ? svg("path", { class: "outline", d: shape.path, transform: `scale(${UNIT})` }, root)
+    : svg("rect", { class: "outline", x: box.x + 1, y: box.y + 1, width: box.width - 2, height: box.height - 2 }, root);
+  // First child, so it lies behind the controls.
+  root.prepend(outline);
+  root.setAttribute("viewBox", `${box.x} ${box.y} ${box.width} ${box.height}`);
 }
 
 function showEvent(event) {
@@ -524,6 +541,11 @@ async function main() {
   showLinks(version);
   $("label-step").textContent = t("ui.step");
   $("label-switch").textContent = t("ui.switch");
+  // The camera panel in Mainsail and Fluidd hides the header; its label leads to the full page.
+  if (document.body.classList.contains("panel")) {
+    const attrs = { href: "/", target: "_blank", rel: "noopener", title: t("ui.open_page") };
+    $("label-switch").replaceChildren(el("a", attrs, `${t("ui.switch")} ↗`));
+  }
   $("switched-off-text").textContent = t("ui.switch_off_note");
   $("switch-on").textContent = t("ui.switch_turn_on");
   $("switch-on").onclick = () => setSwitch(true);

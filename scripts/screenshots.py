@@ -26,8 +26,8 @@ from jogpad.moonraker import Moonraker
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "assets" / "screenshots"
 VIEWPORT = {"width": 1100, "height": 860}
-# Width of a camera panel in Mainsail; the height follows the keypad panel's 40:58.
-PANEL_VIEWPORT = {"width": 400, "height": 580}
+# Width of a camera panel in Mainsail; the height follows the keypad panel's 44:62.
+PANEL_VIEWPORT = {"width": 400, "height": 564}
 
 # KeyEvent payloads as /api/events sends them.
 PRESSES = [

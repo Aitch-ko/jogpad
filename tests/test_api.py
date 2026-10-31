@@ -3,7 +3,7 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from jogpad.api import create_app, describe_event, describe_pad, panel_aspect_ratio
+from jogpad.api import create_app, describe_event, describe_pad, panel_aspect_ratio, sync_panel
 from jogpad.config import Config
 from jogpad.core import BackendError
 from jogpad.moonraker import IPNetwork, Moonraker
@@ -105,9 +105,9 @@ class FakeMoonraker(Moonraker):
         self._check()
         self.switched_on = on
 
-    def panel_url(self) -> str | None:
+    def panel(self) -> tuple[str, str] | None:
         self._check()
-        return self.camera[0] if self.camera else None
+        return self.camera
 
     def add_panel(self, url: str, aspect_ratio: str) -> None:
         self._check()
@@ -268,8 +268,27 @@ def test_panel_while_moonraker_is_down_fails_visibly(tmp_path: Path) -> None:
     assert api.get("/api/panel").status_code == 503
 
 
-def test_panel_of_the_keypad_fits_the_pad_and_the_state_bar() -> None:
-    assert panel_aspect_ratio(Config()) == "40:58"
+def test_panel_of_the_keypad_fits_the_pad_its_outline_and_the_state_bar() -> None:
+    assert panel_aspect_ratio(Config()) == "44:62"
+
+
+def test_panel_of_a_pad_with_its_own_outline_fits_that_outline() -> None:
+    config = Config.model_validate({"input": {"layout": "ch57x-9k3"}})
+    assert panel_aspect_ratio(config) == "53:63"
+
+
+def test_camera_added_for_another_layout_gets_the_ratio_of_this_one() -> None:
+    config = Config.model_validate({"input": {"layout": "ch57x-9k3"}})
+    moonraker = FakeMoonraker()
+    moonraker.camera = ("http://printer:7150/?view=panel", "40:58")
+    sync_panel(config, moonraker)
+    assert moonraker.camera == ("http://printer:7150/?view=panel", panel_aspect_ratio(config))
+
+
+def test_without_a_camera_none_is_added() -> None:
+    moonraker = FakeMoonraker()
+    sync_panel(Config(), moonraker)
+    assert moonraker.camera is None
 
 
 def test_switch_turns_jogpad_off_through_moonraker(tmp_path: Path) -> None:

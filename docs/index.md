@@ -30,7 +30,8 @@ Klipper, tested on a QIDI Plus 4 with the keypad of a Logitech MX Keys S:
   and the step size from green to red, learns keys and checks axis directions;
   open in the network, changes only from computers Moonraker trusts
 - a switch in Mainsail and Fluidd that turns jogpad off, STOP included
-- the pad and its state as a camera panel in Mainsail and Fluidd
+- the pad and its state as a camera panel in Mainsail and Fluidd, sized to
+  the pad and with a link to the full page
 - an [installer](installation.md) that sets jogpad up as a service next to
   Klipper
 - [programming a CH57x macro pad](usage.md#program-a-ch57x-macro-pad) with
