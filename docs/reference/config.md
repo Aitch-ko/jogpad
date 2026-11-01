@@ -38,6 +38,7 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 | `layout` | `"numpad"` | Pad drawn on the web page: `numpad`, `ch57x-9k3`, or `none` to list pressed keys only. |
 | `step_light` | `true` | With a CH57x layout such as `ch57x-9k3`, light the pad in the colour of the step size: green for the smallest, so green after a start, red for the largest, yellow between. The pad stores every new colour in its flash memory, which takes only so many writes; `false` leaves its light alone. |
 | `step_beep` | `""` | G-code for one beep, e.g. `M300 S1000 P100` where `printer.cfg` has an `M300` macro for the printer's beeper. When the step size changes, jogpad sends it once for the smallest step size, twice for the next, and so on, so the step size is known without a look at the pad. Empty: no beep. |
+| `refusal_beep` | `""` | G-code for the sound of a refusal, e.g. one long beep such as `M300 S440 P600`: a lock or the switch holds a key back, the status cannot be read, or the firmware refuses a move or homing. A key that does nothing is then heard, not only seen. Empty: no sound. |
 
 ## `[server]`
 
