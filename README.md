@@ -90,8 +90,7 @@ tells which of them jogpad covers today and which are planned.
 
 ## Status
 
-Early development, not released on PyPI yet. Working today, on Linux with
-Klipper:
+Early development. Working today, on Linux with Klipper:
 
 - jog, home and stop from a numeric keypad or any USB keyboard; tested on a
   QIDI Plus 4 with the keypad of a Logitech MX Keys S

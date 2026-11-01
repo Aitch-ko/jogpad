@@ -1,12 +1,12 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-fancy-pypi-readme"]
 build-backend = "hatchling.build"
 
 [project]
 name = "jogpad"
 version = "0.14.0"
 description = "Turn a programmable macro pad with knobs into a jog pendant for 3D printers and CNC machines."
-readme = "README.md"
+dynamic = ["readme"]
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Aitch-ko" }]
@@ -44,6 +44,36 @@ Changelog = "https://github.com/Aitch-ko/jogpad/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/jogpad"]
+
+# The README links images and pages relative to the repository, which works on
+# GitHub but not on PyPI. For PyPI the links become absolute: documentation
+# pages go to the docs site, everything else to the repository.
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = "README.md"
+
+# GitHub's alert box, which PyPI would show as "[!WARNING]".
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '> \[!WARNING\]\n> '
+replacement = '> **Warning:** '
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '(src|srcset)="(?!https?://)([^"]+)"'
+replacement = '\1="https://raw.githubusercontent.com/Aitch-ko/jogpad/main/\2"'
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '\]\(docs/([^)#]+)\.md(#[^)]*)?\)'
+replacement = '](https://aitch-ko.github.io/jogpad/\1/\2)'
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '\]\(#'
+replacement = '](https://github.com/Aitch-ko/jogpad#'
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '(\]\(|href=")(?!https?://|#)'
+replacement = '\1https://github.com/Aitch-ko/jogpad/blob/main/'
 
 [tool.ruff]
 line-length = 100
