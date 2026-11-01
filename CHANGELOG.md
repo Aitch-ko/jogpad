@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.18.2](https://github.com/Aitch-ko/jogpad/compare/v0.18.1...v0.18.2) (2026-11-01)
+
+
+### Documentation
+
+* the docs site no longer loads fonts from Google ([#25](https://github.com/Aitch-ko/jogpad/issues/25)) ([baa5091](https://github.com/Aitch-ko/jogpad/commit/baa50919e1ad3c48473358b6f032c25819b0b4fa))
+
 ## [0.18.1](https://github.com/Aitch-ko/jogpad/compare/v0.18.0...v0.18.1) (2026-11-01)
 
 
