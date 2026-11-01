@@ -157,9 +157,9 @@ what it does through the pad and the printer:
 A setup with both sounds, for a printer with an `M300` macro:
 
 ```toml
-[input]
-step_beep = "M300 S1000 P100"
-refusal_beep = "M300 S440 P600"
+[sounds]
+step = "M300 S1000 P100"
+refusal = "M300 S440 P600"
 ```
 
 The HOME selection and the reason for a refusal still show only in the console
@@ -201,24 +201,24 @@ writes only when the colour changes. `step_light = false` under `[input]`
 leaves the pad's light alone.
 
 To know the step size without looking, let the printer beep it: once for the
-smallest step, twice for the next, and so on. Give `step_beep` under `[input]`
+smallest step, twice for the next, and so on. Give `step` under `[sounds]`
 the G-code for one beep, for example with an `M300` macro for the beeper in
 `printer.cfg`:
 
 ```toml
-[input]
-step_beep = "M300 S1000 P100"
+[sounds]
+step = "M300 S1000 P100"
 ```
 
 Klipper has no `M300` of its own. Where `printer.cfg` has none, switch the
 beeper's pin directly. On a QIDI Plus 4 it is the output pin `buzzer`:
 
 ```toml
-[input]
-step_beep = "SET_PIN PIN=buzzer VALUE=1\nG4 P100\nSET_PIN PIN=buzzer VALUE=0"
+[sounds]
+step = "SET_PIN PIN=buzzer VALUE=1\nG4 P100\nSET_PIN PIN=buzzer VALUE=0"
 ```
 
-Without a beeper, or with `step_beep` left empty, jogpad does not beep.
+Without a beeper, or with `step` left empty, jogpad does not beep.
 
 Pick the drawing with `layout` under `[input]`: `numpad` (default),
 `ch57x-9k3`, or `none` for the list only.
@@ -378,12 +378,12 @@ replaces the default list, so repeat the print lock if you want to keep it.
 ### Hear a refusal
 
 A refused key moves nothing, and the reason shows only in the console and on
-the web page. To hear it, give `refusal_beep` under `[input]` the G-code for
+the web page. To hear it, give `refusal` under `[sounds]` the G-code for
 a sound that differs from the step beeps, such as one long, low beep:
 
 ```toml
-[input]
-refusal_beep = "M300 S440 P600"
+[sounds]
+refusal = "M300 S440 P600"
 ```
 
 jogpad sends it when a lock or the switch in Mainsail or Fluidd holds a key

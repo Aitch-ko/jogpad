@@ -294,13 +294,13 @@ class Jogger:
 
     def _beep_step(self) -> None:
         # Once for the smallest step, twice for the next: the step size without a look.
-        beep = self.config.input.step_beep
+        beep = self.config.sounds.step
         if beep:
             script = f"\n{BEEP_PAUSE}\n".join([beep] * (self._step_index + 1))
             self._call(self.backend.gcode, script)
 
     def _beep_refusal(self) -> None:
-        beep = self.config.input.refusal_beep
+        beep = self.config.sounds.refusal
         if beep:
             self._call(self.backend.gcode, beep)
 

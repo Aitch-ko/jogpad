@@ -198,20 +198,6 @@ class InputConfig(_Section):
         "largest, yellow between. The pad stores every new colour in its flash memory, "
         "which takes only so many writes; `false` leaves its light alone.",
     )
-    step_beep: str = Field(
-        "",
-        description="G-code for one beep, e.g. `M300 S1000 P100` where `printer.cfg` has an "
-        "`M300` macro for the printer's beeper. When the step size changes, jogpad sends it "
-        "once for the smallest step size, twice for the next, and so on, so the step size "
-        "is known without a look at the pad. Empty: no beep.",
-    )
-    refusal_beep: str = Field(
-        "",
-        description="G-code for the sound of a refusal, e.g. one long beep such as `M300 "
-        "S440 P600`: a lock or the switch holds a key back, the status cannot be read, "
-        "or the firmware refuses a move or homing. A key that does nothing is then heard, "
-        "not only seen. Empty: no sound.",
-    )
 
     @field_validator("layout")
     @classmethod
@@ -247,6 +233,23 @@ class InputConfig(_Section):
         return {parse_key(name): action for action, names in self.keys.items() for name in names}
 
 
+class SoundsConfig(_Section):
+    step: str = Field(
+        "",
+        description="G-code for one beep, e.g. `M300 S1000 P100` where `printer.cfg` has an "
+        "`M300` macro for the printer's beeper. When the step size changes, jogpad sends it "
+        "once for the smallest step size, twice for the next, and so on, so the step size "
+        "is known without a look at the pad. Empty: no beep.",
+    )
+    refusal: str = Field(
+        "",
+        description="G-code for the sound of a refusal, e.g. one long beep such as `M300 "
+        "S440 P600`: a lock or the switch holds a key back, the status cannot be read, "
+        "or the firmware refuses a move or homing. A key that does nothing is then heard, "
+        "not only seen. Empty: no sound.",
+    )
+
+
 class ServerConfig(_Section):
     host: str = Field(
         "0.0.0.0",
@@ -271,6 +274,7 @@ class Config(_Section):
     machine: MachineConfig = Field(default_factory=MachineConfig)
     jog: JogConfig = Field(default_factory=JogConfig)
     input: InputConfig = Field(default_factory=InputConfig)
+    sounds: SoundsConfig = Field(default_factory=SoundsConfig)
     server: ServerConfig = Field(default_factory=ServerConfig)
 
 
