@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.12.0](https://github.com/Aitch-ko/jogpad/compare/v0.11.0...v0.12.0) (2026-11-01)
+
+
+### Features
+
+* a held axis key keeps moving until it is released ([#61](https://github.com/Aitch-ko/jogpad/issues/61)) ([8078632](https://github.com/Aitch-ko/jogpad/commit/8078632cd827e93828ef8b219d168af2b278daf0))
+
+
+### Performance Improvements
+
+* a key press asks Klipper once for the switch and the locks ([#63](https://github.com/Aitch-ko/jogpad/issues/63)) ([1175d58](https://github.com/Aitch-ko/jogpad/commit/1175d5806541f7b1eef7463b8b004294a23d7f80))
+
 ## [0.11.0](https://github.com/Aitch-ko/jogpad/compare/v0.10.0...v0.11.0) (2026-10-31)
 
 
