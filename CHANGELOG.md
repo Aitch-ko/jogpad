@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.18.0](https://github.com/Aitch-ko/jogpad/compare/v0.17.0...v0.18.0) (2026-11-01)
+
+
+### Features
+
+* a refused key can be heard ([#20](https://github.com/Aitch-ko/jogpad/issues/20)) ([cdb0e6b](https://github.com/Aitch-ko/jogpad/commit/cdb0e6b4ab162ae523bf1229ecda86b8eb93aa55))
+
+
+### Documentation
+
+* the README names what you feel, hear and see ([#19](https://github.com/Aitch-ko/jogpad/issues/19)) ([ed9c548](https://github.com/Aitch-ko/jogpad/commit/ed9c548d1be67a06b80ed946aa28ac5030ffc5cb))
+
 ## [0.17.0](https://github.com/Aitch-ko/jogpad/compare/v0.16.0...v0.17.0) (2026-11-01)
 
 
