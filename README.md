@@ -122,6 +122,11 @@ Early development. Working today, on Linux with Klipper:
   and Y, with no key setup, and the pad lights up in the colour of the step size;
   tested on the QIDI Plus 4, held keys included
 
+The keys, the light and the beeps are meant to work without a screen, see
+[without looking](docs/usage.md#without-looking). No one with low vision has
+tested them yet: if that is you and you try jogpad, please tell me what it
+still lacks for you.
+
 | | Now | Later |
 | --- | --- | --- |
 | Firmware | Klipper (Moonraker) | RepRapFirmware, FluidNC |
