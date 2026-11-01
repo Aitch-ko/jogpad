@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.14.0](https://github.com/Aitch-ko/jogpad/compare/v0.13.0...v0.14.0) (2026-11-01)
+
+
+### Features
+
+* the footer is one quiet line with the version and short links ([#69](https://github.com/Aitch-ko/jogpad/issues/69)) ([6e9bd25](https://github.com/Aitch-ko/jogpad/commit/6e9bd2528cfaf8f4f6a97b46121a898575e8f9d1))
+
+
+### Documentation
+
+* the README animation shows the macro pad as it is today ([#71](https://github.com/Aitch-ko/jogpad/issues/71)) ([0ebb74b](https://github.com/Aitch-ko/jogpad/commit/0ebb74b6cef91cb784860c34f7a486bd47a577f8))
+
 ## [0.13.0](https://github.com/Aitch-ko/jogpad/compare/v0.12.0...v0.13.0) (2026-11-01)
 
 
