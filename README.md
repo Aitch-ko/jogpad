@@ -106,7 +106,8 @@ Early development. Working today, on Linux with Klipper:
 - a switch in Mainsail and Fluidd that turns jogpad off, STOP included
 - the pad and its state as a camera panel in Mainsail and Fluidd, sized to
   the pad and with a link to the full page
-- an installer that sets jogpad up as a service next to Klipper
+- an installer that sets jogpad up as a service next to Klipper and downloads
+  Python 3.12 first where the system's is older than 3.10
   ([installation](docs/installation.md), [setup](docs/usage.md)); updates
   with one click from the update panel of Mainsail and Fluidd
 - `jogpad program-pad` writes its key codes into a CH57x macro pad with 9 keys

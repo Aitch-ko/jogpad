@@ -25,17 +25,33 @@ fail() { printf 'Error: %s\n' "$*" >&2; exit 1; }
 is_new_enough() { "$1" -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2> /dev/null; }
 too_old() {
     printf 'Error: jogpad needs Python 3.10 or newer; %s is %s.\n' "$1" "$("$2" --version 2>&1)" >&2
-    cat >&2 <<EOF
-On Raspberry Pi OS 11 (Bullseye), install a newer one next to the system's with uv:
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    ~/.local/bin/uv python install 3.12
-and run again with:
-    JOGPAD_PYTHON="\$(~/.local/bin/uv python find 3.12)" $0
-EOF
     exit 1
 }
+# Debian 10 and 11 ship Python 3.7 and 3.9: Raspberry Pi OS 11 and many printers
+# with Klipper from the factory. uv puts a newer one into the home folder, without
+# sudo and without touching the system's.
+download_python() {
+    say "Python 3.12 for jogpad"
+    echo "jogpad needs Python 3.10 or newer; $PYTHON is $("$PYTHON" --version 2>&1)."
+    echo "uv can download Python 3.12 into your home folder, next to the system's."
+    read -r -p "Download it? [Y/n] " answer || answer=""
+    case "$answer" in
+        [nN]*) fail "jogpad needs Python 3.10 or newer; run again to download it, or set JOGPAD_PYTHON." ;;
+    esac
+    local uv
+    uv="$(command -v uv || echo "$HOME/.local/bin/uv")"
+    if [ ! -x "$uv" ]; then
+        command -v curl > /dev/null || fail "curl not found; install it with: sudo apt install curl"
+        curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR="$(dirname "$uv")" UV_NO_MODIFY_PATH=1 sh \
+            || fail "installing uv failed; is this computer online, and is its clock right?"
+    fi
+    # No python3.12 link in ~/.local/bin: jogpad does not need it, and uv would warn about PATH.
+    UV_PYTHON_INSTALL_BIN=0 "$uv" python install 3.12 \
+        || fail "downloading Python 3.12 failed; is this computer online, and is its clock right?"
+    PYTHON="$("$uv" python find 3.12)"
+}
 command -v "$PYTHON" > /dev/null || fail "Python not found: $PYTHON"
-is_new_enough "$PYTHON" || too_old "$PYTHON" "$PYTHON"
+is_new_enough "$PYTHON" || download_python
 
 # Ask for the password now rather than after the long pip run, when nobody watches.
 echo "The service part needs sudo."
