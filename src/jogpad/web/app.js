@@ -487,7 +487,7 @@ function showLinks(version) {
     if (!href) return;
     const a = $(id);
     a.href = href;
-    a.textContent = label;
+    a.querySelector("span").textContent = label;
     a.target = "_blank";
     a.rel = "noopener";
     a.hidden = false;
@@ -633,6 +633,7 @@ async function main() {
   setUpThemes();
   labels = actionLabels();
   $("version").textContent = version.version;
+  $("footer-version").textContent = `jogpad ${version.version}`;
   showLinks(version);
   $("label-step").textContent = t("ui.step");
   $("label-switch").textContent = t("ui.switch");

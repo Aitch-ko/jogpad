@@ -201,6 +201,8 @@ person who merges a change answers for it.
 
 Pad programming builds on the protocol work in
 [ch57x-keyboard-tool](https://github.com/kriomant/ch57x-keyboard-tool) (MIT).
+The icons at the foot of the web page come from [Lucide](https://lucide.dev)
+(ISC); their licence is in `src/jogpad/web/icons.svg`.
 
 ## License
 

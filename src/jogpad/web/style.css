@@ -199,17 +199,23 @@ section {
 .setup summary h2 { display: inline; }
 .setup details[open] summary { margin-bottom: 0.25rem; }
 
+/* One quiet line: name and version, then the links, set apart by dots. */
 footer {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.5rem 1.5rem;
+  gap: 0.25rem 0;
   padding: 0 1rem 1.5rem;
   font-size: 0.85rem;
+  color: var(--muted);
 }
-
-footer a { color: var(--muted); }
-footer a:hover { color: var(--accent); }
+footer > * { display: inline-flex; align-items: center; gap: 0.3rem; }
+/* The gap after the dot makes up the rest of its space on the right. */
+footer > :not(:first-child)::before { content: "·"; margin: 0 0.3rem 0 0.6rem; }
+footer img, footer .icon { width: 14px; height: 14px; flex: none; }
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover, footer a:focus-visible { color: var(--text); }
+footer a:hover span, footer a:focus-visible span { text-decoration: underline; }
 
 .tables {
   display: grid;
