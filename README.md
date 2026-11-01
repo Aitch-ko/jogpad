@@ -45,6 +45,10 @@ the nozzle.
   one key. Presses that pile up during a move are merged, so the axis stops
   when you stop. Hold a key, and the axis keeps moving until you let go, at a
   speed that goes with the step size.
+- **Feel it, hear it, see it.** Keys and knob detents under your fingers, the
+  step size as one, two or three beeps and in the colour of the pad, every
+  press on the web page. Smell is left to a nozzle digging into the bed, and
+  that is what jogpad is there to prevent.
 - **Home** all axes or just the ones you pick, and **stop** with one key.
 - **Any USB keyboard works**, from a cheap numeric keypad to a macro pad
   with knobs, see [which pad](#which-pad).

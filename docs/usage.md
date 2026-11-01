@@ -183,6 +183,14 @@ the G-code for one beep, for example with an `M300` macro for the beeper in
 step_beep = "M300 S1000 P100"
 ```
 
+Klipper has no `M300` of its own. Where `printer.cfg` has none, switch the
+beeper's pin directly. On a QIDI Plus 4 it is the output pin `buzzer`:
+
+```toml
+[input]
+step_beep = "SET_PIN PIN=buzzer VALUE=1\nG4 P100\nSET_PIN PIN=buzzer VALUE=0"
+```
+
 Without a beeper, or with `step_beep` left empty, jogpad does not beep.
 
 Pick the drawing with `layout` under `[input]`: `numpad` (default),
