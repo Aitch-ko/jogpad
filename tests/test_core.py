@@ -141,7 +141,7 @@ def test_step_change_is_announced() -> None:
 
 
 def test_step_size_beeps_its_number() -> None:
-    config = Config.model_validate({"input": {"step_beep": "M300"}})
+    config = Config.model_validate({"sounds": {"step": "M300"}})
     assert run(press(KPASTERISK), config=config).calls == [("gcode", "M300\nG4 P150\nM300")]
 
 
@@ -204,7 +204,7 @@ def test_failed_move_does_not_raise() -> None:
     assert run(press(KP6), backend).calls == []
 
 
-REFUSAL_BEEP = Config.model_validate({"input": {"refusal_beep": "BEEP"}})
+REFUSAL_BEEP = Config.model_validate({"sounds": {"refusal": "BEEP"}})
 
 
 def test_lock_refusal_is_heard() -> None:
