@@ -169,6 +169,16 @@ source lives in [`docs/`](docs/) and is built with
 | `docs/` | documentation |
 | `tests/` | tests, run with `pytest` |
 
+## Why jogpad exists
+
+jogpad comes from measuring the tool on the RatRig-based prototype of
+[ADDITRIX](https://www.additrix.de), a startup for metal 3D printing. The
+touchscreen gave the finger nothing to feel: eyes on the display, finger on the
+button, eyes on the build plate while pulling the paper back and forth, then
+the next 0.05 mm closer. By then the finger had slipped, and the tap hit the
+wrong button. At worst that changes the step size, and the next move goes 1 mm
+or even 10 mm into the bed. jogpad grew out of that, as a project of its own.
+
 ## Why another tool
 
 Projects exist for single firmwares (keyboard plugins for OctoPrint and CNCjs,
