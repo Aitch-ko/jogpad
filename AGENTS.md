@@ -38,6 +38,11 @@ zensical build --strict
   `README.md`; CI cannot tell when it is out of date.
 - Visible changes to the web page: run `python scripts/screenshots.py` and
   commit the new images under `docs/assets/screenshots/`.
+- A change that existing installations only get from the installer (the
+  service, the udev rule or more in `scripts/install.sh`, the switch macro
+  `src/jogpad/klipper/jogpad.cfg`) ends its PR title in
+  `; run the installer again`. Updates from the Mainsail/Fluidd update panel do
+  not run the installer, and the title becomes the release note.
 - The HTTP API and the agent interface never move a machine.
 - No `Assisted-by` or `Co-Authored-By` trailers; the README says once that
   jogpad is developed with Claude Code.

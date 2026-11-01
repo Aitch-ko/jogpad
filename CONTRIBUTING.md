@@ -79,6 +79,15 @@ pull request open that bumps the version and updates `CHANGELOG.md` from the
 commit titles. Merging it tags `vX.Y.Z` and creates the GitHub release; the
 release publishes the package to PyPI.
 
+An update from the update panel of Mainsail and Fluidd installs the new package
+and restarts jogpad, but does not run the installer. So a change that existing
+installations only get from the installer ends its pull request title in
+`; run the installer again`, for example
+`fix: the service waits for the network; run the installer again`. That covers
+the service, the udev rule and anything else `scripts/install.sh` sets up, and
+the switch macro `src/jogpad/klipper/jogpad.cfg`. The title becomes the
+release note, which the update panel links.
+
 ## Safety
 
 jogpad moves machines. Changes to jogging, locks or STOP need a test that shows
