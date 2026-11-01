@@ -13,7 +13,7 @@ pendant. Every key sits where your finger left it; one press or one knob
 detent is one step; your eyes stay on the nozzle. The same applies to mills,
 lasers and other machines: see [use cases](use-cases.md).
 
-![Animation: a knob on a macro pad is turned; with every detent the nozzle moves down one step towards a sheet of paper, and the console reports each move](assets/demo.svg)
+![Animation: the big knob of a macro pad with nine keys and three knobs is turned; with every detent the nozzle moves down one step towards a sheet of paper, and the console reports each move. The step key switches from 1 mm to 0.01 mm, and the pad's light from red to green](assets/demo.svg)
 
 !!! warning "Not a safety device"
     The STOP key sends the firmware's emergency stop over USB, the host and the

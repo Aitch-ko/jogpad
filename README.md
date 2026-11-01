@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/demo.svg" alt="Animation: a knob on a macro pad is turned; with every detent the nozzle moves down one step towards a sheet of paper, and the console reports each move" width="760">
+  <img src="docs/assets/demo.svg" alt="Animation: the big knob of a macro pad with nine keys and three knobs is turned; with every detent the nozzle moves down one step towards a sheet of paper, and the console reports each move. The step key switches from 1 mm to 0.01 mm, and the pad's light from red to green" width="760">
 </p>
 
 ## Sound familiar?
