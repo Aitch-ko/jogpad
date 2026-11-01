@@ -143,10 +143,9 @@ may change settings, see
 
 ## Documentation
 
-The documentation lives in [`docs/`](docs/) and is built with
-[Zensical](https://zensical.org/). It goes online at
-<https://aitch-ko.github.io/jogpad/> once the repository is public; until then
-read it here or run `zensical serve`.
+The documentation is online at <https://aitch-ko.github.io/jogpad/>. Its
+source lives in [`docs/`](docs/) and is built with
+[Zensical](https://zensical.org/).
 
 | Page | What |
 | --- | --- |
