@@ -45,8 +45,8 @@ the nozzle.
   when you stop. Hold a key, and the axis keeps moving until you let go, at a
   speed that goes with the step size.
 - **Home** all axes or just the ones you pick, and **stop** with one key.
-- **Any USB keyboard works today**, for example a cheap numeric keypad.
-  Programmable CH57x macro pads with knobs are next.
+- **Any USB keyboard works**, from a cheap numeric keypad to a macro pad
+  with knobs, see [which pad](#which-pad).
 - **A web page** draws your pad, lights up every key you press, learns new
   keys and checks that each axis moves the way you expect.
 - **Visible to everyone at the machine**: every move appears in the Mainsail
@@ -72,6 +72,21 @@ tells which of them jogpad covers today and which are planned.
 > [!WARNING]
 > The STOP key is not an emergency stop. It goes through USB, the host and the
 > network. Keep a wired emergency stop on your machine. See [Safety](docs/safety.md).
+
+## Which pad
+
+- **A small USB numeric keypad.** It costs a few euros and works as it
+  comes: plug it in, enter it in `jogpad.toml`, done.
+- **An old keyboard** from the drawer: its numeric block works the same way.
+  Wireless keyboards work too, but take one with a cable if you can. A key
+  release lost over radio keeps a held key's axis moving until you press
+  another key, see [Safety](docs/safety.md#wireless-pads).
+- **A macro pad with 9 keys and 3 knobs (recommended).** The knobs turn like
+  handwheels, the big one for Z, and the pad lights up in the colour of the
+  step size. It is sold under many names. jogpad is tested with one that
+  shows up with USB ID 1189:8840 (`lsusb` shows it), and `jogpad program-pad`
+  sets it up without the vendor's software. Pads with 1189:8890 speak another
+  protocol and do not work yet.
 
 ## Status
 
