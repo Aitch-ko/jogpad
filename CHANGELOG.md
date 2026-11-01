@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.13.0](https://github.com/Aitch-ko/jogpad/compare/v0.12.0...v0.13.0) (2026-11-01)
+
+
+### Features
+
+* keys show arrows and signs in the colour of their axis ([#66](https://github.com/Aitch-ko/jogpad/issues/66)) ([4f38e2b](https://github.com/Aitch-ko/jogpad/commit/4f38e2b18acfc70e9c690729b7c99329ef61b22b))
+
+
+### Bug Fixes
+
+* the HOME messages say that a second HOME starts homing ([#64](https://github.com/Aitch-ko/jogpad/issues/64)) ([060121f](https://github.com/Aitch-ko/jogpad/commit/060121f32b18a6f9b6732dbe12947b68573aae09))
+* the step size badge is only as tall as its text ([#65](https://github.com/Aitch-ko/jogpad/issues/65)) ([8c97b7c](https://github.com/Aitch-ko/jogpad/commit/8c97b7c3d70255a239acf7e08afc2c5efef3cbf1))
+
+
+### Documentation
+
+* README and home page say which pad to take ([#67](https://github.com/Aitch-ko/jogpad/issues/67)) ([be6c2f7](https://github.com/Aitch-ko/jogpad/commit/be6c2f74b33bcfa0f99f70c4cfcbf3e09873554d))
+
 ## [0.12.0](https://github.com/Aitch-ko/jogpad/compare/v0.11.0...v0.12.0) (2026-11-01)
 
 
