@@ -1,8 +1,9 @@
 /* Design tokens. style.css uses only these variables. Text, muted text and
    the accent stay at 4.5:1 or more against the surface, and the accent text
-   against the accent, in light and dark. The axis colours, as edges, stay at
-   3:1 or more against a key. The step colours, smallest to largest step, and
-   STOP are fills, the same in both, with their text at 4.5:1 or more. */
+   against the accent, in light and dark. The axis colours fill the arrows and
+   signs on the keys: 3:1 or more against a key, with --axis-text on them at
+   4.5:1 or more. The step colours, smallest to largest step, and STOP are
+   fills, the same in both, with their text at 4.5:1 or more. */
 
 :root {
   --bg: #f4f4f2;
@@ -23,8 +24,10 @@
   --stop: #b3261e;
   --stop-text: #ffffff;
   --axis-x: #d92d20;
-  --axis-y: #1f8a45;
+  --axis-y: #1d7f40;
   --axis-z: #2563eb;
+  --axis-e: #9a6200;
+  --axis-text: #ffffff;
   --radius: 8px;
   --radius-small: 6px;
   --border: 1px;
@@ -53,6 +56,8 @@
     --axis-x: #f2726a;
     --axis-y: #4cc274;
     --axis-z: #60a5fa;
+    --axis-e: #e0a53a;
+    --axis-text: #161615;
     color-scheme: dark;
   }
 }
@@ -72,5 +77,7 @@
   --axis-x: #f2726a;
   --axis-y: #4cc274;
   --axis-z: #60a5fa;
+  --axis-e: #e0a53a;
+  --axis-text: #161615;
   color-scheme: dark;
 }

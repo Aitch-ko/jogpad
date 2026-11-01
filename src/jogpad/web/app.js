@@ -11,8 +11,13 @@ const OUTLINE = 0.2;
 // which is as wide as the knob's box, and stays inside the pad's outline.
 const TURN_GAP = 10;
 const TURN_ANGLE = (32 * Math.PI) / 180; // from the top to each end
-const TURN_HEAD = 8;
-const TURN_LABEL = 11; // from the arrow's tip outwards to its label's middle
+const TURN_HEAD = 12;
+const TURN_LABEL = 12; // from the arrow's tip outwards to its label's middle
+// Keys that move X or Y show the way the tool goes as an arrow, degrees
+// clockwise from up: Y+ is away from the user, as on the direction check.
+const ARROWS = { y_plus: 0, x_plus: 90, y_minus: 180, x_minus: 270 };
+// Z and the extruder have no way in the drawing's plane; a sign stands in.
+const SIGNS = { z_plus: ["Z", true], z_minus: ["Z", false], e_plus: ["E", true], e_minus: ["E", false] };
 const RECENT = 12;
 const LEARN_S = 30;
 const LANGUAGE_KEY = "jogpad.language";
@@ -154,14 +159,22 @@ function drawPad(pad) {
     // On a knob the corner of the box lies outside the circle, so the label goes inside.
     const label = knob ? { x: x + w / 2, y: y + 15, "text-anchor": "middle" } : { x: x + 6, y: y + 14 };
     text(c.label, { class: "label", ...label }, group);
-    if (actions.press) {
+    const [cx, cy, size] = [x + w / 2, y + h / 2, Math.min(w, h)];
+    const press = actions.press;
+    if (press && !knob && press in ARROWS) {
+      drawArrow(cx, cy, size, ARROWS[press], labels[press] || press, group);
+    } else if (press && !knob && press in SIGNS) {
+      drawSign(cx, cy, size, ...SIGNS[press], group);
+    } else if (press === "home" && !knob) {
+      drawHome(cx, cy, size, group);
+    } else if (press) {
       // Below a knob's label.
-      const press = { x: x + w / 2, y: y + h / 2 + (knob ? 10 : 5), "text-anchor": "middle", class: "action" };
-      text(labels[actions.press] || actions.press, press, group);
+      const at = { x: cx, y: cy + (knob ? 10 : 5), "text-anchor": "middle", class: "action" };
+      text(labels[press] || press, at, group);
     }
-    const ends = knob ? drawTurns(x + w / 2, y + h / 2, Math.min(w, h) / 2, actions, root) : {};
+    const turns = knob ? drawTurns(cx, cy, size / 2, actions, root) : null;
     group.classList.toggle("stop", Object.values(actions).includes("stop"));
-    controls.set(c.id, { group, ends, actions: Object.values(actions) });
+    controls.set(c.id, { group, turns: turns?.group, ends: turns?.ends ?? {}, actions: Object.values(actions) });
   }
   const shape = pad.layout.outline;
   const margin = OUTLINE * UNIT;
@@ -176,10 +189,50 @@ function drawPad(pad) {
   root.setAttribute("viewBox", `${box.x} ${box.y} ${box.width} ${box.height}`);
 }
 
+// Shapes in hundredths of the key's size, around its middle: a thick arrow
+// pointing up, with its shaft below the head, where the action is written.
+const ARROW = [[0, -42], [38, -8], [21, -8], [21, 38], [-21, 38], [-21, -8], [-38, -8]];
+const ARROW_TEXT = 15;
+const SIGN_LENGTH = 38;
+const SIGN_WIDTH = 15;
+
+function points(shape, size) {
+  return shape.map(([x, y]) => `${(x * size) / 100},${(y * size) / 100}`).join(" ");
+}
+
+function drawArrow(cx, cy, size, angle, label, group) {
+  const transform = `translate(${cx} ${cy}) rotate(${angle})`;
+  svg("polygon", { class: "symbol", points: points(ARROW, size), transform }, group);
+  const turn = (angle * Math.PI) / 180;
+  const offset = (ARROW_TEXT * size) / 100;
+  const at = { x: cx - offset * Math.sin(turn), y: cy + offset * Math.cos(turn) };
+  text(label, { class: "on-symbol", ...at, "text-anchor": "middle", "dominant-baseline": "central" }, group);
+}
+
+// A plus or a minus sign with the axis written in its middle.
+function drawSign(cx, cy, size, axis, plus, group) {
+  const [a, b] = [SIGN_LENGTH, SIGN_WIDTH];
+  const shape = plus
+    ? [[-b, -a], [b, -a], [b, -b], [a, -b], [a, b], [b, b], [b, a], [-b, a], [-b, b], [-a, b], [-a, -b], [-b, -b]]
+    : [[-a, -b], [a, -b], [a, b], [-a, b]];
+  svg("polygon", { class: "symbol", points: points(shape, size), transform: `translate(${cx} ${cy})` }, group);
+  text(axis, { class: "on-symbol", x: cx, y: cy, "text-anchor": "middle", "dominant-baseline": "central" }, group);
+}
+
+function drawHome(cx, cy, size, group) {
+  const p = (x, y) => `${cx + (x * size) / 100},${cy + (y * size) / 100}`;
+  // A little low, clear of the key's number in the corner.
+  const roof = `M${p(-30, 6)} L${p(0, -24)} L${p(30, 6)}`;
+  const walls = `M${p(-21, -3)} L${p(-21, 30)} L${p(21, 30)} L${p(21, -3)}`;
+  const door = `M${p(-7, 30)} L${p(-7, 13)} L${p(7, 13)} L${p(7, 30)}`;
+  svg("path", { class: "home", d: `${roof} ${walls} ${door}` }, group);
+}
+
 // Above a knob, outside its circle: an arc with a head at each end, labelled
 // with what that turn does, anticlockwise on the left. Lines and filled heads
-// in one colour, so the drawing also serves as a template for marking the pad.
-// Outside the knob's group, whose colours for STOP or the step would hide it.
+// in the axis's colour, so the drawing also serves as a template for marking
+// the pad. Outside the knob's group, whose colours for STOP or the step would
+// hide it.
 function drawTurns(cx, cy, r, actions, root) {
   const radius = r + TURN_GAP;
   // Angles from the top, clockwise; as "x,y" in a path.
@@ -198,7 +251,7 @@ function drawTurns(cx, cy, r, actions, root) {
     const label = text(turnLabel(actions[part]), { x, y, "text-anchor": "middle", "dominant-baseline": "central" }, node);
     ends[part] = { node, label, action: actions[part] };
   }
-  return ends;
+  return { group, ends };
 }
 
 // A knob on selected_plus/minus moves whichever axis is selected at the time.
@@ -499,15 +552,17 @@ function stepSize(step) {
 // two axes takes none.
 function colourControls(state) {
   const size = stepSize(state.step);
-  for (const { group, actions } of controls.values()) {
+  for (const { group, turns, actions } of controls.values()) {
     const axes = new Set(
       actions
-        .map((a) => (a.startsWith("selected_") ? state.selected_axis : a.match(/^([xyz])_/)?.[1]))
+        .map((a) => (a.startsWith("selected_") ? state.selected_axis : a.match(/^([xyze])_/)?.[1]))
         .filter(Boolean)
         .map((axis) => axis.toLowerCase()),
     );
-    for (const axis of ["x", "y", "z"]) {
-      group.classList.toggle(`axis-${axis}`, axes.size === 1 && axes.has(axis));
+    for (const axis of ["x", "y", "z", "e"]) {
+      const coloured = axes.size === 1 && axes.has(axis);
+      group.classList.toggle(`axis-${axis}`, coloured);
+      turns?.classList.toggle(`axis-${axis}`, coloured);
     }
     for (const s of ["small", "middle", "large"]) {
       group.classList.toggle(`step-${s}`, actions.includes("step") && size === s);

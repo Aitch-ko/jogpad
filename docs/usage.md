@@ -147,17 +147,24 @@ pad and lights up every key you press, with the action it triggers, and shows
 step size, knob axis and the last refusal. Keys outside the drawing are listed
 too, so the page also tells you which code an unknown key sends.
 
-Colours help to find your way. The keys of X, Y and Z have red, green and
-blue edges, as in slicers; a knob on the selected axis takes the colour of
-that axis. STOP is red. The step size and the step key are green for the
-smallest step, red for the largest and yellow for those between, so a large
-step is seen before it moves the machine.
+Symbols and colours help to find your way. They follow the action of each
+key, so a key you learn or set gets its symbol by itself:
 
-An arrow over each knob shows what turning it does: the label at its left end
-belongs to turning left, the one at its right end to turning right, for
-example `X−` and `X+`. The labels follow the keys you set, and a knob on
-`selected_plus` and `selected_minus` names the selected axis. With every
-detent the knob and the end of the arrow light up.
+- X and Y keys carry a thick arrow pointing the way the tool goes, with the
+  action written in it; Y+ points up, away from you.
+- Z and extruder keys carry a large plus or minus sign with the axis in it.
+- HOME shows a house.
+- X is red, Y green, Z blue, as in slicers, and the extruder amber.
+- STOP is red. The step size and the step key are green for the smallest
+  step, red for the largest and yellow for those between, so a large step is
+  seen before it moves the machine.
+
+An arrow over each knob, in the colour of its axis, shows what turning it
+does: the label at its left end belongs to turning left, the one at its right
+end to turning right, for example `X−` and `X+`. The labels follow the keys
+you set, and a knob on `selected_plus` and `selected_minus` names and colours
+the selected axis. With every detent the knob and the end of the arrow light
+up.
 
 A CH57x macro pad shows the step size itself: with a CH57x layout jogpad lights
 the whole pad in the same colours, green after every start. The pad stores each
@@ -186,8 +193,8 @@ everyone at the machine reads them.
 At the bottom, the page links to the repository, to what is new in each
 version, and to a bug report form with your jogpad version already filled in.
 
-![The web page: the drawn macro pad lights up the pressed key, an arrow over each knob names the axis direction of each turn, the list on the right shows the last keys with their actions](assets/screenshots/web-page-light.png#only-light)
-![The web page: the drawn macro pad lights up the pressed key, an arrow over each knob names the axis direction of each turn, the list on the right shows the last keys with their actions](assets/screenshots/web-page-dark.png#only-dark)
+![The web page: the drawn macro pad shows arrows and signs in the colour of each axis and lights up the pressed key, the list on the right shows the last keys with their actions](assets/screenshots/web-page-light.png#only-light)
+![The web page: the drawn macro pad shows arrows and signs in the colour of each axis and lights up the pressed key, the list on the right shows the last keys with their actions](assets/screenshots/web-page-dark.png#only-dark)
 
 ### Set up keys and directions
 

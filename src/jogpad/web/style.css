@@ -137,19 +137,31 @@ section {
 .control .label { fill: var(--muted); font-size: 11px; }
 .control .action { font-size: 12px; font-weight: 600; }
 
-/* The arrows above the knobs, in one colour like a marking on the pad. */
+/* Axes in the colours slicers use, the extruder in amber: arrows for X and Y,
+   signs for Z and E, and the arrow above a knob, like a marking on the pad.
+   Fills only for STOP and for the step key, which shows the current step size
+   like the state bar. */
+.control.axis-x, .turns.axis-x { --axis: var(--axis-x); }
+.control.axis-y, .turns.axis-y { --axis: var(--axis-y); }
+.control.axis-z, .turns.axis-z { --axis: var(--axis-z); }
+.control.axis-e, .turns.axis-e { --axis: var(--axis-e); }
+.control .action { fill: var(--axis, var(--text)); }
+.control .symbol { fill: var(--axis, var(--muted)); }
+.control .on-symbol { fill: var(--axis-text); font-size: 12px; font-weight: 600; }
+.control .home {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 3.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .turns { pointer-events: none; }
-.turns .arc { fill: none; stroke: var(--muted); stroke-width: calc(var(--border) * 1.5); }
-.turns .head { fill: var(--muted); }
-.turns text { fill: var(--text); font-size: 11px; font-weight: 600; }
+.turns .arc { fill: none; stroke: var(--axis, var(--muted)); stroke-width: 4px; }
+.turns .head { fill: var(--axis, var(--muted)); }
+.turns text { fill: var(--axis, var(--text)); font-size: 12px; font-weight: 600; }
 .turns .on .head, .turns .on text { fill: var(--accent); }
 
-/* Axes in the colours slicers use. Fills only for STOP and for the step key,
-   which shows the current step size like the state bar. */
-.control.axis-x rect, .control.axis-x circle { stroke: var(--axis-x); }
-.control.axis-y rect, .control.axis-y circle { stroke: var(--axis-y); }
-.control.axis-z rect, .control.axis-z circle { stroke: var(--axis-z); }
-.control[class*="axis-"] rect, .control[class*="axis-"] circle { stroke-width: calc(var(--border) * 3); }
 .control.stop rect, .control.stop circle { fill: var(--stop); stroke: var(--stop); }
 .control.stop text { fill: var(--stop-text); }
 .control.step-small rect, .control.step-small circle { fill: var(--step-small); }
@@ -159,6 +171,9 @@ section {
 
 .control.active rect, .control.active circle { fill: var(--accent); stroke: var(--accent); }
 .control.active text { fill: var(--accent-text); }
+.control.active .symbol { fill: var(--accent-text); }
+.control.active .on-symbol { fill: var(--accent); }
+.control.active .home { stroke: var(--accent-text); }
 
 .recent ol {
   list-style: none;

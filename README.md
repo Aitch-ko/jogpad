@@ -60,7 +60,7 @@ the nozzle.
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/screenshots/web-page-dark.png">
-    <img src="docs/assets/screenshots/web-page-light.png" alt="The jogpad web page: the drawn macro pad lights up the pressed key, an arrow over each knob names the axis direction of each turn, a list shows the last keys with their actions" width="720">
+    <img src="docs/assets/screenshots/web-page-light.png" alt="The jogpad web page: the drawn macro pad shows arrows and signs in the colour of each axis and lights up the pressed key, a list shows the last keys with their actions" width="720">
   </picture>
 </p>
 
@@ -99,7 +99,7 @@ Klipper:
   key, at most 250 mm/s
 - every move and homing shows up in the Mainsail or Fluidd console
 - a web page in English and German, light or dark, that draws the pad with
-  its axes in colour and an arrow over each knob for its turning directions,
+  arrows and signs in the colour of each axis on its keys and over its knobs,
   shows each key press live and the step size from green to red, learns keys
   and checks the direction of each axis; reachable from every computer in the
   network, changes only from those Moonraker trusts
