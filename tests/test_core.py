@@ -29,12 +29,14 @@ class FakeBackend:
         self.status = {"print_stats": {"state": "standby"}, **(status or {})}
         self.calls: list[tuple[Any, ...]] = []
         self.notes: list[str] = []
+        self.queries: list[dict[str, list[str]]] = []
         self.fail_query = False
         self.fail_move = False
         # Seconds of moves the firmware still has queued.
         self.left = 0.0
 
     def query(self, objects: dict[str, list[str]]) -> dict[str, dict[str, Any]]:
+        self.queries.append(objects)
         if self.fail_query:
             raise BackendError("down")
         return self.status
@@ -115,6 +117,11 @@ def test_axis_change_keeps_moves_apart() -> None:
 def test_held_key_moves_only_once() -> None:
     events = [(KP6, KEY_PRESS), (KP6, KEY_AUTOREPEAT), (KP6, KEY_AUTOREPEAT), (KP6, KEY_RELEASE)]
     assert run(events).calls == [("move", "X", 0.01, 3000)]
+
+
+def test_press_asks_klipper_once_for_switch_and_locks() -> None:
+    # Klipper answers a query only at its next status update, up to 0.25 s later.
+    assert run(press(KP6)).queries == [{"print_stats": ["state"], SWITCH: ["value"]}]
 
 
 def test_step_key_selects_next_step_size() -> None:
@@ -491,6 +498,14 @@ def test_held_key_after_presses_that_cancelled_out_moves_when_allowed() -> None:
     jogger.handle(press(KP4) + [(KP6, KEY_PRESS)], now=100.0)
     jogger.tick(100.5)
     assert backend.calls == [("queue", "X", 0.6, 120)]
+
+
+def test_held_key_after_cancelled_presses_sees_a_lock_that_came_since() -> None:
+    jogger = Jogger(Config(), backend := FakeBackend())
+    jogger.handle(press(KP4) + [(KP6, KEY_PRESS)], now=100.0)
+    backend.status = {"print_stats": {"state": "printing"}}
+    jogger.tick(100.5)
+    assert backend.calls == []
 
 
 def test_held_key_starts_without_asking_klipper_again() -> None:

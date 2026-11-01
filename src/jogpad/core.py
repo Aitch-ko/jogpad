@@ -125,6 +125,8 @@ class Jogger:
         self._home_deadline = 0.0
         self._last_refusal: str | None = None
         self._hold: _Hold | None = None
+        # Read once for the presses in one call of handle().
+        self._status: dict[str, dict[str, Any]] | None = None
 
     @property
     def step(self) -> float:
@@ -153,11 +155,7 @@ class Jogger:
         except BackendError as exc:
             log.warning("switch not readable: %s", exc)
             return Switch.UNREADABLE
-        # Klipper answers for a macro that does not exist with value null.
-        value = status.get(SWITCH, {}).get("value")
-        if value is None:
-            return Switch.MISSING
-        return Switch.ON if value else Switch.OFF
+        return _switch_in(status)
 
     def switch_state(self) -> bool | None:
         """Whether jogpad is on; None if the switch cannot be read.
@@ -170,14 +168,21 @@ class Jogger:
     def handle(self, events: list[tuple[int, int]], now: float) -> None:
         is_allowed = True
         if any(value == KEY_PRESS for _, value in events):
-            switch = self.switch_state()
-            if switch is False:
-                # Switched off means off: no moves, no console messages.
-                self._last_refusal = t("switch.off", self.language)
-                is_allowed = False
-            elif switch is None:
+            # Switch and locks in one query: Klipper answers it only at its next status
+            # update, up to 0.25 s later.
+            objects = self._lock_objects()
+            objects.setdefault(SWITCH, []).append("value")
+            try:
+                self._status = self.backend.query(objects)
+            except BackendError as exc:
+                log.warning("status not readable: %s", exc)
+            if self._status is None:
                 self._last_refusal = t("status.unreadable", self.language)
                 self._notify("refused", reason=self._last_refusal)
+                is_allowed = False
+            elif _switch_in(self._status) is Switch.OFF:
+                # Switched off means off: no moves, no console messages.
+                self._last_refusal = t("switch.off", self.language)
                 is_allowed = False
         moves: list[list[Any]] = []
         for code, value in events:
@@ -216,6 +221,8 @@ class Jogger:
                 self._home_deadline = now + self.config.jog.home_timeout
                 self._notify("home.select")
         self._flush(moves)
+        # The status belongs to these presses; a hold that starts later reads its own.
+        self._status = None
 
     def tick(self, now: float) -> None:
         if self._home_axes is not None and now >= self._home_deadline:
@@ -334,17 +341,22 @@ class Jogger:
             self._notify("refused", reason=reason)
         return reason is not None
 
-    def _lock_reason(self) -> str | None:
-        locks = self.config.machine.locks
+    def _lock_objects(self) -> dict[str, list[str]]:
         objects: dict[str, list[str]] = {}
-        for lock in locks:
+        for lock in self.config.machine.locks:
             objects.setdefault(lock.object, []).append(lock.field)
-        try:
-            status = self.backend.query(objects) if objects else {}
-        except BackendError as exc:
-            log.warning("status not readable: %s", exc)
-            return t("status.unreadable", self.language)
-        for lock in locks:
+        return objects
+
+    def _lock_reason(self) -> str | None:
+        status = self._status
+        if status is None:
+            objects = self._lock_objects()
+            try:
+                status = self.backend.query(objects) if objects else {}
+            except BackendError as exc:
+                log.warning("status not readable: %s", exc)
+                return t("status.unreadable", self.language)
+        for lock in self.config.machine.locks:
             value = status.get(lock.object, {}).get(lock.field)
             # Klipper answers for an object or field that does not exist with null.
             # A typo in a laser lock must not quietly switch it off.
@@ -367,6 +379,14 @@ class Jogger:
         log.info(message)
         with contextlib.suppress(BackendError):
             self.backend.notify(message)
+
+
+def _switch_in(status: dict[str, dict[str, Any]]) -> Switch:
+    # Klipper answers for a macro that does not exist with value null.
+    value = status.get(SWITCH, {}).get("value")
+    if value is None:
+        return Switch.MISSING
+    return Switch.ON if value else Switch.OFF
 
 
 def _is_locked(lock: Lock, value: Any) -> bool:
