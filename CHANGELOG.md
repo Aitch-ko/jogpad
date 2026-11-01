@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.15.0](https://github.com/Aitch-ko/jogpad/compare/v0.14.2...v0.15.0) (2026-11-01)
+
+
+### Features
+
+* Mainsail and Fluidd show jogpad's updates and install them with one click ([#9](https://github.com/Aitch-ko/jogpad/issues/9)) ([6dbc6ad](https://github.com/Aitch-ko/jogpad/commit/6dbc6ad566bf2a744fb77f358a75e8f4016325eb))
+
+
+### Documentation
+
+* the README tells where jogpad comes from ([#11](https://github.com/Aitch-ko/jogpad/issues/11)) ([e715cf9](https://github.com/Aitch-ko/jogpad/commit/e715cf98c6b49f0b9398058939dce40585a3798a))
+
 ## [0.14.2](https://github.com/Aitch-ko/jogpad/compare/v0.14.1...v0.14.2) (2026-11-01)
 
 
