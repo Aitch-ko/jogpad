@@ -140,6 +140,33 @@ example `jogpad X +0.3 mm`, so others at the machine can see who moved it. Merge
 presses give one line, and so does a held key when you let go. Set
 `announce_moves = false` under `[jog]` to turn this off.
 
+## Without looking
+
+jogpad is built so that your eyes can stay on the nozzle, and it tells you
+what it does through the pad and the printer:
+
+- **Feel**: the keys sit where your finger left them, and every knob detent is
+  one step. On the CH57x pad the middle key is the step key, the keys around
+  it form a cross for X and Y, and STOP is the top right corner.
+- **See**: a CH57x pad lights up green, yellow or red for the step size.
+- **Hear**: the printer's beeper counts the step size, once for the smallest
+  step, and plays a sound of its own when a key is refused. Both are off until
+  you set them, see [the step beep](#web-page) and
+  [hear a refusal](#hear-a-refusal).
+
+A setup with both sounds, for a printer with an `M300` macro:
+
+```toml
+[input]
+step_beep = "M300 S1000 P100"
+refusal_beep = "M300 S440 P600"
+```
+
+The HOME selection and the reason for a refusal still show only in the console
+and on the web page. No one with low vision has tested jogpad yet. If you have,
+please [open an issue](https://github.com/Aitch-ko/jogpad/issues) and tell us
+what is missing.
+
 ## Web page
 
 `jogpad serve` also serves a page on port 7150 of the machine, for example
