@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.1](https://github.com/Aitch-ko/jogpad/compare/v0.14.0...v0.14.1) (2026-11-01)
+
+
+### Documentation
+
+* the README links the documentation site ([#4](https://github.com/Aitch-ko/jogpad/issues/4)) ([a9d4598](https://github.com/Aitch-ko/jogpad/commit/a9d45981d55ee2d7beefa7a93c5646eb92abc4d0))
+
 ## [0.14.0](https://github.com/Aitch-ko/jogpad/compare/v0.13.0...v0.14.0) (2026-11-01)
 
 
