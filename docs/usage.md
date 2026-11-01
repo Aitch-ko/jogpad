@@ -5,7 +5,8 @@ the Raspberry Pi, and reads the pad from `/dev/input`.
 
 ## Requirements
 
-- Linux with Python 3.10 or newer
+- Linux with Python 3.10 or newer; where the system's is older, the
+  [installer](installation.md#older-systems-with-python-37-or-39) downloads one
 - Klipper with Moonraker, and `[respond]` in `printer.cfg` so jogpad's messages
   appear in the Mainsail or Fluidd console
 - A USB numeric keypad, or a macro pad programmed to send distinct keys

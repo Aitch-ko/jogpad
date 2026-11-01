@@ -6,8 +6,9 @@
     program there, without the service, the access to the pad and `jogpad.toml`.
 
 jogpad needs Python 3.10 or newer. Raspberry Pi OS 12 (Bookworm) ships 3.11.
-Raspberry Pi OS 11 (Bullseye) ships 3.9; there jogpad gets its own Python, see
-[older systems](#older-systems-with-python-39).
+Raspberry Pi OS 11 (Bullseye) ships 3.9, and many printers with Klipper from the
+factory ship 3.7 or 3.9; there the installer downloads a newer one for jogpad,
+see [older systems](#older-systems-with-python-37-or-39).
 
 ## On the Klipper computer
 
@@ -20,7 +21,9 @@ git clone https://github.com/Aitch-ko/jogpad.git
 ```
 
 The installer asks for your sudo password first, then downloads jogpad and its
-dependencies from PyPI, which takes a few minutes on a Raspberry Pi. It
+dependencies from PyPI, which takes a few minutes on a Raspberry Pi. Where the
+system's Python is older than 3.10, it offers to download a newer one before
+that, see [older systems](#older-systems-with-python-37-or-39). It
 
 - installs the release of jogpad that the checkout belongs to into its own
   environment `~/jogpad-env`, next to Klipper's `~/klippy-env`
@@ -57,20 +60,27 @@ cd ~/jogpad && git pull && ./scripts/install.sh
 
 Logs: `journalctl -u jogpad -f`.
 
-## Older systems with Python 3.9
+## Older systems with Python 3.7 or 3.9
 
-jogpad runs in its own environment, so it does not need the system's Python.
-[uv](https://docs.astral.sh/uv/) installs a newer one in your home folder,
-without sudo and without touching the system or Klipper:
+Raspberry Pi OS 11 (Bullseye) ships Python 3.9. Many printers with Klipper from
+the factory run Debian 10 or 11 with Python 3.7 or 3.9, for example many QIDI
+and Sovol printers. jogpad runs in its own environment, so the installer offers
+to download Python 3.12 with [uv](https://docs.astral.sh/uv/) into your home
+folder, about 120 MB. That needs no sudo and leaves the system's Python alone.
+jogpad's environment keeps using it, also for updates from the update panel.
+Klipper keeps running on its own Python; jogpad talks to it only through
+Moonraker.
+
+If the download fails on a printer with a Makerbase board, QIDI printers in
+particular, check the clock with `date`. These boards often start with a wrong
+date, and then every download fails. Set it with `sudo date -s 'YYYY-MM-DD'`
+and run the installer again.
+
+To use a Python of your own instead, name it when you run the installer:
 
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-~/.local/bin/uv python install 3.12
-JOGPAD_PYTHON="$(~/.local/bin/uv python find 3.12)" ./jogpad/scripts/install.sh
+JOGPAD_PYTHON=/usr/bin/python3.11 ./jogpad/scripts/install.sh
 ```
-
-The installer says the same when it finds Python 3.9. Klipper keeps running on
-its own Python; jogpad talks to it only through Moonraker.
 
 ## For development
 
