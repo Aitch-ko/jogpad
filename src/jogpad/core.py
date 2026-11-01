@@ -291,8 +291,10 @@ class Jogger:
                 self._home_axes.remove(axis)
             else:
                 self._home_axes.append(axis)
-            label = " ".join(sorted(self._home_axes)) or t("home.all", self.language)
-            self._notify("home.selected", axes=label)
+            if self._home_axes:
+                self._notify("home.selected", axes=" ".join(sorted(self._home_axes)))
+            else:
+                self._notify("home.select")
             return
         axes, self._home_axes = sorted(self._home_axes), None
         if action is not Action.HOME:

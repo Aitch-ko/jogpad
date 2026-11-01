@@ -200,6 +200,19 @@ def test_home_with_selected_axes() -> None:
     assert run(press(KPENTER, KP4, KP8, KPENTER)).calls == [("home", "X", "Y")]
 
 
+def test_home_says_how_to_go_on() -> None:
+    assert run(press(KPENTER)).notes == ["HOME: pick axes, or press HOME to home all"]
+
+
+def test_picked_home_axis_says_how_to_go_on() -> None:
+    assert run(press(KPENTER, KP8)).notes[-1] == "HOME: Y picked -- press HOME to home"
+
+
+def test_dropping_the_last_home_axis_says_home_homes_all() -> None:
+    notes = run(press(KPENTER, KP8, KP8)).notes
+    assert notes[-1] == "HOME: pick axes, or press HOME to home all"
+
+
 def test_home_axis_pressed_twice_is_deselected() -> None:
     assert run(press(KPENTER, KP6, KP4, KPENTER)).calls == [("home",)]
 
