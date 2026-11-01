@@ -69,9 +69,11 @@ section {
 .state div { display: grid; gap: 0.15rem; }
 .state span { color: var(--muted); font-size: 0.85rem; }
 .state strong { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
-/* Traffic light for the step size, so a large step is seen before it moves. */
+/* Traffic light for the step size, so a large step is seen before it moves.
+   Only as tall as its text: the switch's button makes the row taller. */
 #step[data-size] {
   justify-self: start;
+  align-self: start;
   padding: 0 0.4rem;
   border-radius: var(--radius-small);
   color: var(--step-text);
