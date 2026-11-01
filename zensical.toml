@@ -25,6 +25,8 @@ nav = [
 language = "en"
 logo = "assets/icon.svg"
 favicon = "assets/icon.svg"
+# System fonts: Google Fonts would send every visitor's address to Google.
+font = false
 features = [
   "content.code.copy",
   "content.action.edit",
