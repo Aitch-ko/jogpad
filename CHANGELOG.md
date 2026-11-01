@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.11.0](https://github.com/Aitch-ko/jogpad/compare/v0.10.0...v0.11.0) (2026-10-31)
+
+
+### Features
+
+* a CH57x pad lights up in the colour of the step size ([#58](https://github.com/Aitch-ko/jogpad/issues/58)) ([7e29ed0](https://github.com/Aitch-ko/jogpad/commit/7e29ed0c3b153ec42483f6961fe2ec6dd5fcc6c0))
+* an arrow over each knob shows the axis direction of each turn ([#60](https://github.com/Aitch-ko/jogpad/issues/60)) ([4111f4f](https://github.com/Aitch-ko/jogpad/commit/4111f4f0d844d6c1b84258940a14fe912e8e9087))
+
+
+### Bug Fixes
+
+* a refused move no longer leaves the printer in relative mode ([#57](https://github.com/Aitch-ko/jogpad/issues/57)) ([69f3647](https://github.com/Aitch-ko/jogpad/commit/69f3647f614351b0747c23b31ebb28ec9091acd5))
+
 ## [0.10.0](https://github.com/Aitch-ko/jogpad/compare/v0.9.1...v0.10.0) (2026-10-31)
 
 
