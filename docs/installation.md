@@ -47,9 +47,9 @@ Under **Set up** it can also add the pad as a camera panel in Mainsail and
 Fluidd, see [web page](usage.md#web-page).
 
 New releases show up in the update panel of Mainsail and Fluidd. One click
-installs the release from PyPI and restarts jogpad. When a release asks for the
-installer, for example because the service changed, or if you left out the
-update panel, pull and run the installer again:
+installs the release from PyPI and restarts jogpad. The installer is needed
+again only when a release note says "run the installer again", for example
+because the service changed, or if you left out the update panel:
 
 ```bash
 cd ~/jogpad && git pull && ./scripts/install.sh
