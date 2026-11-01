@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.0](https://github.com/Aitch-ko/jogpad/compare/v0.15.1...v0.16.0) (2026-11-01)
+
+
+### Features
+
+* the installer downloads Python 3.12 where the system's is too old ([#15](https://github.com/Aitch-ko/jogpad/issues/15)) ([b77c6ad](https://github.com/Aitch-ko/jogpad/commit/b77c6ad7a2481be4049d81a2e0deaa191924d8e7))
+
 ## [0.15.1](https://github.com/Aitch-ko/jogpad/compare/v0.15.0...v0.15.1) (2026-11-01)
 
 
