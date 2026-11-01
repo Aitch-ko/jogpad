@@ -183,10 +183,13 @@ class Jogger:
             if self._status is None:
                 self._last_refusal = t("status.unreadable", self.language)
                 self._notify("refused", reason=self._last_refusal)
+                self._beep_refusal()
                 is_allowed = False
             elif _switch_in(self._status) is Switch.OFF:
-                # Switched off means off: no moves, no console messages.
+                # Switched off means off: no moves, no console messages. The refusal
+                # sound stays, or a key would seem dead to someone not looking.
                 self._last_refusal = t("switch.off", self.language)
+                self._beep_refusal()
                 is_allowed = False
         moves: list[list[Any]] = []
         for code, value in events:
@@ -278,6 +281,7 @@ class Jogger:
         sign = -hold.sign if hold.axis in jog.invert else hold.sign
         distance = round(sign * speed * duration, 3)
         if not self._call(self.backend.queue_move, hold.axis, distance, speed * 60):
+            self._beep_refusal()
             hold.is_stopped = True
             return
         hold.moved += distance
@@ -294,6 +298,11 @@ class Jogger:
         if beep:
             script = f"\n{BEEP_PAUSE}\n".join([beep] * (self._step_index + 1))
             self._call(self.backend.gcode, script)
+
+    def _beep_refusal(self) -> None:
+        beep = self.config.input.refusal_beep
+        if beep:
+            self._call(self.backend.gcode, beep)
 
     def _handle_home_key(self, action: Action) -> None:
         assert self._home_axes is not None
@@ -318,7 +327,8 @@ class Jogger:
         if self.config.jog.announce_moves:
             label = " ".join(axes) or t("home.all", self.language)
             self._notify("home.started", axes=label)
-        self._call(self.backend.home, axes)
+        if not self._call(self.backend.home, axes):
+            self._beep_refusal()
 
     @staticmethod
     def _add_move(moves: list[list[Any]], axis: str, distance: float) -> None:
@@ -344,6 +354,7 @@ class Jogger:
         for axis, distance in pending:
             distance = round(-distance if axis in jog.invert else distance, 6)
             if not self._call(self.backend.move, axis, distance, feeds[axis]):
+                self._beep_refusal()
                 break
             if jog.announce_moves:
                 self._notify("moved", axis=axis, distance=f"{distance:+g}")
@@ -353,6 +364,7 @@ class Jogger:
         self._last_refusal = reason
         if reason is not None:
             self._notify("refused", reason=reason)
+            self._beep_refusal()
         return reason is not None
 
     def _lock_objects(self) -> dict[str, list[str]]:

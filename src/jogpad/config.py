@@ -205,6 +205,13 @@ class InputConfig(_Section):
         "once for the smallest step size, twice for the next, and so on, so the step size "
         "is known without a look at the pad. Empty: no beep.",
     )
+    refusal_beep: str = Field(
+        "",
+        description="G-code for the sound of a refusal, e.g. one long beep such as `M300 "
+        "S440 P600`: a lock or the switch holds a key back, the status cannot be read, "
+        "or the firmware refuses a move or homing. A key that does nothing is then heard, "
+        "not only seen. Empty: no sound.",
+    )
 
     @field_validator("layout")
     @classmethod

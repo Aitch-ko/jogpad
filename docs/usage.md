@@ -339,3 +339,18 @@ object or field does not exist: Klipper reports those as null, and a typo in
 the name of a laser lock must not switch it off unnoticed. The refusal names
 the lock, so check the console after adding one. Defining `[[machine.locks]]`
 replaces the default list, so repeat the print lock if you want to keep it.
+
+### Hear a refusal
+
+A refused key moves nothing, and the reason shows only in the console and on
+the web page. To hear it, give `refusal_beep` under `[input]` the G-code for
+a sound that differs from the step beeps, such as one long, low beep:
+
+```toml
+[input]
+refusal_beep = "M300 S440 P600"
+```
+
+jogpad sends it when a lock or the switch in Mainsail or Fluidd holds a key
+back, when the status cannot be read, and when Klipper refuses a move or
+homing, for example "Must home axis first". Empty, the default, stays silent.

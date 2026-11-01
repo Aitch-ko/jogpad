@@ -204,6 +204,26 @@ def test_failed_move_does_not_raise() -> None:
     assert run(press(KP6), backend).calls == []
 
 
+REFUSAL_BEEP = Config.model_validate({"input": {"refusal_beep": "BEEP"}})
+
+
+def test_lock_refusal_is_heard() -> None:
+    backend = FakeBackend({"print_stats": {"state": "printing"}})
+    assert run(press(KP6), backend, REFUSAL_BEEP).calls == [("gcode", "BEEP")]
+
+
+def test_unreadable_status_is_heard() -> None:
+    backend = FakeBackend()
+    backend.fail_query = True
+    assert run(press(KP6), backend, REFUSAL_BEEP).calls == [("gcode", "BEEP")]
+
+
+def test_move_refused_by_the_firmware_is_heard() -> None:
+    backend = FakeBackend()
+    backend.fail_move = True
+    assert run(press(KP6), backend, REFUSAL_BEEP).calls == [("gcode", "BEEP")]
+
+
 def test_home_twice_homes_all_axes() -> None:
     assert run(press(KPENTER, KPENTER)).calls == [("home",)]
 
@@ -307,6 +327,10 @@ def test_switched_off_pad_moves_nothing() -> None:
 
 def test_switched_off_pad_writes_nothing_to_the_console() -> None:
     assert run(press(KPASTERISK, KPENTER), switched(0)).notes == []
+
+
+def test_switched_off_pad_is_heard() -> None:
+    assert run(press(KP6), switched(0), REFUSAL_BEEP).calls == [("gcode", "BEEP")]
 
 
 def test_switched_off_pad_keeps_its_step_size() -> None:
