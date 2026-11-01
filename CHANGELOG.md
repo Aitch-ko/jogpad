@@ -5,199 +5,199 @@
 
 ### Features
 
-* the footer is one quiet line with the version and short links ([#69](https://github.com/Aitch-ko/jogpad/issues/69)) ([6e9bd25](https://github.com/Aitch-ko/jogpad/commit/6e9bd2528cfaf8f4f6a97b46121a898575e8f9d1))
+* the footer is one quiet line with the version and short links ([8f9b448](https://github.com/Aitch-ko/jogpad/commit/8f9b448e09532e8755cacf23811ab4c564c8a751))
 
 
 ### Documentation
 
-* the README animation shows the macro pad as it is today ([#71](https://github.com/Aitch-ko/jogpad/issues/71)) ([0ebb74b](https://github.com/Aitch-ko/jogpad/commit/0ebb74b6cef91cb784860c34f7a486bd47a577f8))
+* the README animation shows the macro pad as it is today ([8cf6714](https://github.com/Aitch-ko/jogpad/commit/8cf671417e04ce407de95d407dc371d170d57ead))
 
 ## [0.13.0](https://github.com/Aitch-ko/jogpad/compare/v0.12.0...v0.13.0) (2026-11-01)
 
 
 ### Features
 
-* keys show arrows and signs in the colour of their axis ([#66](https://github.com/Aitch-ko/jogpad/issues/66)) ([4f38e2b](https://github.com/Aitch-ko/jogpad/commit/4f38e2b18acfc70e9c690729b7c99329ef61b22b))
+* keys show arrows and signs in the colour of their axis ([d1c7b1c](https://github.com/Aitch-ko/jogpad/commit/d1c7b1cd1d74fe75917df2ea7146d1cb13f761ef))
 
 
 ### Bug Fixes
 
-* the HOME messages say that a second HOME starts homing ([#64](https://github.com/Aitch-ko/jogpad/issues/64)) ([060121f](https://github.com/Aitch-ko/jogpad/commit/060121f32b18a6f9b6732dbe12947b68573aae09))
-* the step size badge is only as tall as its text ([#65](https://github.com/Aitch-ko/jogpad/issues/65)) ([8c97b7c](https://github.com/Aitch-ko/jogpad/commit/8c97b7c3d70255a239acf7e08afc2c5efef3cbf1))
+* the HOME messages say that a second HOME starts homing ([8359057](https://github.com/Aitch-ko/jogpad/commit/8359057312fdf6c188d4987700589b6186c34840))
+* the step size badge is only as tall as its text ([ea3b84b](https://github.com/Aitch-ko/jogpad/commit/ea3b84b2cc8793d229576af4ca425905b0217eae))
 
 
 ### Documentation
 
-* README and home page say which pad to take ([#67](https://github.com/Aitch-ko/jogpad/issues/67)) ([be6c2f7](https://github.com/Aitch-ko/jogpad/commit/be6c2f74b33bcfa0f99f70c4cfcbf3e09873554d))
+* README and home page say which pad to take ([2be8915](https://github.com/Aitch-ko/jogpad/commit/2be891565d54374fe0fdb14c9c68ac984638b04a))
 
 ## [0.12.0](https://github.com/Aitch-ko/jogpad/compare/v0.11.0...v0.12.0) (2026-11-01)
 
 
 ### Features
 
-* a held axis key keeps moving until it is released ([#61](https://github.com/Aitch-ko/jogpad/issues/61)) ([8078632](https://github.com/Aitch-ko/jogpad/commit/8078632cd827e93828ef8b219d168af2b278daf0))
+* a held axis key keeps moving until it is released ([064a569](https://github.com/Aitch-ko/jogpad/commit/064a569b0d5079871af24d16a1d1e9bbf7a546f5))
 
 
 ### Performance Improvements
 
-* a key press asks Klipper once for the switch and the locks ([#63](https://github.com/Aitch-ko/jogpad/issues/63)) ([1175d58](https://github.com/Aitch-ko/jogpad/commit/1175d5806541f7b1eef7463b8b004294a23d7f80))
+* a key press asks Klipper once for the switch and the locks ([cd4de94](https://github.com/Aitch-ko/jogpad/commit/cd4de94e9b8cdcda2e0cb6ecce0e2a3ab7a86e97))
 
 ## [0.11.0](https://github.com/Aitch-ko/jogpad/compare/v0.10.0...v0.11.0) (2026-10-31)
 
 
 ### Features
 
-* a CH57x pad lights up in the colour of the step size ([#58](https://github.com/Aitch-ko/jogpad/issues/58)) ([7e29ed0](https://github.com/Aitch-ko/jogpad/commit/7e29ed0c3b153ec42483f6961fe2ec6dd5fcc6c0))
-* an arrow over each knob shows the axis direction of each turn ([#60](https://github.com/Aitch-ko/jogpad/issues/60)) ([4111f4f](https://github.com/Aitch-ko/jogpad/commit/4111f4f0d844d6c1b84258940a14fe912e8e9087))
+* a CH57x pad lights up in the colour of the step size ([567a7a4](https://github.com/Aitch-ko/jogpad/commit/567a7a4e58701fcd1b246f1a8432ab0d06be13ad))
+* an arrow over each knob shows the axis direction of each turn ([f390a91](https://github.com/Aitch-ko/jogpad/commit/f390a91b61aae68d1740872367dba83b953dc935))
 
 
 ### Bug Fixes
 
-* a refused move no longer leaves the printer in relative mode ([#57](https://github.com/Aitch-ko/jogpad/issues/57)) ([69f3647](https://github.com/Aitch-ko/jogpad/commit/69f3647f614351b0747c23b31ebb28ec9091acd5))
+* a refused move no longer leaves the printer in relative mode ([b2bb864](https://github.com/Aitch-ko/jogpad/commit/b2bb8645ffc5c6cfd1346a3192cbbd7a666b0c2e))
 
 ## [0.10.0](https://github.com/Aitch-ko/jogpad/compare/v0.9.1...v0.10.0) (2026-10-31)
 
 
 ### Features
 
-* jogpad program-pad reads the bindings back and checks them ([#54](https://github.com/Aitch-ko/jogpad/issues/54)) ([f7937d0](https://github.com/Aitch-ko/jogpad/commit/f7937d063b0b63a63806dd094db99d81c24fb8b8))
-* the panel fits the pad, draws its outline and links to the full page ([#55](https://github.com/Aitch-ko/jogpad/issues/55)) ([2fcd1c9](https://github.com/Aitch-ko/jogpad/commit/2fcd1c9cb28f487cb064c1c5ffdde072e12f9893))
+* jogpad program-pad reads the bindings back and checks them ([78f7103](https://github.com/Aitch-ko/jogpad/commit/78f710386c0978c9b4ea17834e2751e0d4ad2010))
+* the panel fits the pad, draws its outline and links to the full page ([ac7adb5](https://github.com/Aitch-ko/jogpad/commit/ac7adb526e049816839ba0cd4b4f8c6fe33d2d26))
 
 ## [0.9.1](https://github.com/Aitch-ko/jogpad/compare/v0.9.0...v0.9.1) (2026-10-31)
 
 
 ### Bug Fixes
 
-* the web page loads its new files after an update ([#52](https://github.com/Aitch-ko/jogpad/issues/52)) ([8d58a3d](https://github.com/Aitch-ko/jogpad/commit/8d58a3d987113184c605fd16c9c18a805adfecf8))
+* the web page loads its new files after an update ([79bbfcc](https://github.com/Aitch-ko/jogpad/commit/79bbfccc925b74975e107766c690fcd2237f6814))
 
 ## [0.9.0](https://github.com/Aitch-ko/jogpad/compare/v0.8.0...v0.9.0) (2026-10-31)
 
 
 ### Features
 
-* a programmed CH57x pad works without key setup, a knob per axis ([#48](https://github.com/Aitch-ko/jogpad/issues/48)) ([29649c8](https://github.com/Aitch-ko/jogpad/commit/29649c8d5137b30051572e713bde963daf2d57f0))
-* the web page has a light/dark switch ([#50](https://github.com/Aitch-ko/jogpad/issues/50)) ([58f200a](https://github.com/Aitch-ko/jogpad/commit/58f200aff5c08ac5156aec7f95fdc3aef166e8ac))
-* the web page shows axes, STOP and the step size in colour ([#49](https://github.com/Aitch-ko/jogpad/issues/49)) ([3dd1009](https://github.com/Aitch-ko/jogpad/commit/3dd1009f4fda5528e2d37cfbe03aa900095d1395))
+* a programmed CH57x pad works without key setup, a knob per axis ([9d2fd5e](https://github.com/Aitch-ko/jogpad/commit/9d2fd5e4c0223bbdf72438098e635241f999464a))
+* the web page has a light/dark switch ([9bf6cab](https://github.com/Aitch-ko/jogpad/commit/9bf6cab97554705cfd5cc582d1f41472fb55e513))
+* the web page shows axes, STOP and the step size in colour ([8919ecc](https://github.com/Aitch-ko/jogpad/commit/8919ecc97f7197b5325c1963185599b3502cbdd7))
 
 ## [0.8.0](https://github.com/Aitch-ko/jogpad/compare/v0.7.1...v0.8.0) (2026-10-31)
 
 
 ### Features
 
-* jogpad program-pad writes the layout's key codes into a CH57x pad ([#47](https://github.com/Aitch-ko/jogpad/issues/47)) ([4a8c00e](https://github.com/Aitch-ko/jogpad/commit/4a8c00e01f5ae338a1957c5aac500c4fa640a355))
+* jogpad program-pad writes the layout's key codes into a CH57x pad ([3053478](https://github.com/Aitch-ko/jogpad/commit/3053478eed2392d905a4b0414bd901981e8193d7))
 
 
 ### Bug Fixes
 
-* the CH57x drawing shows the knobs where the real pad has them ([#45](https://github.com/Aitch-ko/jogpad/issues/45)) ([d7a84d0](https://github.com/Aitch-ko/jogpad/commit/d7a84d0107e795ff18a0b526408c8041ccdb9812))
+* the CH57x drawing shows the knobs where the real pad has them ([e11022f](https://github.com/Aitch-ko/jogpad/commit/e11022f85a4b1aff71b031534b1b5baa6f1efcf1))
 
 ## [0.7.1](https://github.com/Aitch-ko/jogpad/compare/v0.7.0...v0.7.1) (2026-10-25)
 
 
 ### Bug Fixes
 
-* a lock on an object the firmware does not know refuses moves ([#41](https://github.com/Aitch-ko/jogpad/issues/41)) ([339efe1](https://github.com/Aitch-ko/jogpad/commit/339efe114bb7970a008955005dfa670b88b73d49))
+* a lock on an object the firmware does not know refuses moves ([6f9b6ed](https://github.com/Aitch-ko/jogpad/commit/6f9b6ede042d58c7adba62f694ada87cf5bb680a))
 
 ## [0.7.0](https://github.com/Aitch-ko/jogpad/compare/v0.6.1...v0.7.0) (2026-10-25)
 
 
 ### Features
 
-* installer builds jogpad's venv from JOGPAD_PYTHON, with a way out of Python 3.9 ([#39](https://github.com/Aitch-ko/jogpad/issues/39)) ([49bd37c](https://github.com/Aitch-ko/jogpad/commit/49bd37c34f72e8623d5196a25842072d22108264))
+* installer builds jogpad's venv from JOGPAD_PYTHON, with a way out of Python 3.9 ([d6bdb26](https://github.com/Aitch-ko/jogpad/commit/d6bdb26b4c7ab821b17b1240657a584d2048b4fe))
 
 
 ### Documentation
 
-* one note on Claude Code instead of a trailer in every commit ([#38](https://github.com/Aitch-ko/jogpad/issues/38)) ([3158e41](https://github.com/Aitch-ko/jogpad/commit/3158e41062e3baf1f27cc648acb55fea4b72bf0e))
+* one note on Claude Code instead of a trailer in every commit ([692e411](https://github.com/Aitch-ko/jogpad/commit/692e411682e4f48eb4a2b7b930f85501b7a688c6))
 
 ## [0.6.1](https://github.com/Aitch-ko/jogpad/compare/v0.6.0...v0.6.1) (2026-10-25)
 
 
 ### Documentation
 
-* installer names the web page, installation guide says what to do there ([#35](https://github.com/Aitch-ko/jogpad/issues/35)) ([25bfa23](https://github.com/Aitch-ko/jogpad/commit/25bfa239657681bf159e3afadad296ec0c4e1033))
+* installer names the web page, installation guide says what to do there ([2fd495d](https://github.com/Aitch-ko/jogpad/commit/2fd495dd4ff48766487ddc8e42c05eb6e9c6d0f7))
 
 ## [0.6.0](https://github.com/Aitch-ko/jogpad/compare/v0.5.0...v0.6.0) (2026-10-25)
 
 
 ### Features
 
-* installer and jogpad setup-switch add the switch to Klipper and Moonraker ([#33](https://github.com/Aitch-ko/jogpad/issues/33)) ([eaf72e4](https://github.com/Aitch-ko/jogpad/commit/eaf72e434b736a264c7c77a903ebb4a0f74842a7))
+* installer and jogpad setup-switch add the switch to Klipper and Moonraker ([b85a432](https://github.com/Aitch-ko/jogpad/commit/b85a4322810ce8e86dc67a1f0c8045bdb4b26fa6))
 
 ## [0.5.0](https://github.com/Aitch-ko/jogpad/compare/v0.4.0...v0.5.0) (2026-10-25)
 
 
 ### Features
 
-* setup section of the web page starts folded away ([#29](https://github.com/Aitch-ko/jogpad/issues/29)) ([f4cce37](https://github.com/Aitch-ko/jogpad/commit/f4cce3744a2f7d5b947e72c489a270e2b39b5364))
-* show the pad as a camera panel in Mainsail and Fluidd ([#30](https://github.com/Aitch-ko/jogpad/issues/30)) ([2c4f3fc](https://github.com/Aitch-ko/jogpad/commit/2c4f3fc129b7c01b73a60795106b0ec6b17ab300))
-* switch jogpad on and off from its page and camera panel ([#32](https://github.com/Aitch-ko/jogpad/issues/32)) ([bdc67cb](https://github.com/Aitch-ko/jogpad/commit/bdc67cba6a953bddb91f10ed6f49f0ad1a0c5bac))
-* switch jogpad on and off in Mainsail and Fluidd ([#28](https://github.com/Aitch-ko/jogpad/issues/28)) ([ee6f8ac](https://github.com/Aitch-ko/jogpad/commit/ee6f8acb2e2427dd6dc574469354fe5904dfa290))
+* setup section of the web page starts folded away ([b839d83](https://github.com/Aitch-ko/jogpad/commit/b839d837088d87c7e4a83b453cad0373d58735fd))
+* show the pad as a camera panel in Mainsail and Fluidd ([6b20dd2](https://github.com/Aitch-ko/jogpad/commit/6b20dd2e0c2afcf0a27a61d380efe98b3e93677e))
+* switch jogpad on and off from its page and camera panel ([0f40cf4](https://github.com/Aitch-ko/jogpad/commit/0f40cf4eda1ff12092a4cccf3df347320510c1a0))
+* switch jogpad on and off in Mainsail and Fluidd ([7057318](https://github.com/Aitch-ko/jogpad/commit/70573185bd4ea97466fa08875f58119755b11296))
 
 
 ### Bug Fixes
 
-* keep web page requests out of the journal ([#27](https://github.com/Aitch-ko/jogpad/issues/27)) ([ac58baf](https://github.com/Aitch-ko/jogpad/commit/ac58bafa53bfb89e953f51e7376c5422d5522d91))
+* keep web page requests out of the journal ([e22e7c9](https://github.com/Aitch-ko/jogpad/commit/e22e7c936850ce3ba713919e3df5591974beedde))
 
 
 ### Documentation
 
-* usage.md switch section, API reference, panel screenshot. ([bdc67cb](https://github.com/Aitch-ko/jogpad/commit/bdc67cba6a953bddb91f10ed6f49f0ad1a0c5bac))
+* usage.md switch section, API reference, panel screenshot. ([0f40cf4](https://github.com/Aitch-ko/jogpad/commit/0f40cf4eda1ff12092a4cccf3df347320510c1a0))
 
 ## [0.4.0](https://github.com/Aitch-ko/jogpad/compare/v0.3.0...v0.4.0) (2026-10-25)
 
 
 ### Features
 
-* web page open in the network, changes only from computers Moonraker trusts ([#25](https://github.com/Aitch-ko/jogpad/issues/25)) ([29fb062](https://github.com/Aitch-ko/jogpad/commit/29fb062703fa313c0e5b1faa8b72d2d9d4407bc2))
+* web page open in the network, changes only from computers Moonraker trusts ([d69ae16](https://github.com/Aitch-ko/jogpad/commit/d69ae16ff92ab32072668768959750ec68aa1eb3))
 
 
 ### Bug Fixes
 
-* start message reaches the journal right away ([#26](https://github.com/Aitch-ko/jogpad/issues/26)) ([6a57431](https://github.com/Aitch-ko/jogpad/commit/6a574318704731aaf7f63bd2d4a2b0ca0feff73f))
+* start message reaches the journal right away ([1ac5127](https://github.com/Aitch-ko/jogpad/commit/1ac512728f2ed8ae47d588399bca2418810adaac))
 
 
 ### Documentation
 
-* getting started, documentation map and repository layout in the README ([#23](https://github.com/Aitch-ko/jogpad/issues/23)) ([47ba03a](https://github.com/Aitch-ko/jogpad/commit/47ba03a5c1e615ceca77c4b13e43a26d15b966c9))
+* getting started, documentation map and repository layout in the README ([4710be6](https://github.com/Aitch-ko/jogpad/commit/4710be6113e8882652210201efe92db11afff788))
 
 ## [0.3.0](https://github.com/Aitch-ko/jogpad/compare/v0.2.0...v0.3.0) (2026-10-24)
 
 
 ### Features
 
-* page header and footer, language menu, design tokens with checked contrast ([#17](https://github.com/Aitch-ko/jogpad/issues/17)) ([4ad5871](https://github.com/Aitch-ko/jogpad/commit/4ad5871c1f26b1496ab59fab2604d071d5313c0a))
-* planned key codes for the CH57x macro pad layout ([#22](https://github.com/Aitch-ko/jogpad/issues/22)) ([f8468b3](https://github.com/Aitch-ko/jogpad/commit/f8468b3caa8d380a9ce8e32e0680399eb068cce1))
+* page header and footer, language menu, design tokens with checked contrast ([d408779](https://github.com/Aitch-ko/jogpad/commit/d408779c43915c18d9f331ecac4e7b64d5693b40))
+* planned key codes for the CH57x macro pad layout ([faedcbb](https://github.com/Aitch-ko/jogpad/commit/faedcbb349bcb1fbba921b4eed6d0218e23cc9ca))
 
 
 ### Documentation
 
-* an animation at the top of the README showing what jogpad does ([#21](https://github.com/Aitch-ko/jogpad/issues/21)) ([5f42cfb](https://github.com/Aitch-ko/jogpad/commit/5f42cfb9af0376602ea5f858fcaa9e6b187eaac0))
-* screenshots of the web page, made by a script ([#20](https://github.com/Aitch-ko/jogpad/issues/20)) ([8a2747f](https://github.com/Aitch-ko/jogpad/commit/8a2747f5be78920750dcee00dfcbd185c9a373c7))
+* an animation at the top of the README showing what jogpad does ([768a3d0](https://github.com/Aitch-ko/jogpad/commit/768a3d0b541539eafefe9a12be66d84921ca87f2))
+* screenshots of the web page, made by a script ([dc5ea85](https://github.com/Aitch-ko/jogpad/commit/dc5ea8544494488100527222b763dee3302ef0d6))
 
 ## [0.2.0](https://github.com/Aitch-ko/jogpad/compare/v0.1.0...v0.2.0) (2026-10-24)
 
 
 ### Features
 
-* add an installer that sets jogpad up as a service ([#11](https://github.com/Aitch-ko/jogpad/issues/11)) ([2cc2609](https://github.com/Aitch-ko/jogpad/commit/2cc260913b1c76331276e6efac323caf69654d98))
-* announce moves and homing in the console ([#9](https://github.com/Aitch-ko/jogpad/issues/9)) ([8872abd](https://github.com/Aitch-ko/jogpad/commit/8872abd501c1c3d5ea70660e99cfece691e45774))
-* learn keys and check axis directions on the web page ([#15](https://github.com/Aitch-ko/jogpad/issues/15)) ([3e74c14](https://github.com/Aitch-ko/jogpad/commit/3e74c1402a18de5715e493cefb44986964d0c760))
-* web page with the pad drawn and live key presses ([#14](https://github.com/Aitch-ko/jogpad/issues/14)) ([0858933](https://github.com/Aitch-ko/jogpad/commit/0858933ef1b6a996c4d30824981e51da542dc7dd))
+* add an installer that sets jogpad up as a service ([a80d329](https://github.com/Aitch-ko/jogpad/commit/a80d329c40145cb919356990190591821fc494b8))
+* announce moves and homing in the console ([234273c](https://github.com/Aitch-ko/jogpad/commit/234273c03951965147cc018d4d37d0d912e53078))
+* learn keys and check axis directions on the web page ([fae055d](https://github.com/Aitch-ko/jogpad/commit/fae055d1a183f6e4c421f0195aeea0c52ef389a2))
+* web page with the pad drawn and live key presses ([3929d21](https://github.com/Aitch-ko/jogpad/commit/3929d21268c543c7613ee54fc81111792f89c8e8))
 
 
 ### Bug Fixes
 
-* show installer progress and ask for sudo up front ([#12](https://github.com/Aitch-ko/jogpad/issues/12)) ([fc4cc85](https://github.com/Aitch-ko/jogpad/commit/fc4cc85c50881ef2e33360f76407e5c6d23e8c11))
+* show installer progress and ask for sudo up front ([758e622](https://github.com/Aitch-ko/jogpad/commit/758e622538b3a0588bced6588a0176b166e5d908))
 
 
 ### Documentation
 
-* tell why jogpad exists, add a logo and use cases ([#16](https://github.com/Aitch-ko/jogpad/issues/16)) ([8de7e50](https://github.com/Aitch-ko/jogpad/commit/8de7e50f7d83d3e9b41a7a5378342817798247ef))
+* tell why jogpad exists, add a logo and use cases ([1573410](https://github.com/Aitch-ko/jogpad/commit/157341020fe5bd1c8a6a4eb33720d544f87a680f))
 
 ## 0.1.0 (2026-10-24)
 
 
 ### Features
 
-* jog Klipper from a keypad or macro pad ([#7](https://github.com/Aitch-ko/jogpad/issues/7)) ([699fcc3](https://github.com/Aitch-ko/jogpad/commit/699fcc316a54b493919987b4d9336f5060af10eb))
+* jog Klipper from a keypad or macro pad ([5bf570b](https://github.com/Aitch-ko/jogpad/commit/5bf570bca55204b2e638f0a69d221967b6b1893e))
