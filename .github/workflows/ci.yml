@@ -66,3 +66,9 @@ jobs:
         run: python scripts/check_i18n.py
       - name: Documentation builds without warnings
         run: zensical build --strict
+      # Otherwise a broken package would only show when a release publishes it.
+      - name: Package builds, and PyPI can show its description
+        run: |
+          pip install build twine "readme-renderer[md]"
+          python -m build
+          twine check --strict dist/*
