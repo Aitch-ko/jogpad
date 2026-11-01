@@ -55,8 +55,8 @@ the nozzle.
 - **Refuses to move during a print**, and you can add your own locks.
 - **Switch it off in Mainsail or Fluidd** when you do not need it; then no key
   does anything.
-- **Installs next to Klipper** as a service with one script, and shows up in
-  the service menu of Mainsail and Fluidd.
+- **Installs next to Klipper** as a service with one script, shows up in the
+  service menu of Mainsail and Fluidd, and updates from their update panel.
 
 <p align="center">
   <picture>
@@ -107,7 +107,8 @@ Early development. Working today, on Linux with Klipper:
 - the pad and its state as a camera panel in Mainsail and Fluidd, sized to
   the pad and with a link to the full page
 - an installer that sets jogpad up as a service next to Klipper
-  ([installation](docs/installation.md), [setup](docs/usage.md))
+  ([installation](docs/installation.md), [setup](docs/usage.md)); updates
+  with one click from the update panel of Mainsail and Fluidd
 - `jogpad program-pad` writes its key codes into a CH57x macro pad with 9 keys
   and 3 knobs (USB ID 1189:8840), without the vendor's software, and reads them
   back to check; then its knobs move X, Y and Z and its keys form a cross for X

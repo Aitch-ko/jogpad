@@ -19,11 +19,11 @@ git clone https://github.com/Aitch-ko/jogpad.git
 ./jogpad/scripts/install.sh
 ```
 
-The installer asks for your sudo password first, then downloads jogpad's
-dependencies, which takes a few minutes on a Raspberry Pi. It
+The installer asks for your sudo password first, then downloads jogpad and its
+dependencies from PyPI, which takes a few minutes on a Raspberry Pi. It
 
-- installs jogpad into its own environment `~/jogpad-env`, next to Klipper's
-  `~/klippy-env`
+- installs the release of jogpad that the checkout belongs to into its own
+  environment `~/jogpad-env`, next to Klipper's `~/klippy-env`
 - writes `~/printer_data/config/jogpad.toml` if it does not exist yet, so you
   can edit it in Mainsail or Fluidd. Existing files are left alone
 - adds you to the group `input`, which may read keyboards and pads, and lets
@@ -34,6 +34,9 @@ dependencies, which takes a few minutes on a Raspberry Pi. It
 - asks whether to add the on/off switch for Mainsail and Fluidd to
   `printer.cfg` and `moonraker.conf`, with a backup of each, see
   [the switch](usage.md#switch-it-on-and-off-in-mainsail-or-fluidd)
+- asks whether to add `[update_manager jogpad]` to `moonraker.conf`, with a
+  backup. After a Moonraker restart, Mainsail and Fluidd show jogpad's updates
+  in their update panel
 
 Then enter your pad in `jogpad.toml`, see [Klipper setup](usage.md).
 
@@ -43,7 +46,10 @@ shows every key press live, learns keys and checks the direction of each axis.
 Under **Set up** it can also add the pad as a camera panel in Mainsail and
 Fluidd, see [web page](usage.md#web-page).
 
-To update, pull and run the installer again:
+New releases show up in the update panel of Mainsail and Fluidd. One click
+installs the release from PyPI and restarts jogpad. When a release asks for the
+installer, for example because the service changed, or if you left out the
+update panel, pull and run the installer again:
 
 ```bash
 cd ~/jogpad && git pull && ./scripts/install.sh
