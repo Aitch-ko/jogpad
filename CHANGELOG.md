@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.1](https://github.com/Aitch-ko/jogpad/compare/v0.15.0...v0.15.1) (2026-11-01)
+
+
+### Documentation
+
+* changes that need the installer say so in their release note ([#12](https://github.com/Aitch-ko/jogpad/issues/12)) ([d6d9c54](https://github.com/Aitch-ko/jogpad/commit/d6d9c5444a78fca3af79add3bf4b7965a05db009))
+
 ## [0.15.0](https://github.com/Aitch-ko/jogpad/compare/v0.14.2...v0.15.0) (2026-11-01)
 
 
