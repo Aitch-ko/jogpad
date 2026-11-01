@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.18.1](https://github.com/Aitch-ko/jogpad/compare/v0.18.0...v0.18.1) (2026-11-01)
+
+
+### Documentation
+
+* what jogpad tells you without a screen, and a call to low-vision testers ([#22](https://github.com/Aitch-ko/jogpad/issues/22)) ([222a0be](https://github.com/Aitch-ko/jogpad/commit/222a0bea8109668fbba892a6be4ba5443990558f))
+
 ## [0.18.0](https://github.com/Aitch-ko/jogpad/compare/v0.17.0...v0.18.0) (2026-11-01)
 
 
