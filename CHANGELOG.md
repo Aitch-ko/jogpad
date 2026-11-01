@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.17.0](https://github.com/Aitch-ko/jogpad/compare/v0.16.0...v0.17.0) (2026-11-01)
+
+
+### Features
+
+* the printer's beeper counts the step size ([#17](https://github.com/Aitch-ko/jogpad/issues/17)) ([07f385b](https://github.com/Aitch-ko/jogpad/commit/07f385b5cc65e98db9edbaf979b66add33132025))
+
 ## [0.16.0](https://github.com/Aitch-ko/jogpad/compare/v0.15.1...v0.16.0) (2026-11-01)
 
 
