@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.19.0](https://github.com/Aitch-ko/jogpad/compare/v0.18.2...v0.19.0) (2026-11-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* the sounds move from [input] to their own section [sounds] ([#27](https://github.com/Aitch-ko/jogpad/issues/27))
+
+### Features
+
+* the sounds move from [input] to their own section [sounds] ([#27](https://github.com/Aitch-ko/jogpad/issues/27)) ([899a6d4](https://github.com/Aitch-ko/jogpad/commit/899a6d47fdc3432baf1b614a57e943f3920052f8))
+
 ## [0.18.2](https://github.com/Aitch-ko/jogpad/compare/v0.18.1...v0.18.2) (2026-11-01)
 
 
