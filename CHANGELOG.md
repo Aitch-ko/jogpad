@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.2](https://github.com/Aitch-ko/jogpad/compare/v0.14.1...v0.14.2) (2026-11-01)
+
+
+### Documentation
+
+* jogpad is on PyPI, and the installer stays the way to set it up ([#7](https://github.com/Aitch-ko/jogpad/issues/7)) ([751725b](https://github.com/Aitch-ko/jogpad/commit/751725b62033e94334e697e2991f2ade164a6470))
+
 ## [0.14.1](https://github.com/Aitch-ko/jogpad/compare/v0.14.0...v0.14.1) (2026-11-01)
 
 
