@@ -51,6 +51,8 @@ HOLD_QUEUE_S = 0.65
 # Not sooner than this after a move, so the queue read shows it.
 HOLD_POLL_S = 0.15
 HOLD_MIN_MOVE_S = 0.05
+# Silence between two beeps, so they can be counted.
+BEEP_PAUSE = "G4 P150"
 
 
 class BackendError(Exception):
@@ -80,6 +82,8 @@ class Backend(Protocol):
     def emergency_stop(self) -> None: ...
 
     def notify(self, message: str) -> None: ...
+
+    def gcode(self, script: str) -> None: ...
 
 
 class Switch(Enum):
@@ -215,6 +219,7 @@ class Jogger:
                 self._flush(moves)
                 self._step_index = (self._step_index + 1) % len(self.config.jog.steps)
                 self._notify("step.changed", step=f"{self.step:g}")
+                self._beep_step()
             elif action is Action.HOME:
                 self._flush(moves)
                 self._home_axes = []
@@ -282,6 +287,13 @@ class Jogger:
         hold, self._hold = self._hold, None
         if hold.moved and self.config.jog.announce_moves:
             self._notify("moved", axis=hold.axis, distance=f"{round(hold.moved, 3):+g}")
+
+    def _beep_step(self) -> None:
+        # Once for the smallest step, twice for the next: the step size without a look.
+        beep = self.config.input.step_beep
+        if beep:
+            script = f"\n{BEEP_PAUSE}\n".join([beep] * (self._step_index + 1))
+            self._call(self.backend.gcode, script)
 
     def _handle_home_key(self, action: Action) -> None:
         assert self._home_axes is not None

@@ -55,6 +55,9 @@ class FakeBackend:
     def notify(self, message: str) -> None:
         self.notes.put(message)
 
+    def gcode(self, script: str) -> None:
+        self.calls.append(("gcode",))
+
 
 def started(
     config: Config | None = None, backend: FakeBackend | None = None

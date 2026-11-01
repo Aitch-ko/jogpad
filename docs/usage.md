@@ -173,6 +173,18 @@ new colour in its flash memory, which takes only so many writes, so jogpad
 writes only when the colour changes. `step_light = false` under `[input]`
 leaves the pad's light alone.
 
+To know the step size without looking, let the printer beep it: once for the
+smallest step, twice for the next, and so on. Give `step_beep` under `[input]`
+the G-code for one beep, for example with an `M300` macro for the beeper in
+`printer.cfg`:
+
+```toml
+[input]
+step_beep = "M300 S1000 P100"
+```
+
+Without a beeper, or with `step_beep` left empty, jogpad does not beep.
+
 Pick the drawing with `layout` under `[input]`: `numpad` (default),
 `ch57x-9k3`, or `none` for the list only.
 
