@@ -287,7 +287,7 @@ object_name: gcode_macro _JOGPAD
 to the end of `moonraker.conf`. Before changing a file it keeps a copy next
 to it, such as `printer.cfg.bak-20261025-143000`. Entries that are already
 there stay as they are, so running it again only refreshes the macro; the
-installer does that on every update. `--config-dir` points it at another
+installer does that every time it runs. `--config-dir` points it at another
 folder.
 
 After restarting Klipper and Moonraker, `jogpad` shows up among the power

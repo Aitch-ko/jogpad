@@ -52,7 +52,7 @@ with the keypad of a Logitech MX Keys S:
 - the pad and its state as a camera panel in Mainsail and Fluidd, sized to
   the pad and with a link to the full page
 - an [installer](installation.md) that sets jogpad up as a service next to
-  Klipper
+  Klipper; updates with one click from the update panel of Mainsail and Fluidd
 - [programming a CH57x macro pad](usage.md#program-a-ch57x-macro-pad) with
   9 keys and 3 knobs, without the vendor's software; it lights up in the
   colour of the step size

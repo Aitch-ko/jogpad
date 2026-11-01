@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Installs jogpad from this checkout as a systemd service next to Klipper.
-# Run it again after `git pull` to update. Asks for sudo for the service only.
+# Installs jogpad as a systemd service next to Klipper: the release on PyPI that
+# this checkout belongs to. Asks for sudo for the service only.
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+VERSION="$(sed -n 's/^version = "\(.*\)"$/\1/p' "$REPO_DIR/pyproject.toml")"
 VENV_DIR="${JOGPAD_VENV:-$HOME/jogpad-env}"
 # The Python jogpad's own venv is built from; Klipper keeps its own.
 PYTHON="${JOGPAD_PYTHON:-python3}"
@@ -46,8 +47,12 @@ say "Python environment in $VENV_DIR"
 # A venv from an earlier attempt keeps the Python it was made with.
 is_new_enough "$VENV_DIR/bin/python" \
     || too_old "the venv $VENV_DIR (remove it, then run again)" "$VENV_DIR/bin/python"
-echo "Installing jogpad and its dependencies; the first run can take a few minutes."
-"$VENV_DIR/bin/pip" install --upgrade --disable-pip-version-check "$REPO_DIR"
+[ -n "$VERSION" ] || fail "no version found in $REPO_DIR/pyproject.toml"
+echo "Installing jogpad $VERSION from PyPI; the first run can take a few minutes."
+# From PyPI rather than from this checkout: Moonraker updates only packages that
+# came from an index or from git, not ones built from a folder.
+"$VENV_DIR/bin/pip" install --upgrade --disable-pip-version-check "jogpad==$VERSION" \
+    || fail "installing jogpad $VERSION from PyPI failed; is this computer online?"
 "$VENV_DIR/bin/jogpad" --version
 
 say "Configuration $CONFIG_FILE"
@@ -117,6 +122,26 @@ if [ -f "$DATA_DIR/config/printer.cfg" ] && [ -f "$DATA_DIR/config/moonraker.con
             *) echo "skipped; run 'jogpad setup-switch' later to add it" ;;
         esac
     fi
+fi
+
+# Mainsail and Fluidd show updates for what moonraker.conf lists. The file
+# belongs to the user, so ask, like for the switch.
+MOONRAKER_CONF="$DATA_DIR/config/moonraker.conf"
+if [ -f "$MOONRAKER_CONF" ] && grep -qE '^\[update_manager\]' "$MOONRAKER_CONF" \
+    && ! grep -qE '^\[update_manager[[:space:]]+jogpad\]' "$MOONRAKER_CONF"; then
+    say "Updates in Mainsail and Fluidd"
+    echo "Mainsail and Fluidd can show jogpad's updates and install them with one"
+    echo "click. That adds [update_manager jogpad] to moonraker.conf, backed up first."
+    read -r -p "Add it? [Y/n] " answer || answer=""
+    case "$answer" in
+        [nN]*) echo "skipped; the installer asks again next time" ;;
+        *)
+            cp "$MOONRAKER_CONF" "$MOONRAKER_CONF.bak-$(date +%Y%m%d-%H%M%S)"
+            printf '\n[update_manager jogpad]\ntype: python\nvirtualenv: %s\nproject_name: jogpad\nmanaged_services: jogpad\n' \
+                "$VENV_DIR" >> "$MOONRAKER_CONF"
+            echo "added; restart Moonraker to see jogpad in the update panel"
+            ;;
+    esac
 fi
 
 # Moonraker only lets Mainsail and Fluidd control services listed here.
