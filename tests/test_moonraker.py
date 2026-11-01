@@ -157,6 +157,12 @@ def test_switch_runs_the_macro(monkeypatch: pytest.MonkeyPatch) -> None:
     assert sent == [{"script": "_JOGPAD VALUE=0"}]
 
 
+def test_gcode_is_sent_as_one_script(monkeypatch: pytest.MonkeyPatch) -> None:
+    scripts = record_scripts(monkeypatch)
+    Moonraker("http://moonraker").gcode("M300\nG4 P150\nM300")
+    assert scripts == ["M300\nG4 P150\nM300"]
+
+
 def record_scripts(monkeypatch: pytest.MonkeyPatch) -> list[str]:
     scripts: list[str] = []
 

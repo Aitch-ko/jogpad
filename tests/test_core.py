@@ -63,6 +63,9 @@ class FakeBackend:
     def notify(self, message: str) -> None:
         self.notes.append(message)
 
+    def gcode(self, script: str) -> None:
+        self.calls.append(("gcode", script))
+
 
 def press(*codes: int) -> list[tuple[int, int]]:
     return [event for code in codes for event in ((code, KEY_PRESS), (code, KEY_RELEASE))]
@@ -135,6 +138,15 @@ def test_step_size_wraps_to_the_smallest() -> None:
 
 def test_step_change_is_announced() -> None:
     assert run(press(KPASTERISK)).notes == ["Step 0.1 mm"]
+
+
+def test_step_size_beeps_its_number() -> None:
+    config = Config.model_validate({"input": {"step_beep": "M300"}})
+    assert run(press(KPASTERISK), config=config).calls == [("gcode", "M300\nG4 P150\nM300")]
+
+
+def test_step_change_without_beep_sends_no_gcode() -> None:
+    assert run(press(KPASTERISK)).calls == []
 
 
 def test_merged_move_is_announced_once() -> None:

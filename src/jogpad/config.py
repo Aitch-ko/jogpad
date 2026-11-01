@@ -198,6 +198,13 @@ class InputConfig(_Section):
         "largest, yellow between. The pad stores every new colour in its flash memory, "
         "which takes only so many writes; `false` leaves its light alone.",
     )
+    step_beep: str = Field(
+        "",
+        description="G-code for one beep, e.g. `M300 S1000 P100` where `printer.cfg` has an "
+        "`M300` macro for the printer's beeper. When the step size changes, jogpad sends it "
+        "once for the smallest step size, twice for the next, and so on, so the step size "
+        "is known without a look at the pad. Empty: no beep.",
+    )
 
     @field_validator("layout")
     @classmethod

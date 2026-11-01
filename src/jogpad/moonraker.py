@@ -89,6 +89,9 @@ class Moonraker:
         text = message.replace('"', "'").replace("\n", " ")
         self._script(f'RESPOND PREFIX=jogpad MSG="{text}"', 5)
 
+    def gcode(self, script: str) -> None:
+        self._script(script, 5)
+
     def trusted_networks(self) -> list[IPNetwork]:
         """Addresses Moonraker lets in without a login, from `trusted_clients`.
 

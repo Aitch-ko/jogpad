@@ -98,6 +98,8 @@ Early development. Working today, on Linux with Klipper:
 - a held axis key keeps moving until released, at a speed set with the step
   key, at most 250 mm/s
 - every move and homing shows up in the Mainsail or Fluidd console
+- the printer's beeper can count the step size: once for the smallest, twice
+  for the next
 - a web page in English and German, light or dark, that draws the pad with
   arrows and signs in the colour of each axis on its keys and over its knobs,
   shows each key press live and the step size from green to red, learns keys
