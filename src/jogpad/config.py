@@ -105,11 +105,38 @@ class MachineConfig(_Section):
     )
 
 
+# The reduced speed of robots moved by hand (ISO 10218-1); the machinery directive
+# itself names no figure.
+MAX_HOLD_SPEED = 250
+
+
 class JogConfig(_Section):
     steps: list[float] = Field(
         [0.01, 0.1, 1.0],
         description="Step sizes in mm. The step key cycles through them; jogpad starts "
         "with the first.",
+    )
+    hold_delay: float = Field(
+        0.5,
+        gt=0,
+        description="Seconds an axis key must be held before its axis keeps moving until "
+        "the key is released. A shorter press moves one step.",
+    )
+    hold_speeds_xy: list[float] = Field(
+        [2, 10, 50],
+        description="Speeds in mm/s for X and Y while a key is held, one per step size; "
+        "the step key switches both. At most 250. Klipper cannot take back a move it has "
+        "queued, so the axis runs on for up to 0.65 s after the key is released: up to "
+        "33 mm at 50 mm/s.",
+    )
+    hold_speeds_z: list[float] = Field(
+        [0.5, 2, 10],
+        description="Speeds in mm/s for Z while a key is held, one per step size. "
+        "Klipper keeps them below its `max_z_velocity`.",
+    )
+    hold_speeds_e: list[float] = Field(
+        [1, 2, 5],
+        description="Speeds in mm/s for the extruder while a key is held, one per step size.",
     )
     feed_xy: float = Field(3000, gt=0, description="Feed rate for X and Y in mm/min.")
     feed_z: float = Field(600, gt=0, description="Feed rate for Z in mm/min.")
@@ -130,6 +157,20 @@ class JogConfig(_Section):
         description="Axes whose keys move the other way, e.g. when the bed moves instead "
         "of the tool. Klipper's coordinates stay as they are.",
     )
+
+    @model_validator(mode="after")
+    def _hold_speeds_fit(self) -> JogConfig:
+        lists = {
+            "hold_speeds_xy": self.hold_speeds_xy,
+            "hold_speeds_z": self.hold_speeds_z,
+            "hold_speeds_e": self.hold_speeds_e,
+        }
+        for name, speeds in lists.items():
+            if len(speeds) != len(self.steps):
+                raise ValueError(f"{name} needs {len(self.steps)} speeds, one per step size")
+            if not all(0 < speed <= MAX_HOLD_SPEED for speed in speeds):
+                raise ValueError(f"{name}: speeds must be above 0 and at most {MAX_HOLD_SPEED}")
+        return self
 
 
 class InputConfig(_Section):

@@ -31,6 +31,8 @@ class FakeBackend:
         self.notes: list[str] = []
         self.fail_query = False
         self.fail_move = False
+        # Seconds of moves the firmware still has queued.
+        self.left = 0.0
 
     def query(self, objects: dict[str, list[str]]) -> dict[str, dict[str, Any]]:
         if self.fail_query:
@@ -41,6 +43,14 @@ class FakeBackend:
         if self.fail_move:
             raise BackendError("Must home axis first")
         self.calls.append(("move", axis, distance, feed))
+
+    def queue_move(self, axis: str, distance: float, feed: float) -> None:
+        if self.fail_move:
+            raise BackendError("Move out of range")
+        self.calls.append(("queue", axis, distance, feed))
+
+    def motion_left(self) -> float:
+        return self.left
 
     def home(self, axes: list[str]) -> None:
         self.calls.append(("home", *axes))
@@ -337,3 +347,180 @@ def test_missing_lock_object_is_named_in_the_refusal() -> None:
 def test_lock_on_an_existing_field_that_is_off_allows_moves() -> None:
     backend = FakeBackend({"gcode_macro LASER_VARS": {"laser_on": False}})
     assert run(press(KP6), backend, laser_lock_config()).calls == [("move", "X", 0.01, 3000)]
+
+
+# A key held down: pressed at 100.0, released only when a test says so. With the
+# defaults it starts moving at 100.5; the first move fills Klipper's empty queue with
+# 0.65 s - 0.35 s = 0.3 s at 2 mm/s, so 0.6 mm.
+def held(
+    code: int, backend: FakeBackend | None = None, config: Config | None = None
+) -> tuple[Jogger, FakeBackend]:
+    backend = backend or FakeBackend()
+    jogger = Jogger(config or Config(), backend)
+    jogger.handle([(code, KEY_PRESS)], now=100.0)
+    return jogger, backend
+
+
+def test_key_held_past_the_delay_keeps_its_axis_moving() -> None:
+    jogger, backend = held(KP6)
+    jogger.tick(100.5)
+    assert backend.calls == [("move", "X", 0.01, 3000), ("queue", "X", 0.6, 120)]
+
+
+def test_key_held_shorter_than_the_delay_moves_one_step() -> None:
+    jogger, backend = held(KP6)
+    jogger.tick(100.4)
+    assert backend.calls == [("move", "X", 0.01, 3000)]
+
+
+def test_key_released_before_the_delay_moves_one_step() -> None:
+    jogger, backend = held(KP6)
+    jogger.handle([(KP6, KEY_RELEASE)], now=100.2)
+    jogger.tick(100.5)
+    assert backend.calls == [("move", "X", 0.01, 3000)]
+
+
+def test_tap_in_a_late_batch_moves_one_step() -> None:
+    # Press and release arrive together when the previous move held up the worker.
+    jogger = Jogger(Config(), backend := FakeBackend())
+    jogger.handle(press(KP6), now=100.0)
+    jogger.tick(101.0)
+    assert backend.calls == [("move", "X", 0.01, 3000)]
+
+
+def test_released_key_stops_its_axis() -> None:
+    jogger, backend = held(KP6)
+    jogger.tick(100.5)
+    jogger.handle([(KP6, KEY_RELEASE)], now=100.6)
+    jogger.tick(101.0)
+    assert backend.calls == [("move", "X", 0.01, 3000), ("queue", "X", 0.6, 120)]
+
+
+def test_held_key_tops_up_what_klipper_has_left() -> None:
+    jogger, backend = held(KP6)
+    jogger.tick(100.5)
+    backend.left = 0.4
+    jogger.tick(100.65)
+    assert backend.calls[-1] == ("queue", "X", 0.5, 120)
+
+
+def test_held_key_queues_nothing_while_klipper_has_enough() -> None:
+    jogger, backend = held(KP6)
+    jogger.tick(100.5)
+    backend.left = 1.0
+    jogger.tick(100.65)
+    assert backend.calls == [("move", "X", 0.01, 3000), ("queue", "X", 0.6, 120)]
+
+
+def test_held_key_reads_the_queue_once_klipper_has_taken_the_last_move() -> None:
+    jogger, _ = held(KP6)
+    jogger.tick(100.5)
+    assert jogger.next_deadline() == pytest.approx(100.65)
+
+
+def test_held_key_moves_at_the_speed_of_the_step_size() -> None:
+    jogger = Jogger(Config(), backend := FakeBackend())
+    jogger.handle(press(KPASTERISK, KPASTERISK) + [(KP6, KEY_PRESS)], now=100.0)
+    jogger.tick(100.5)
+    assert backend.calls[-1] == ("queue", "X", 15.0, 3000)
+
+
+def test_held_z_key_uses_the_z_speeds() -> None:
+    jogger, backend = held(KPPLUS)
+    jogger.tick(100.5)
+    assert backend.calls[-1] == ("queue", "Z", 0.15, 30)
+
+
+def test_held_extruder_key_uses_the_extruder_speeds() -> None:
+    jogger, backend = held(F16, config=knob_config())
+    jogger.tick(100.5)
+    assert backend.calls[-1] == ("queue", "E", 0.3, 60)
+
+
+def test_held_inverted_axis_moves_the_other_way() -> None:
+    config = Config.model_validate({"jog": {"invert": ["X"]}})
+    jogger, backend = held(KP6, config=config)
+    jogger.tick(100.5)
+    assert backend.calls[-1] == ("queue", "X", -0.6, 120)
+
+
+def test_held_key_waits_as_long_as_configured() -> None:
+    config = Config.model_validate({"jog": {"hold_delay": 1.0}})
+    jogger, backend = held(KP6, config=config)
+    jogger.tick(100.5)
+    assert backend.calls == [("move", "X", 0.01, 3000)]
+
+
+def test_held_move_is_announced_once_on_release() -> None:
+    jogger, backend = held(KP6)
+    jogger.tick(100.5)
+    jogger.tick(100.65)
+    jogger.handle([(KP6, KEY_RELEASE)], now=100.7)
+    assert backend.notes == ["X +0.01 mm", "X +1.2 mm"]
+
+
+def test_other_key_stops_a_held_key() -> None:
+    jogger, backend = held(KP6)
+    jogger.tick(100.5)
+    jogger.handle(press(KP8), now=100.55)
+    jogger.tick(101.0)
+    assert backend.calls == [
+        ("move", "X", 0.01, 3000),
+        ("queue", "X", 0.6, 120),
+        ("move", "Y", 0.01, 3000),
+    ]
+
+
+def test_refused_press_does_not_hold() -> None:
+    backend = FakeBackend({"print_stats": {"state": "printing"}})
+    jogger, _ = held(KP6, backend)
+    jogger.tick(100.5)
+    assert backend.calls == []
+
+
+def test_held_key_after_presses_that_cancelled_out_is_checked() -> None:
+    backend = FakeBackend({"print_stats": {"state": "printing"}})
+    jogger = Jogger(Config(), backend)
+    jogger.handle(press(KP4) + [(KP6, KEY_PRESS)], now=100.0)
+    jogger.tick(100.5)
+    assert backend.calls == []
+
+
+def test_held_key_after_presses_that_cancelled_out_moves_when_allowed() -> None:
+    jogger = Jogger(Config(), backend := FakeBackend())
+    jogger.handle(press(KP4) + [(KP6, KEY_PRESS)], now=100.0)
+    jogger.tick(100.5)
+    assert backend.calls == [("queue", "X", 0.6, 120)]
+
+
+def test_held_key_starts_without_asking_klipper_again() -> None:
+    jogger, backend = held(KP6)
+    backend.fail_query = True
+    jogger.tick(100.5)
+    assert backend.calls[-1] == ("queue", "X", 0.6, 120)
+
+
+def test_refused_move_stops_a_held_key() -> None:
+    jogger, backend = held(KP6)
+    jogger.tick(100.5)
+    backend.fail_move = True
+    jogger.tick(100.65)
+    backend.fail_move = False
+    jogger.tick(101.0)
+    assert backend.calls == [("move", "X", 0.01, 3000), ("queue", "X", 0.6, 120)]
+
+
+def test_release_stops_a_held_key_after_the_switch_went_off() -> None:
+    jogger, backend = held(KP6, switched(1))
+    jogger.tick(100.5)
+    backend.status[SWITCH]["value"] = 0
+    jogger.handle([(KP6, KEY_RELEASE), (KP8, KEY_PRESS)], now=100.6)
+    jogger.tick(101.0)
+    assert backend.calls == [("move", "X", 0.01, 3000), ("queue", "X", 0.6, 120)]
+
+
+def test_held_key_in_the_home_selection_only_selects() -> None:
+    jogger = Jogger(Config(), backend := FakeBackend())
+    jogger.handle(press(KPENTER) + [(KP6, KEY_PRESS)], now=100.0)
+    jogger.tick(100.5)
+    assert backend.calls == []

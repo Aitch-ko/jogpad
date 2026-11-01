@@ -42,7 +42,8 @@ the nozzle.
 
 - **Jog X, Y, Z and the extruder** in steps of 0.01, 0.1 or 1 mm, switched with
   one key. Presses that pile up during a move are merged, so the axis stops
-  when you stop.
+  when you stop. Hold a key, and the axis keeps moving until you let go, at a
+  speed that goes with the step size.
 - **Home** all axes or just the ones you pick, and **stop** with one key.
 - **Any USB keyboard works today**, for example a cheap numeric keypad.
   Programmable CH57x macro pads with knobs are next.
@@ -79,6 +80,8 @@ Klipper:
 
 - jog, home and stop from a numeric keypad or any USB keyboard; tested on a
   QIDI Plus 4 with the keypad of a Logitech MX Keys S
+- a held axis key keeps moving until released, at a speed set with the step
+  key, at most 250 mm/s
 - every move and homing shows up in the Mainsail or Fluidd console
 - a web page in English and German, light or dark, that draws the pad with
   its axes in colour and an arrow over each knob for its turning directions,
@@ -93,9 +96,8 @@ Klipper:
 - `jogpad program-pad` writes its key codes into a CH57x macro pad with 9 keys
   and 3 knobs (USB ID 1189:8840), without the vendor's software, and reads them
   back to check; then its knobs move X, Y and Z and its keys form a cross for X
-  and Y, with no key setup, and the pad lights up in the colour of the step size
-
-Next: jogging with the programmed CH57x pad on the QIDI Plus 4.
+  and Y, with no key setup, and the pad lights up in the colour of the step size;
+  tested on the QIDI Plus 4, held keys included
 
 | | Now | Later |
 | --- | --- | --- |

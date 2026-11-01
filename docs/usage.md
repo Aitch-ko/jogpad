@@ -110,16 +110,34 @@ Stop the service before running `jogpad keys`: it holds the pad exclusively.
 | Key | What happens |
 | --- | --- |
 | Axis key or knob detent | moves by one step. Presses during a running move are merged into the next move |
-| Step | next step size (0.01, 0.1, 1 mm by default); jogpad starts with the smallest |
+| Axis key held for half a second | keeps moving until released, at the speed that goes with the step size |
+| Step | next step size (0.01, 0.1, 1 mm by default) and its speed for held keys; jogpad starts with the smallest |
 | Select next | the knob switches to the next axis in `select_axes` |
 | HOME | starts the HOME selection: press axis keys to pick axes, HOME again to home. Twice HOME homes all axes. Any other key, or 5 s without input, cancels |
 | STOP | sends Klipper's emergency stop immediately, even during a move. Not a safety device, see [Safety](safety.md) |
 
-Holding a key does not repeat it: one press is one step.
+A short press moves one step. Hold an axis key for half a second, and its axis
+keeps moving until you let go, at the speed that goes with the step size:
+
+| Step | X, Y | Z | Extruder |
+| --- | --- | --- | --- |
+| 0.01 mm | 2 mm/s | 0.5 mm/s | 1 mm/s |
+| 0.1 mm | 10 mm/s | 2 mm/s | 2 mm/s |
+| 1 mm | 50 mm/s | 10 mm/s | 5 mm/s |
+
+The axis runs on for up to 0.65 s after you let go, since Klipper cannot take
+back a move it has queued: up to 33 mm at 50 mm/s, see
+[Safety](safety.md#holding-a-key). jogpad keeps it that short by queueing a
+short move four times a second, and Klipper slows down briefly between them, so
+the axis pulses a little. Any other key ends the move. Knobs always move in
+steps. Under `[jog]`, `hold_speeds_xy`, `hold_speeds_z` and
+`hold_speeds_e` set the speeds, one per step size and at most 250 mm/s;
+`hold_delay` sets the half second.
 
 Every move and every homing shows up in the Mainsail or Fluidd console, for
 example `jogpad X +0.3 mm`, so others at the machine can see who moved it. Merged
-presses give one line. Set `announce_moves = false` under `[jog]` to turn this off.
+presses give one line, and so does a held key when you let go. Set
+`announce_moves = false` under `[jog]` to turn this off.
 
 ## Web page
 

@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+import itertools
 import queue
 import threading
+import types
 from collections.abc import Callable
 from typing import Any
 
+import pytest
+
 from jogpad import ch57x
+from jogpad import service as service_module
 from jogpad.config import Config
 from jogpad.core import KEY_PRESS, KEY_RELEASE, SWITCH, BackendError, Jogger
 from jogpad.service import Service
@@ -22,6 +27,8 @@ class FakeBackend:
         self.fail_query = False
         self.calls: list[tuple[Any, ...]] = []
         self.called = threading.Event()
+        self.queued = threading.Event()
+        self.notes: queue.Queue[str] = queue.Queue()
 
     def query(self, objects: dict[str, list[str]]) -> dict[str, dict[str, Any]]:
         if self.fail_query:
@@ -32,6 +39,13 @@ class FakeBackend:
         self.calls.append(("move", axis))
         self.called.set()
 
+    def queue_move(self, axis: str, distance: float, feed: float) -> None:
+        self.calls.append(("queue", axis))
+        self.queued.set()
+
+    def motion_left(self) -> float:
+        return 0.0
+
     def home(self, axes: list[str]) -> None:
         self.calls.append(("home",))
 
@@ -39,7 +53,7 @@ class FakeBackend:
         self.calls.append(("stop",))
 
     def notify(self, message: str) -> None:
-        pass
+        self.notes.put(message)
 
 
 def started(
@@ -65,6 +79,56 @@ def test_keys_while_learning_move_nothing() -> None:
     backend.called.wait(2)
     service.stop()
     assert backend.calls == [("move", "Y")]
+
+
+def test_release_while_learning_stops_a_held_key() -> None:
+    service, backend = started(Config.model_validate({"jog": {"hold_delay": 0.05}}))
+    service.on_key(KP6, KEY_PRESS)
+    backend.queued.wait(2)
+    service.learn(30)
+    service.on_key(KP6, KEY_RELEASE)
+    # The first note is the step of the press, the second the end of the hold.
+    notes = [backend.notes.get(timeout=2), backend.notes.get(timeout=2)]
+    service.stop()
+    assert notes[1].startswith("X +")
+
+
+class SlowBackend(FakeBackend):
+    """Holds a move of X until the test lets it finish."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.moving_x = threading.Event()
+        self.finish_x = threading.Event()
+        self.moved_y = threading.Event()
+
+    def move(self, axis: str, distance: float, feed: float) -> None:
+        super().move(axis, distance, feed)
+        if axis == "X":
+            self.moving_x.set()
+            self.finish_x.wait(2)
+        else:
+            self.moved_y.set()
+
+
+def test_key_let_go_during_its_step_moves_only_that_step(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Every look at the clock is a second later, so a hold is due once the step is done.
+    seconds = itertools.count(1000.0)
+    monkeypatch.setattr(
+        service_module, "time", types.SimpleNamespace(monotonic=lambda: next(seconds))
+    )
+    backend = SlowBackend()
+    service, _ = started(backend=backend)
+    service.on_key(KP6, KEY_PRESS)
+    backend.moving_x.wait(2)
+    service.on_key(KP6, KEY_RELEASE)
+    backend.finish_x.set()
+    tap(service, KP8)
+    backend.moved_y.wait(2)
+    service.stop()
+    assert backend.calls == [("move", "X"), ("move", "Y")]
 
 
 def test_stop_works_while_learning() -> None:

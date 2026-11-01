@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import queue
 import threading
@@ -10,7 +11,15 @@ from collections.abc import Callable
 
 from jogpad.ch57x import step_colour
 from jogpad.config import Config
-from jogpad.core import KEY_AUTOREPEAT, KEY_PRESS, Backend, BackendError, Jogger, State
+from jogpad.core import (
+    KEY_AUTOREPEAT,
+    KEY_PRESS,
+    KEY_RELEASE,
+    Backend,
+    BackendError,
+    Jogger,
+    State,
+)
 from jogpad.events import EventHub
 from jogpad.linux_input import read_device
 
@@ -70,7 +79,8 @@ class Service:
         if self.jogger.is_stop(code):
             if value == KEY_PRESS and self.jogger.switch_state() is not False:
                 self._emergency_stop()
-        elif not self.is_learning():
+        elif not self.is_learning() or value == KEY_RELEASE:
+            # A release may end a held key's move, so it goes through while learning.
             self._events.put((code, value))
         if value != KEY_AUTOREPEAT:
             self.events.publish((code, value))
@@ -87,17 +97,24 @@ class Service:
             deadline = self.jogger.next_deadline()
             timeout = 0.5 if deadline is None else max(0.0, deadline - time.monotonic())
             batch = []
-            try:
+            with contextlib.suppress(queue.Empty):
                 batch.append(self._events.get(timeout=timeout))
-                while True:
-                    batch.append(self._events.get_nowait())
-            except queue.Empty:
-                pass
             with self._lock:
-                self.jogger.handle(batch, time.monotonic())
+                self.jogger.handle(batch + self._pending(), time.monotonic())
+                # Keys that came while that batch moved the machine are handled before
+                # tick(): a key let go meanwhile was a tap and must not start a hold.
+                while late := self._pending():
+                    self.jogger.handle(late, time.monotonic())
                 self.jogger.tick(time.monotonic())
                 self._state = self.jogger.state()
             self._light_step()
+
+    def _pending(self) -> list[tuple[int, int]]:
+        events = []
+        with contextlib.suppress(queue.Empty):
+            while True:
+                events.append(self._events.get_nowait())
+        return events
 
     def _light_step(self) -> None:
         colour = step_colour(self._state.step, self.jogger.config.jog.steps)

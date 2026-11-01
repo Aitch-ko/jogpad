@@ -3,6 +3,11 @@
 `handle()` gets every key event that arrived since the last call. Presses that
 pile up while the previous move is running become one move, so the axis stops
 when the user stops turning instead of working off a queue.
+
+An axis key held for `hold_delay` keeps its axis moving until it is released:
+`tick()` reads how much the firmware has queued and tops it up with a short move,
+never to more than it needs to run smoothly, since a queued move cannot be taken
+back.
 """
 
 from __future__ import annotations
@@ -35,6 +40,18 @@ AXIS_ACTIONS: dict[Action, tuple[str, int]] = {
     Action.E_MINUS: ("E", -1),
 }
 
+# Klipper takes a move into its queue 0.1 s after it arrives and starts it no
+# sooner than 0.25 s after that.
+KLIPPER_START_S = 0.35
+# Klipper answers a status query at its next status update, every 0.25 s. At each
+# answer a held key tops the queue up to this: enough to last until the next answer
+# and still start the move queued then on time. The axis runs on for up to this
+# long after the key is released.
+HOLD_QUEUE_S = 0.65
+# Not sooner than this after a move, so the queue read shows it.
+HOLD_POLL_S = 0.15
+HOLD_MIN_MOVE_S = 0.05
+
 
 class BackendError(Exception):
     pass
@@ -46,6 +63,17 @@ class Backend(Protocol):
     def query(self, objects: dict[str, list[str]]) -> dict[str, dict[str, Any]]: ...
 
     def move(self, axis: str, distance: float, feed: float) -> None: ...
+
+    def queue_move(self, axis: str, distance: float, feed: float) -> None:
+        """Like `move`, but returns once the firmware has the move, not when it is done."""
+        ...
+
+    def motion_left(self) -> float:
+        """Seconds until the firmware has worked off the moves it has queued.
+
+        May take a while: Klipper answers at its next status update.
+        """
+        ...
 
     def home(self, axes: list[str]) -> None: ...
 
@@ -69,6 +97,22 @@ class State:
     last_refusal: str | None
 
 
+@dataclass
+class _Hold:
+    """An axis key from its press to its release."""
+
+    code: int
+    axis: str
+    sign: int
+    # When to start moving, then when to top up the firmware's queue next.
+    due: float
+    # The locks were checked for the press's own step.
+    is_checked: bool = False
+    is_moving: bool = False
+    is_stopped: bool = False
+    moved: float = 0.0
+
+
 class Jogger:
     def __init__(self, config: Config, backend: Backend) -> None:
         self.config = config
@@ -80,6 +124,7 @@ class Jogger:
         self._home_axes: list[str] | None = None
         self._home_deadline = 0.0
         self._last_refusal: str | None = None
+        self._hold: _Hold | None = None
 
     @property
     def step(self) -> float:
@@ -123,31 +168,39 @@ class Jogger:
         return None if switch is Switch.UNREADABLE else switch is not Switch.OFF
 
     def handle(self, events: list[tuple[int, int]], now: float) -> None:
+        is_allowed = True
         if any(value == KEY_PRESS for _, value in events):
             switch = self.switch_state()
             if switch is False:
                 # Switched off means off: no moves, no console messages.
                 self._last_refusal = t("switch.off", self.language)
-                return
-            if switch is None:
+                is_allowed = False
+            elif switch is None:
                 self._last_refusal = t("status.unreadable", self.language)
                 self._notify("refused", reason=self._last_refusal)
-                return
+                is_allowed = False
         moves: list[list[Any]] = []
         for code, value in events:
+            # Releases count even when presses are refused: one may end a held key.
+            if value == KEY_RELEASE and self._hold is not None and self._hold.code == code:
+                self._end_hold()
             action = self.actions.get(code)
-            # Held keys repeat in the kernel; one press is one step, nothing more.
-            if action is None or value != KEY_PRESS:
+            # Held keys repeat in the kernel; the press and the release time a hold.
+            if action is None or value != KEY_PRESS or not is_allowed:
                 continue
+            if self._hold is not None:
+                self._end_hold()
             if self._home_axes is not None:
                 self._handle_home_key(action)
                 continue
             if action in AXIS_ACTIONS:
                 axis, sign = AXIS_ACTIONS[action]
                 self._add_move(moves, axis, sign * self.step)
+                self._hold = _Hold(code, axis, sign, due=now + self.config.jog.hold_delay)
             elif action in (Action.SELECTED_PLUS, Action.SELECTED_MINUS):
                 sign = 1 if action is Action.SELECTED_PLUS else -1
                 self._add_move(moves, self._selected, sign * self.step)
+                self._hold = _Hold(code, self._selected, sign, due=now + self.config.jog.hold_delay)
             elif action is Action.SELECT_NEXT:
                 self._flush(moves)
                 axes = self.config.jog.select_axes
@@ -168,11 +221,60 @@ class Jogger:
         if self._home_axes is not None and now >= self._home_deadline:
             self._home_axes = None
             self._notify("home.cancelled")
+        hold = self._hold
+        if hold is not None and not hold.is_stopped and now >= hold.due:
+            self._keep_moving(hold, now)
 
     def next_deadline(self) -> float | None:
-        return self._home_deadline if self._home_axes is not None else None
+        deadlines = []
+        if self._home_axes is not None:
+            deadlines.append(self._home_deadline)
+        if self._hold is not None and not self._hold.is_stopped:
+            deadlines.append(self._hold.due)
+        return min(deadlines, default=None)
 
     # -- internals ----------------------------------------------------------
+
+    def _keep_moving(self, hold: _Hold, now: float) -> None:
+        hold.due = now + HOLD_POLL_S
+        if hold.is_moving:
+            try:
+                left = self.backend.motion_left()
+            except BackendError as exc:
+                log.warning("queue not readable, held key stopped: %s", exc)
+                hold.is_stopped = True
+                return
+        else:
+            # Presses that cancelled out moved nothing, so nothing was checked.
+            if not hold.is_checked and self._refused():
+                hold.is_stopped = True
+                return
+            hold.is_moving = True
+            # The press's own step was waited for, so nothing is queued.
+            left = 0.0
+        duration = HOLD_QUEUE_S - max(left, KLIPPER_START_S)
+        if duration < HOLD_MIN_MOVE_S:
+            return
+        jog = self.config.jog
+        speeds = {
+            "X": jog.hold_speeds_xy,
+            "Y": jog.hold_speeds_xy,
+            "Z": jog.hold_speeds_z,
+            "E": jog.hold_speeds_e,
+        }
+        speed = speeds[hold.axis][self._step_index]
+        sign = -hold.sign if hold.axis in jog.invert else hold.sign
+        distance = round(sign * speed * duration, 3)
+        if not self._call(self.backend.queue_move, hold.axis, distance, speed * 60):
+            hold.is_stopped = True
+            return
+        hold.moved += distance
+
+    def _end_hold(self) -> None:
+        assert self._hold is not None
+        hold, self._hold = self._hold, None
+        if hold.moved and self.config.jog.announce_moves:
+            self._notify("moved", axis=hold.axis, distance=f"{round(hold.moved, 3):+g}")
 
     def _handle_home_key(self, action: Action) -> None:
         assert self._home_axes is not None
@@ -207,8 +309,15 @@ class Jogger:
     def _flush(self, moves: list[list[Any]]) -> None:
         pending = [(axis, distance) for axis, distance in moves if abs(distance) > 1e-9]
         moves.clear()
-        if not pending or self._refused():
+        if not pending:
             return
+        # A held key goes on from its press's step, so it shares that step's check.
+        if self._refused():
+            if self._hold is not None:
+                self._hold.is_stopped = True
+            return
+        if self._hold is not None:
+            self._hold.is_checked = True
         jog = self.config.jog
         feeds = {"X": jog.feed_xy, "Y": jog.feed_xy, "Z": jog.feed_z, "E": jog.feed_e}
         for axis, distance in pending:

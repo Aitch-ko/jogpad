@@ -155,3 +155,52 @@ def test_switch_runs_the_macro(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(urllib.request, "urlopen", urlopen)
     Moonraker("http://moonraker").set_switch(False)
     assert sent == [{"script": "_JOGPAD VALUE=0"}]
+
+
+def record_scripts(monkeypatch: pytest.MonkeyPatch) -> list[str]:
+    scripts: list[str] = []
+
+    def urlopen(request: urllib.request.Request, timeout: float) -> io.BytesIO:
+        scripts.append(json.loads(request.data)["script"])  # type: ignore[arg-type]
+        return io.BytesIO(b"{}")
+
+    monkeypatch.setattr(urllib.request, "urlopen", urlopen)
+    return scripts
+
+
+def test_move_waits_until_the_move_is_done(monkeypatch: pytest.MonkeyPatch) -> None:
+    scripts = record_scripts(monkeypatch)
+    Moonraker("http://moonraker").move("X", 0.1, 3000)
+    assert scripts[0].endswith("\nM400")
+
+
+def test_queued_move_returns_without_waiting(monkeypatch: pytest.MonkeyPatch) -> None:
+    scripts = record_scripts(monkeypatch)
+    Moonraker("http://moonraker").queue_move("X", 0.3, 120)
+    assert scripts == [
+        "SAVE_GCODE_STATE NAME=JOGPAD\nG91\nG1 X0.300 F120\nRESTORE_GCODE_STATE NAME=JOGPAD"
+    ]
+
+
+def toolhead(print_time: float, estimated_print_time: float) -> dict[str, Any]:
+    status = {"print_time": print_time, "estimated_print_time": estimated_print_time}
+    return {"result": {"status": {"toolhead": status}}}
+
+
+def test_motion_left_runs_to_the_end_of_the_queued_moves(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    answer_with(monkeypatch, toolhead(105.0, 104.6))
+    assert Moonraker("http://moonraker").motion_left() == pytest.approx(0.4)
+
+
+def test_idle_printer_has_no_motion_left(monkeypatch: pytest.MonkeyPatch) -> None:
+    # At rest, the end of the last move lies in the past.
+    answer_with(monkeypatch, toolhead(9984.0, 10025.1))
+    assert Moonraker("http://moonraker").motion_left() == 0.0
+
+
+def test_unexpected_toolhead_reply_is_an_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    answer_with(monkeypatch, {"result": {"status": {"toolhead": {"print_time": None}}}})
+    with pytest.raises(BackendError):
+        Moonraker("http://moonraker").motion_left()

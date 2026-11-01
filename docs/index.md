@@ -25,6 +25,8 @@ Early development, not released on PyPI yet. Working today on Linux with
 Klipper, tested on a QIDI Plus 4 with the keypad of a Logitech MX Keys S:
 
 - jog, home and stop from a numeric keypad or any USB keyboard
+- a held axis key keeps moving until released, at a speed set with the step
+  key, at most 250 mm/s
 - every move and homing shows up in the Mainsail or Fluidd console
 - a web page that draws the pad with its axes in colour, shows key presses live
   and the step size from green to red, learns keys and checks axis directions;

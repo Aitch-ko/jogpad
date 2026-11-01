@@ -12,6 +12,7 @@ from collections.abc import Callable
 log = logging.getLogger(__name__)
 
 EV_KEY = 1
+KEY_RELEASE, KEY_PRESS = 0, 1
 # struct input_event: two C longs of timestamp, then type, code, value.
 # Native "l" is 4 bytes on 32-bit userlands (e.g. armhf) and 8 on 64-bit.
 EVENT_FORMAT = "llHHi"
@@ -52,14 +53,23 @@ def read_device(
             log.debug("cannot open %s: %s", path, exc)
             stop.wait(RETRY_S)
             continue
+        pressed: set[int] = set()
         try:
             fcntl.ioctl(fd, EVIOCGRAB, 1)
             log.info("reading %s", path)
             while not stop.is_set():
                 for code, value in parse_events(os.read(fd, EVENT_SIZE * 64)):
+                    if value == KEY_RELEASE:
+                        pressed.discard(code)
+                    elif value == KEY_PRESS:
+                        pressed.add(code)
                     on_key(code, value)
         except OSError as exc:
             log.warning("lost %s: %s", path, exc)
+            # Releases the kernel sends as the device goes cannot be read any more,
+            # and a held key must not keep its axis moving.
+            for code in pressed:
+                on_key(code, KEY_RELEASE)
         finally:
             os.close(fd)
         stop.wait(RETRY_S)

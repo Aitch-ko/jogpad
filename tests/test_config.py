@@ -127,3 +127,24 @@ def test_unknown_layout_is_rejected_in_config(tmp_path: Path) -> None:
     path = write(tmp_path, '[input]\nlayout = "nope"\n')
     with pytest.raises(ValidationError):
         load_config(path)
+
+
+def test_hold_speed_above_250_mm_per_s_is_rejected(tmp_path: Path) -> None:
+    path = write(tmp_path, "[jog]\nhold_speeds_xy = [2, 10, 300]\n")
+    with pytest.raises(ValidationError):
+        load_config(path)
+
+
+def test_hold_speeds_need_one_per_step_size(tmp_path: Path) -> None:
+    path = write(tmp_path, "[jog]\nsteps = [0.1, 1]\n")
+    with pytest.raises(ValidationError, match="2 speeds, one per step size"):
+        load_config(path)
+
+
+def test_hold_speeds_follow_their_own_step_sizes(tmp_path: Path) -> None:
+    path = write(
+        tmp_path,
+        "[jog]\nsteps = [0.1, 1]\nhold_speeds_xy = [5, 50]\n"
+        "hold_speeds_z = [1, 5]\nhold_speeds_e = [1, 3]\n",
+    )
+    assert load_config(path).jog.hold_speeds_xy == [5, 50]

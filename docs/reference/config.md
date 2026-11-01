@@ -17,6 +17,10 @@ jogpad reads a TOML file, by default none (all values below apply). Pass it with
 | Key | Default | Description |
 | --- | --- | --- |
 | `steps` | `[0.01, 0.1, 1.0]` | Step sizes in mm. The step key cycles through them; jogpad starts with the first. |
+| `hold_delay` | `0.5` | Seconds an axis key must be held before its axis keeps moving until the key is released. A shorter press moves one step. |
+| `hold_speeds_xy` | `[2.0, 10.0, 50.0]` | Speeds in mm/s for X and Y while a key is held, one per step size; the step key switches both. At most 250. Klipper cannot take back a move it has queued, so the axis runs on for up to 0.65 s after the key is released: up to 33 mm at 50 mm/s. |
+| `hold_speeds_z` | `[0.5, 2.0, 10.0]` | Speeds in mm/s for Z while a key is held, one per step size. Klipper keeps them below its `max_z_velocity`. |
+| `hold_speeds_e` | `[1.0, 2.0, 5.0]` | Speeds in mm/s for the extruder while a key is held, one per step size. |
 | `feed_xy` | `3000.0` | Feed rate for X and Y in mm/min. |
 | `feed_z` | `600.0` | Feed rate for Z in mm/min. |
 | `feed_e` | `300.0` | Feed rate for the extruder in mm/min. |

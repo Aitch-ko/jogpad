@@ -39,18 +39,36 @@ class Moonraker:
         return status
 
     def move(self, axis: str, distance: float, feed: float) -> None:
-        mode = "M83" if axis == "E" else "G91"
-        # M400 holds the reply until the move has finished; the core relies on
-        # that to merge presses instead of queueing them.
+        self._move(axis, distance, feed, wait=True)
+
+    def queue_move(self, axis: str, distance: float, feed: float) -> None:
+        self._move(axis, distance, feed, wait=False)
+
+    def motion_left(self) -> float:
+        status = self.query({"toolhead": ["print_time", "estimated_print_time"]})
         try:
-            self._script(
-                "SAVE_GCODE_STATE NAME=JOGPAD\n"
-                f"{mode}\n"
-                f"G1 {axis}{distance:.3f} F{feed:.0f}\n"
-                "RESTORE_GCODE_STATE NAME=JOGPAD\n"
-                "M400",
-                MOVE_TIMEOUT_S,
-            )
+            # print_time is where Klipper's queued moves end, on the motors' clock.
+            toolhead = status["toolhead"]
+            left = float(toolhead["print_time"]) - float(toolhead["estimated_print_time"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise BackendError(f"unexpected reply: {status!r}") from exc
+        return max(0.0, left)
+
+    def _move(self, axis: str, distance: float, feed: float, wait: bool) -> None:
+        mode = "M83" if axis == "E" else "G91"
+        script = (
+            "SAVE_GCODE_STATE NAME=JOGPAD\n"
+            f"{mode}\n"
+            f"G1 {axis}{distance:.3f} F{feed:.0f}\n"
+            "RESTORE_GCODE_STATE NAME=JOGPAD"
+        )
+        try:
+            if wait:
+                # M400 holds the reply until the move has finished; the core relies on
+                # that to merge presses instead of queueing them.
+                self._script(script + "\nM400", MOVE_TIMEOUT_S)
+            else:
+                self._script(script, 5)
         except BackendError:
             # Klipper drops the rest of a script at the first error, so a refused
             # move ("Move out of range", a cold hotend) would leave G91 or M83 behind.

@@ -19,7 +19,7 @@ like every other key. If jogpad cannot read the switch, STOP still goes out.
 jogpad sends the next move only after the firmware has finished the previous
 one. Detents that arrive in the meantime are merged into a single move. Without
 this, fast turning queues moves in the firmware and the axis keeps travelling
-after you stop turning.
+after you stop turning. A held key is the exception, see below.
 
 ## Locks
 
@@ -30,11 +30,28 @@ refuses as well, so a misspelt lock does not quietly stop working.
 
 ## Holding a key
 
-Actions that run while a key is held (for example feeding filament) repeat
-their command while held. The firmware side must switch off on its own when the
-repetition stops, otherwise a lost cable or a crashed service leaves it running.
+An axis key held for half a second keeps its axis moving until it is released.
+jogpad sends short moves and keeps only as many queued as Klipper needs to move
+without stuttering. Klipper cannot take back a move it has queued, so the axis
+runs on for 0.4 to 0.65 s after the release:
+
+| Speed | Runs on for up to |
+| --- | --- |
+| 2 mm/s | 1.3 mm |
+| 10 mm/s | 6.5 mm |
+| 50 mm/s | 33 mm |
+| 250 mm/s | 16 cm |
+
+Choose the speeds with that in mind. jogpad refuses speeds above 250 mm/s, the
+reduced speed of robots moved by hand (ISO 10218-1); the machinery directive
+itself names no figure.
+
+A pad unplugged while a key is held counts as released. A jogpad that crashes
+sends nothing more, so the axis stops after the moves already queued. Any
+other key of the pad ends the move as well.
 
 ## Wireless pads
 
-Wireless pads can drop or delay key presses. Prefer a cable. Over radio jogpad
-only ever moves in single steps.
+Wireless pads can drop or delay key presses and releases. Prefer a cable. If a
+release is lost on the way, a held key's axis keeps moving until you press
+another key, at most to the end of the axis.
