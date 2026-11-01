@@ -1,7 +1,9 @@
 # Installation
 
 !!! note
-    jogpad has not been released on PyPI yet. Install it from the repository.
+    jogpad is also on [PyPI](https://pypi.org/project/jogpad/), but on the
+    Klipper computer use the installer below: `pip install jogpad` only puts the
+    program there, without the service, the access to the pad and `jogpad.toml`.
 
 jogpad needs Python 3.10 or newer. Raspberry Pi OS 12 (Bookworm) ships 3.11.
 Raspberry Pi OS 11 (Bullseye) ships 3.9; there jogpad gets its own Python, see
